@@ -82,9 +82,9 @@ Kennzahlen B2 (H1 / H2): Trefferquote 43,5 % / 49,9 %; Ø Gewinn 2.569 / 4.076 U
 Kosten 11.840 / 7.983 USD; Cashzins 71.204 / 115.434 USD; 190 / 217 Tage ohne passenden Verfall; offenes
 Maximalrisiko höchstens 3,52 % / 3,53 % des aktuellen Kontowerts.
 
-**Ganze Kontrakte:** Ein SPX-Spread riskiert 1.700–5.800 USD (2007–2025). Für 0,85 % braucht man 200.000–690.000 USD
-Kontowert. C1/C2: in H1 wegen zu kleinen Kontos an 654 bzw. 351 Tagen ausgelassen, in H2 an allen Tagen mit erfülltem
-Filter; tatsächliches Risiko je Einstieg 0,43–0,85 % (Median 0,73–0,74 %). XSP (Basis SPX/10, 1-Punkt-Raster):
+**Ganze Kontrakte:** Ein SPX-Spread riskierte über alle B2-Trades 495–2.799 USD in H1 (Median 1.630) und
+1.012–7.596 USD in H2 (Median 3.579). Für 0,85 % braucht ein Median-Spread in H2 rund 421.000 USD Kontowert. C1/C2: in H1 wegen zu kleinen Kontos an 654 bzw. 351 Tagen ausgelassen, in H2 an allen Tagen mit erfülltem
+Filter; tatsächliches Risiko je Einstieg in H1 0,43–0,85 % (C1) bzw. 0,44–0,85 % (C2), Median 0,74 % bzw. 0,73 %. XSP (Basis SPX/10, 1-Punkt-Raster):
 Risiko je Einstieg 0,57–0,85 %, kein Trade ausgelassen. XSP-Verfügbarkeit vor 2022, XSP-Strikeraster und XSP-Kosten
 sind nicht geprüft; XSP-Ergebnisse sind daher nur rechnerisch.
 
