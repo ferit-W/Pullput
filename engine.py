@@ -78,6 +78,7 @@ DEFAULT = dict(tage=21, delta=0.8, breite=100.0, breite_ref=2750.0, max_pos=3, e
                max_risiko=None,    # Obergrenze Summe max. Verlust offener Positionen (Anteil Konto)
                vx_max=None,        # kein Einstieg wenn VX1 > vx_max
                dd_bremse=None,     # (schwelle, faktor): Einsatz * faktor, wenn Konto-DD > schwelle
+               ema_steigung=0,     # >0: Einstieg nur wenn EMA heute > EMA vor n Handelstagen
                )
 
 
@@ -133,6 +134,8 @@ def backtest(d, start, ende, **kw):
         filt = C[i - 1] >= ema[i - 1]
         if emak is not None:
             filt = filt and C[i - 1] >= emak[i - 1]
+        if p['ema_steigung'] and ema[i - 1] <= ema[i - 1 - p['ema_steigung']]:
+            filt = False
         if p['vx_max'] is not None and VX[i] > p['vx_max']:
             filt = False
         if filt and len(pos) < p['max_pos'] and i - letzter_einstieg >= p['min_abstand']:

@@ -47,3 +47,13 @@ tage 21, delta 0,8, breite 100 (Ref. 2.750), max_pos 4, ema 200, einsatz 0,85 %,
 ## Schritt 8 – Einmalige H2-Auswertung (`endauswertung.py`, `ergebnisse/endauswertung_neu.json`)
 - Neu: H1 15,17 % / 14,68 %, H2 21,30 % / 21,01 % -> H2-Grenze verfehlt. Basis zum Vergleich: H2 20,23 % / 24,21 %.
 - Kein Nachjustieren. Ergebnis siehe ERGEBNIS.md.
+
+## Schritt 9 – Runde 4 (Nachfrage „weiter optimieren“), Regel festgeschrieben vor dem Lauf
+- Offenlegung: H2-Ergebnis der Runde-3-Variante (21,0 % DD) ist bekannt. Jede neue H2-Auswertung ist ein zweiter Blick
+  auf H2 und damit weniger beweiskräftig als der erste.
+- Neue modellneutrale Hebel auf Basis der Runde-3-Struktur (21 T / 0,8 / 100): Drawdown-Bremse (Schwelle 5/8/10 %,
+  Faktor 0,5/0,75), VX1-Deckel für Einstiege (25/30/35), EMA-Steigungsfilter (EMA > EMA vor 20 Tagen),
+  max_pos 3/4/5, EMA 150/200.
+- Regel unverändert: Einsatz so groß wie möglich bei H1-DD <= 15 %, H1-Rendite >= 12,5 %, Teil-DD < 17 %, höchste
+  H1-Rendite. Zusätzlich: Ersetzt die Runde-3-Variante nur bei >= 0,3 Pkt mehr H1-Rendite, und die Median-Rendite
+  der direkten Hebel-Nachbarn muss >= 90 % der eigenen sein.
