@@ -34,3 +34,12 @@
   skew +3: 6,6/14,6 vs. 9,0/18,2. Der Vorsprung kommt aus dem marktunüblichen negativen Skew (Long-Put billig).
 - Konsequenz: Delta, Breite, Laufzeit bleiben auf dem Kalibrierungspunkt (0,8 / 100 / 21). Gesucht wird nur über
   modellneutrale Portfolio-/Timing-Hebel. Regelpunkte 2–5 aus Schritt 3 gelten weiter.
+
+## Schritt 6 – Runde 3 modellneutral (`runde3_h1.py`, `ergebnisse/runde3_*.json`), 1.500 Varianten, 53 getunt, 19 zulässig
+- Gewinner nach Regel: max_pos 4, EMA 200, min_abstand 1, kein kurzer EMA, kein Risikodeckel; Einsatz 0,85 %.
+  H1: 15,17 % / 14,68 % DD; Teile 2007–11: 11,0 % / 14,2 %, 2012–16: 19,8 % / 13,9 %.
+- Skew-Probe H1 (Diagnose, keine Auswahl): skew 0: Basis 9,7/14,6 vs. neu 9,7/13,7; skew +3: 6,6/14,6 vs. 6,4/13,4.
+  -> Drawdown-Vorteil ist modellunabhängig, der Renditevorsprung hängt am kalibrierten Modell.
+
+## Schritt 7 – AUSWAHL FESTGESCHRIEBEN (vor H2-Auswertung)
+tage 21, delta 0,8, breite 100 (Ref. 2.750), max_pos 4, ema 200, einsatz 0,85 %, Kosten 0,25 Pkt + 3,60 USD, Zins 4 %.
