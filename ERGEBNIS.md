@@ -27,4 +27,6 @@ Drawdown neu H2: Hoch 18.11.2021, Tief 24.05.2023.
    Der Renditevorsprung hängt also am Modell, der Drawdown-Vorteil nicht.
 4. Weiteres Iterieren gegen Hälfte 2 würde die Vorgabe verletzen; es wurde nicht nachjustiert.
 
+Runde 4 (Drawdown-Bremse, VX1-Deckel, EMA-Steigung) brachte auf H1 keine Verbesserung >= 0,3 Pkt; Variante bleibt.
+
 Verlauf: STAND.md. Daten: ergebnisse/*.json.

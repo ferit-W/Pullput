@@ -1,0 +1,15 @@
+True True {'dd_bremse': None, 'vx_max': 30, 'ema_steigung': 0, 'max_pos': 4, 'ema': 200} 0.0085 0.1518 0.1468 [0.142, 0.139] 0.1416
+True True {'dd_bremse': None, 'vx_max': 35, 'ema_steigung': 0, 'max_pos': 4, 'ema': 200} 0.0085 0.1517 0.1468 [0.142, 0.139] 0.1457
+True True {'dd_bremse': (0.1, 0.75), 'vx_max': 30, 'ema_steigung': 0, 'max_pos': 4, 'ema': 150} 0.009 0.1502 0.146 [0.146, 0.146] 0.1392
+True True {'dd_bremse': (0.1, 0.5), 'vx_max': 35, 'ema_steigung': 20, 'max_pos': 5, 'ema': 150} 0.0065 0.1478 0.1486 [0.103, 0.149] 0.1333
+True True {'dd_bremse': (0.08, 0.5), 'vx_max': 35, 'ema_steigung': 20, 'max_pos': 5, 'ema': 150} 0.007 0.147 0.1428 [0.098, 0.143] 0.1333
+True True {'dd_bremse': (0.08, 0.5), 'vx_max': 30, 'ema_steigung': 20, 'max_pos': 3, 'ema': 150} 0.012 0.146 0.1474 [0.111, 0.147] 0.1323
+True True {'dd_bremse': (0.08, 0.75), 'vx_max': None, 'ema_steigung': 0, 'max_pos': 4, 'ema': 200} 0.0095 0.145 0.1451 [0.143, 0.142] 0.1351
+True True {'dd_bremse': (0.08, 0.75), 'vx_max': 35, 'ema_steigung': 0, 'max_pos': 4, 'ema': 200} 0.0095 0.145 0.1451 [0.143, 0.142] 0.1352
+True True {'dd_bremse': (0.08, 0.75), 'vx_max': 30, 'ema_steigung': 0, 'max_pos': 4, 'ema': 200} 0.0095 0.1449 0.1451 [0.143, 0.142] 0.1398
+True True {'dd_bremse': (0.1, 0.75), 'vx_max': 30, 'ema_steigung': 0, 'max_pos': 4, 'ema': 200} 0.009 0.1445 0.1486 [0.138, 0.141] 0.1397
+True True {'dd_bremse': (0.08, 0.75), 'vx_max': 30, 'ema_steigung': 0, 'max_pos': 5, 'ema': 150} 0.0075 0.1439 0.1476 [0.137, 0.148] 0.1375
+True True {'dd_bremse': (0.08, 0.75), 'vx_max': None, 'ema_steigung': 0, 'max_pos': 5, 'ema': 200} 0.0075 0.1436 0.147 [0.138, 0.152] 0.1343
+True True {'dd_bremse': (0.08, 0.75), 'vx_max': 35, 'ema_steigung': 0, 'max_pos': 5, 'ema': 200} 0.0075 0.1436 0.147 [0.138, 0.152] 0.1375
+True True {'dd_bremse': (0.1, 0.75), 'vx_max': 30, 'ema_steigung': 0, 'max_pos': 3, 'ema': 200} 0.012 0.1436 0.1462 [0.146, 0.141] 0.1315
+True True {'dd_bremse': (0.1, 0.75), 'vx_max': None, 'ema_steigung': 0, 'max_pos': 4, 'ema': 200} 0.009 0.1429 0.1486 [0.137, 0.141] 0.1365

@@ -57,3 +57,8 @@ tage 21, delta 0,8, breite 100 (Ref. 2.750), max_pos 4, ema 200, einsatz 0,85 %,
 - Regel unverändert: Einsatz so groß wie möglich bei H1-DD <= 15 %, H1-Rendite >= 12,5 %, Teil-DD < 17 %, höchste
   H1-Rendite. Zusätzlich: Ersetzt die Runde-3-Variante nur bei >= 0,3 Pkt mehr H1-Rendite, und die Median-Rendite
   der direkten Hebel-Nachbarn muss >= 90 % der eigenen sein.
+
+## Schritt 10 – Runde 4 Ergebnis (`runde4_h1.py`, `ergebnisse/runde4_h1.json`, 336 Strukturen, 107 zulässig mit Plateau)
+- Beste: VX1-Deckel 30 auf Runde-3-Struktur, 15,18 % / 14,68 % – nur +0,01 Pkt (Schwelle 0,3 Pkt) -> kein Ersatz.
+- Drawdown-Bremse und EMA-Steigungsfilter senken bei auf 15 % DD normiertem Einsatz die H1-Rendite (14,3–15,0 %).
+- Runde-3-Variante bleibt. Da keine neue Variante gewählt wurde, findet keine zweite H2-Auswertung statt.
