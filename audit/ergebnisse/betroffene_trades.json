@@ -1,0 +1,28 @@
+{
+ "H1": {
+  "trades": 550,
+  "nicht_verfuegbar_VW": 422,
+  "anteil_VW": 0.7672727272727272,
+  "nicht_verfuegbar_VM": 523,
+  "anteil_VM": 0.9509090909090909,
+  "als_PM_gerechnet_aber_AM": 27,
+  "nicht_verfuegbar_nach_wochentag_VW": {
+   "Wednesday": 78,
+   "Thursday": 114,
+   "Monday": 48,
+   "Tuesday": 182
+  }
+ },
+ "H2": {
+  "trades": 603,
+  "nicht_verfuegbar_VW": 174,
+  "anteil_VW": 0.2885572139303483,
+  "nicht_verfuegbar_VM": 574,
+  "anteil_VM": 0.9519071310116086,
+  "als_PM_gerechnet_aber_AM": 29,
+  "nicht_verfuegbar_nach_wochentag_VW": {
+   "Tuesday": 114,
+   "Thursday": 60
+  }
+ }
+}

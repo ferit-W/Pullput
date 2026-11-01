@@ -1,0 +1,1085 @@
+{
+ "kalibriert (+5,5 im Doku-Sinn)": [
+  {
+   "vx": 10,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 10,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  }
+ ],
+ "flach (0)": [
+  {
+   "vx": 10,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  }
+ ],
+ "marktüblich (−3 im Doku-Sinn)": [
+  {
+   "vx": 10,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 10,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 15,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 20,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 30,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 40,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 60,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 1,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 7,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 14,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 21,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  },
+  {
+   "vx": 71,
+   "tage": 28,
+   "monotonie_verletzt": 0,
+   "steigung_ueber_df": 0,
+   "konvex_verletzt": 0,
+   "schranke_verletzt": 0,
+   "punkte": 101,
+   "erste_konv_verletzung": null
+  }
+ ],
+ "spread_vega": [
+  {
+   "vx": 10,
+   "spreadwert": 29.31182372110976,
+   "aenderung_bei_plus_1_vx": -0.4689546402419751
+  },
+  {
+   "vx": 15,
+   "spreadwert": 27.515606552894212,
+   "aenderung_bei_plus_1_vx": -0.22100896308842266
+  },
+  {
+   "vx": 20,
+   "spreadwert": 26.718885968970767,
+   "aenderung_bei_plus_1_vx": -0.08346698757884496
+  },
+  {
+   "vx": 30,
+   "spreadwert": 26.540204148249984,
+   "aenderung_bei_plus_1_vx": 0.03947111551593707
+  },
+  {
+   "vx": 40,
+   "spreadwert": 27.187562592898303,
+   "aenderung_bei_plus_1_vx": 0.08852026320772666
+  }
+ ]
+}

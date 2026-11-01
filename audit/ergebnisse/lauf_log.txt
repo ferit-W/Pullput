@@ -1,0 +1,119 @@
+                                                              variante zeitraum  rendite_pa  max_drawdown_stress  max_drawdown_schluss  trades_pa  trefferquote  tage_konto_zu_klein  tage_kein_verfall  max_offenes_risiko_anteil
+                             A0 Ausgangsstand (engine.py, unverändert)       H1      0.1517               0.1468                0.1468    55.0528        0.4725                  NaN                NaN                        NaN
+                             A0 Ausgangsstand (engine.py, unverändert)       H2      0.2130               0.2101                0.2089    61.4011        0.5174                  NaN                NaN                        NaN
+                           A1 Original-Logik, Datenende-Fehler behoben       H1      0.1517               0.1468                0.1468    55.0528        0.4725                  0.0                0.0                     0.0352
+                           A1 Original-Logik, Datenende-Fehler behoben       H2      0.2139               0.2101                0.2089    61.4011        0.5209                  0.0                0.0                     0.0358
+                           A1 Original-Logik, Datenende-Fehler behoben   Gesamt      0.1842               0.2101                0.2089    57.9658        0.4969                  0.0                0.0                     0.0358
+                             A2 + Laufzeit = tatsächliche Restlaufzeit       H1      0.1521               0.1468                0.1468    55.0528        0.4725                  0.0                0.0                     0.0352
+                             A2 + Laufzeit = tatsächliche Restlaufzeit       H2      0.2157               0.2101                0.2089    61.4011        0.5242                  0.0                0.0                     0.0358
+                             A2 + Laufzeit = tatsächliche Restlaufzeit   Gesamt      0.1854               0.2101                0.2089    57.9658        0.4987                  0.0                0.0                     0.0358
+                        A3 + Stress: 3 Kombinationen inkl. Verfallstag       H1      0.1521               0.1468                0.1468    55.0528        0.4725                  0.0                0.0                     0.0352
+                        A3 + Stress: 3 Kombinationen inkl. Verfallstag       H2      0.2157               0.2104                0.2089    61.4011        0.5242                  0.0                0.0                     0.0358
+                        A3 + Stress: 3 Kombinationen inkl. Verfallstag   Gesamt      0.1854               0.2104                0.2089    57.9658        0.4987                  0.0                0.0                     0.0358
+                                       A4 + Cashzins nur auf Kontowert       H1      0.1488               0.1488                0.1488    55.0528        0.4725                  0.0                0.0                     0.0352
+                                       A4 + Cashzins nur auf Kontowert       H2      0.2119               0.2138                0.2123    61.4011        0.5242                  0.0                0.0                     0.0359
+                                       A4 + Cashzins nur auf Kontowert   Gesamt      0.1819               0.2138                0.2123    57.9658        0.4987                  0.0                0.0                     0.0359
+                                            A5 + 5-Punkte-Strikeraster       H1      0.1464               0.1538                0.1538    55.0528        0.4725                  0.0                0.0                     0.0352
+                                            A5 + 5-Punkte-Strikeraster       H2      0.2112               0.2139                0.2124    61.4011        0.5259                  0.0                0.0                     0.0358
+                                            A5 + 5-Punkte-Strikeraster   Gesamt      0.1801               0.2139                0.2124    57.9658        0.5004                  0.0                0.0                     0.0358
+A6 + VX1-Datumszuordnung korrigiert (korrigiertes Modell, synthetisch)       H1      0.1464               0.1538                0.1538    55.0528        0.4725                  0.0                0.0                     0.0352
+A6 + VX1-Datumszuordnung korrigiert (korrigiertes Modell, synthetisch)       H2      0.2118               0.2139                0.2124    61.4011        0.5259                  0.0                0.0                     0.0358
+A6 + VX1-Datumszuordnung korrigiert (korrigiertes Modell, synthetisch)   Gesamt      0.1804               0.2139                0.2124    57.9658        0.5004                  0.0                0.0                     0.0358
+                  B1 V-W: Weeklys ab Einführung (Listing-Annahme 28 T)       H1      0.1365               0.1523                0.1438    53.7515        0.4615                  0.0                0.0                     0.0352
+                  B1 V-W: Weeklys ab Einführung (Listing-Annahme 28 T)       H2      0.2466               0.2150                0.2134    61.1974        0.5360                  0.0                0.0                     0.0363
+                  B1 V-W: Weeklys ab Einführung (Listing-Annahme 28 T)   Gesamt      0.1915               0.2150                0.2134    57.3099        0.5018                  0.0                0.0                     0.0363
+                                       B2 V-M: nur Monatsverfälle (AM)       H1      0.1141               0.1926                0.1860    37.9364        0.4347                  0.0              190.0                     0.0352
+                                       B2 V-M: nur Monatsverfälle (AM)       H2      0.1862               0.2264                0.2244    42.0542        0.4988                  0.0              217.0                     0.0353
+                                       B2 V-M: nur Monatsverfälle (AM)   Gesamt      0.1495               0.2264                0.2244    39.7537        0.4694                  0.0              407.0                     0.0353
+                                           C1 SPX ganze Kontrakte, V-W       H1      0.1294               0.1286                0.1286    36.7352        0.4573                654.0                0.0                     0.0339
+                                           C1 SPX ganze Kontrakte, V-W       H2      0.0400               0.0000                0.0000     0.0000           NaN               2066.0                0.0                     0.0000
+                                           C1 SPX ganze Kontrakte, V-W   Gesamt      0.1564               0.1454                0.1447    45.3536        0.4927                938.0                0.0                     0.0339
+                                           C2 SPX ganze Kontrakte, V-M       H1      0.1146               0.1356                0.1331    26.6255        0.4545                351.0              497.0                     0.0331
+                                           C2 SPX ganze Kontrakte, V-M       H2      0.0400               0.0000                0.0000     0.0000           NaN               1014.0             1052.0                     0.0000
+                                           C2 SPX ganze Kontrakte, V-M   Gesamt      0.1244               0.1377                0.1363    30.6225        0.4594                547.0              888.0                     0.0331
+          C3 XSP ganze Kontrakte, V-W (XSP-Verfälle = SPX unterstellt)       H1      0.1113               0.1477                0.1455    53.7515        0.4503                  0.0                0.0                     0.0334
+          C3 XSP ganze Kontrakte, V-W (XSP-Verfälle = SPX unterstellt)       H2      0.2110               0.2002                0.1990    61.1974        0.5209                  0.0                0.0                     0.0341
+          C3 XSP ganze Kontrakte, V-W (XSP-Verfälle = SPX unterstellt)   Gesamt      0.1687               0.2137                0.2123    57.3099        0.4885                  0.0                0.0                     0.0349
+          C4 XSP ganze Kontrakte, V-M (XSP-Verfälle = SPX unterstellt)       H1      0.1015               0.1686                0.1627    37.9364        0.4293                  0.0              190.0                     0.0332
+          C4 XSP ganze Kontrakte, V-M (XSP-Verfälle = SPX unterstellt)       H2      0.1603               0.2045                0.2028    42.0542        0.4963                  0.0              217.0                     0.0336
+          C4 XSP ganze Kontrakte, V-M (XSP-Verfälle = SPX unterstellt)   Gesamt      0.1359               0.2174                0.2155    39.7537        0.4656                  0.0              407.0                     0.0343
+                         D B1 · ohne Cashzins (reines Optionsergebnis)       H1      0.0929               0.1890                0.1868    53.7515        0.4615                  0.0                0.0                     0.0352
+                         D B1 · ohne Cashzins (reines Optionsergebnis)       H2      0.1988               0.2607                0.2592    61.1974        0.5360                  0.0                0.0                     0.0363
+                                 D B1 · Zins 0 % (Cash und Bepreisung)       H1      0.1603               0.1832                0.1811    53.7515        0.5084                  0.0                0.0                     0.0352
+                                 D B1 · Zins 0 % (Cash und Bepreisung)       H2      0.2974               0.2346                0.2311    61.1974        0.5729                  0.0                0.0                     0.0364
+                                 D B1 · Zins 2 % (Cash und Bepreisung)       H1      0.1512               0.1557                0.1540    53.7515        0.4859                  0.0                0.0                     0.0352
+                                 D B1 · Zins 2 % (Cash und Bepreisung)       H2      0.2727               0.2257                0.2231    61.1974        0.5611                  0.0                0.0                     0.0363
+                                            D B1 · Dividende 2 % p. a.       H1      0.1698               0.1405                0.1403    53.7515        0.4841                  0.0                0.0                     0.0352
+                                            D B1 · Dividende 2 % p. a.       H2      0.2925               0.2029                0.2003    61.1974        0.5595                  0.0                0.0                     0.0363
+                                               D B1 · Abschlag 0,5 Pkt       H1      0.1260               0.1529                0.1457    53.7515        0.4597                  0.0                0.0                     0.0352
+                                               D B1 · Abschlag 0,5 Pkt       H2      0.2407               0.2160                0.2145    61.1974        0.5343                  0.0                0.0                     0.0363
+                                               D B1 · Abschlag 1,0 Pkt       H1      0.1065               0.1655                0.1632    53.7515        0.4578                  0.0                0.0                     0.0352
+                                               D B1 · Abschlag 1,0 Pkt       H2      0.2293               0.2181                0.2167    61.1974        0.5343                  0.0                0.0                     0.0362
+                                               D B1 · Abschlag 1,5 Pkt       H1      0.0887               0.1811                0.1789    53.7515        0.4484                  0.0                0.0                     0.0352
+                                               D B1 · Abschlag 1,5 Pkt       H2      0.2183               0.2200                0.2188    61.1974        0.5276                  0.0                0.0                     0.0362
+               D B1 · Gebühren verdoppelt (3,60 je Kontrakt und Seite)       H1      0.1350               0.1524                0.1437    53.7515        0.4615                  0.0                0.0                     0.0351
+               D B1 · Gebühren verdoppelt (3,60 je Kontrakt und Seite)       H2      0.2457               0.2151                0.2136    61.1974        0.5360                  0.0                0.0                     0.0362
+                    D B1 · Gebühr auch bei Abrechnung (1,80 je Spread)       H1      0.1359               0.1527                0.1440    53.7515        0.4615                  0.0                0.0                     0.0352
+                    D B1 · Gebühr auch bei Abrechnung (1,80 je Spread)       H2      0.2463               0.2152                0.2136    61.1974        0.5360                  0.0                0.0                     0.0363
+                                    D B1 · VX1 vom Vortag für Einstieg       H1      0.1358               0.1544                0.1520    53.7515        0.4615                  0.0                0.0                     0.0352
+                                    D B1 · VX1 vom Vortag für Einstieg       H2      0.2429               0.2149                0.2115    61.1974        0.5276                  0.0                0.0                     0.0363
+                                                 D B1 · Skew 0 (flach)       H1      0.0962               0.1351                0.1350    53.7515        0.4934                  0.0                0.0                     0.0353
+                                                 D B1 · Skew 0 (flach)       H2      0.1711               0.1971                0.1939    61.1974        0.5796                  0.0                0.0                     0.0354
+                                D B1 · Skew −3 (marktübliche Richtung)       H1      0.0668               0.1395                0.1395    53.7515        0.5141                  0.0                0.0                     0.0352
+                                D B1 · Skew −3 (marktübliche Richtung)       H2      0.1282               0.1908                0.1878    61.1974        0.5829                  0.0                0.0                     0.0353
+                                         D B1 · Cashzins inkl. Prämien       H1      0.1396               0.1504                0.1426    53.7515        0.4615                  0.0                0.0                     0.0352
+                                         D B1 · Cashzins inkl. Prämien       H2      0.2504               0.2117                0.2101    61.1974        0.5360                  0.0                0.0                     0.0363
+                         D B2 · ohne Cashzins (reines Optionsergebnis)       H1      0.0713               0.2651                0.2589    37.9364        0.4347                  0.0              190.0                     0.0353
+                         D B2 · ohne Cashzins (reines Optionsergebnis)       H2      0.1408               0.2805                0.2786    42.0542        0.4988                  0.0              217.0                     0.0354
+                                 D B2 · Zins 0 % (Cash und Bepreisung)       H1      0.1318               0.2123                0.2057    37.9364        0.4960                  0.0              190.0                     0.0353
+                                 D B2 · Zins 0 % (Cash und Bepreisung)       H2      0.2117               0.2523                0.2507    42.0542        0.5501                  0.0              217.0                     0.0354
+                                 D B2 · Zins 2 % (Cash und Bepreisung)       H1      0.1243               0.1970                0.1903    37.9364        0.4640                  0.0              190.0                     0.0353
+                                 D B2 · Zins 2 % (Cash und Bepreisung)       H2      0.1983               0.2415                0.2397    42.0542        0.5232                  0.0              217.0                     0.0354
+                                            D B2 · Dividende 2 % p. a.       H1      0.1424               0.1799                0.1770    37.9364        0.4640                  0.0              190.0                     0.0352
+                                            D B2 · Dividende 2 % p. a.       H2      0.2171               0.2169                0.2150    42.0542        0.5183                  0.0              217.0                     0.0353
+                                               D B2 · Abschlag 0,5 Pkt       H1      0.1063               0.1953                0.1887    37.9364        0.4293                  0.0              190.0                     0.0352
+                                               D B2 · Abschlag 0,5 Pkt       H2      0.1820               0.2269                0.2250    42.0542        0.4988                  0.0              217.0                     0.0353
+                                               D B2 · Abschlag 1,0 Pkt       H1      0.0918               0.2001                0.1936    37.9364        0.4240                  0.0              190.0                     0.0352
+                                               D B2 · Abschlag 1,0 Pkt       H2      0.1737               0.2279                0.2260    42.0542        0.4939                  0.0              217.0                     0.0353
+                                               D B2 · Abschlag 1,5 Pkt       H1      0.0786               0.2043                0.1978    37.9364        0.4240                  0.0              190.0                     0.0352
+                                               D B2 · Abschlag 1,5 Pkt       H2      0.1658               0.2292                0.2273    42.0542        0.4939                  0.0              217.0                     0.0353
+               D B2 · Gebühren verdoppelt (3,60 je Kontrakt und Seite)       H1      0.1129               0.1930                0.1864    37.9364        0.4347                  0.0              190.0                     0.0351
+               D B2 · Gebühren verdoppelt (3,60 je Kontrakt und Seite)       H2      0.1856               0.2265                0.2245    42.0542        0.4988                  0.0              217.0                     0.0353
+                    D B2 · Gebühr auch bei Abrechnung (1,80 je Spread)       H1      0.1136               0.1933                0.1867    37.9364        0.4347                  0.0              190.0                     0.0352
+                    D B2 · Gebühr auch bei Abrechnung (1,80 je Spread)       H2      0.1860               0.2266                0.2246    42.0542        0.4988                  0.0              217.0                     0.0353
+                                    D B2 · VX1 vom Vortag für Einstieg       H1      0.1081               0.1931                0.1912    37.9364        0.4320                  0.0              190.0                     0.0352
+                                    D B2 · VX1 vom Vortag für Einstieg       H2      0.1874               0.2243                0.2225    42.0542        0.4963                  0.0              217.0                     0.0354
+                                                 D B2 · Skew 0 (flach)       H1      0.0959               0.1744                0.1717    37.9364        0.5040                  0.0              190.0                     0.0352
+                                                 D B2 · Skew 0 (flach)       H2      0.1476               0.1918                0.1901    42.0542        0.5575                  0.0              217.0                     0.0353
+                                D B2 · Skew −3 (marktübliche Richtung)       H1      0.0724               0.1789                0.1786    37.9364        0.5200                  0.0              190.0                     0.0352
+                                D B2 · Skew −3 (marktübliche Richtung)       H2      0.1141               0.1853                0.1832    42.0542        0.5795                  0.0              217.0                     0.0352
+                                         D B2 · Cashzins inkl. Prämien       H1      0.1169               0.1889                0.1837    37.9364        0.4347                  0.0              190.0                     0.0352
+                                         D B2 · Cashzins inkl. Prämien       H2      0.1895               0.2229                0.2210    42.0542        0.4988                  0.0              217.0                     0.0353
+{
+ "H1": {
+  "trades": 550,
+  "nicht_verfuegbar_VW": 422,
+  "anteil_VW": 0.7672727272727272,
+  "nicht_verfuegbar_VM": 523,
+  "anteil_VM": 0.9509090909090909,
+  "als_PM_gerechnet_aber_AM": 27,
+  "nicht_verfuegbar_nach_wochentag_VW": {
+   "Wednesday": 78,
+   "Thursday": 114,
+   "Monday": 48,
+   "Tuesday": 182
+  }
+ },
+ "H2": {
+  "trades": 603,
+  "nicht_verfuegbar_VW": 174,
+  "anteil_VW": 0.2885572139303483,
+  "nicht_verfuegbar_VM": 574,
+  "anteil_VM": 0.9519071310116086,
+  "als_PM_gerechnet_aber_AM": 29,
+  "nicht_verfuegbar_nach_wochentag_VW": {
+   "Tuesday": 114,
+   "Thursday": 60
+  }
+ }
+}

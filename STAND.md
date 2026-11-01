@@ -66,3 +66,11 @@ tage 21, delta 0,8, breite 100 (Ref. 2.750), max_pos 4, ema 200, einsatz 0,85 %,
 ## Schritt 11 – Verifikation (`verifikation.py`, `VERIFIKATION.md`, `ergebnisse/verifikation.json`)
 - Originalcode nirgends auffindbar. 22/23 Prüfungen bestanden; A4 (Strike-Suche bei VX1 >= 70) ohne Auswirkung auf Trades.
 - Ergebnis bestätigt: H2-Drawdown 21,0 %, Spanne über alle Kosten-/Zins-/Kalibrierungsannahmen 20,8–21,5 %.
+
+## Schritt 12 – Audit (Auftrag „unabhängig prüfen und fachlich verbessern“)
+- Ausgangsstand Commit 160d408 gesichert, Prüfsummen `audit/pruefsummen_ausgangsstand.txt`, reproduziert.
+- Regeln vor Berechnung festgelegt: `audit/VORAB_REGELN.md` (Commit 478e6ad).
+- Korrigierte Engine `audit/engine2.py`, 21 Tests, Auswertung `audit/lauf.py`, Bericht `audit/AUDITBERICHT.md`,
+  Regelwerk `audit/REGELWERK.md`. 11 bestätigte Fehler, 5 widerlegte Verdachtsfälle.
+- Strategie unverändert. Mit belegbar verfügbaren Monatsverfällen: H1 11,4 % / 19,3 %, H2 18,6 % / 22,6 %.
+  SPX mit ganzen Kontrakten bei 100.000 USD ab 2017 nicht handelbar.
