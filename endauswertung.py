@@ -8,6 +8,6 @@ out = []
 for name, p in V.items():
     for h, (a, b) in (('H1 2007–2016', H1), ('H2 2017–2026', H2)):
         r = backtest(d, a, b, **p)
-        out.append(dict(variante=name, haelfte=h, **{k: (float(v) if not isinstance(v, str) else v) for k, v in r.items()}))
+        out.append(dict(variante=name, haelfte=h, **{k: (float(v) if not isinstance(v, str) else v) for k, v in r.items() if k in ('cagr','dd','ntr','dd_hoch','dd_tief','trefferquote','dd_schluss')}))
         print(name, h, round(r['cagr'] * 100, 2), round(r['dd'] * 100, 2), round(r['ntr'], 1), r['dd_hoch'], r['dd_tief'])
 json.dump(out, open('ergebnisse/endauswertung_neu.json', 'w'), indent=1, ensure_ascii=False)

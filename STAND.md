@@ -62,3 +62,7 @@ tage 21, delta 0,8, breite 100 (Ref. 2.750), max_pos 4, ema 200, einsatz 0,85 %,
 - Beste: VX1-Deckel 30 auf Runde-3-Struktur, 15,18 % / 14,68 % – nur +0,01 Pkt (Schwelle 0,3 Pkt) -> kein Ersatz.
 - Drawdown-Bremse und EMA-Steigungsfilter senken bei auf 15 % DD normiertem Einsatz die H1-Rendite (14,3–15,0 %).
 - Runde-3-Variante bleibt. Da keine neue Variante gewählt wurde, findet keine zweite H2-Auswertung statt.
+
+## Schritt 11 – Verifikation (`verifikation.py`, `VERIFIKATION.md`, `ergebnisse/verifikation.json`)
+- Originalcode nirgends auffindbar. 22/23 Prüfungen bestanden; A4 (Strike-Suche bei VX1 >= 70) ohne Auswirkung auf Trades.
+- Ergebnis bestätigt: H2-Drawdown 21,0 %, Spanne über alle Kosten-/Zins-/Kalibrierungsannahmen 20,8–21,5 %.

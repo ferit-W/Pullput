@@ -78,6 +78,7 @@ DEFAULT = dict(tage=21, delta=0.8, breite=100.0, breite_ref=2750.0, max_pos=3, e
                max_risiko=None,    # Obergrenze Summe max. Verlust offener Positionen (Anteil Konto)
                vx_max=None,        # kein Einstieg wenn VX1 > vx_max
                dd_bremse=None,     # (schwelle, faktor): Einsatz * faktor, wenn Konto-DD > schwelle
+               zins_basis='cash',  # 'cash' (inkl. vereinnahmter Praemien) oder 'equity' (nur Kontowert)
                ema_steigung=0,     # >0: Einstieg nur wenn EMA heute > EMA vor n Handelstagen
                )
 
@@ -104,6 +105,9 @@ def backtest(d, start, ende, **kw):
     ntr = 0
     letzter_einstieg = -10**9
     gewinne = []
+    trades = []
+    dd_schluss = 0.0
+    eq_prev = cash
 
     def bewerte(i, S, vx):
         tot = 0.0
@@ -115,7 +119,8 @@ def backtest(d, start, ende, **kw):
     for i in range(i0, i1):
         if i > i0:
             dt = (tage_arr[i] - tage_arr[i - 1]).astype(int)
-            cash *= (1.0 + p['zins']) ** (dt / 365.0)
+            basis = cash if p['zins_basis'] == 'cash' else eq_prev
+            cash += basis * ((1.0 + p['zins']) ** (dt / 365.0) - 1.0)
         S = C[i]
         # Verfall
         rest = []
@@ -124,6 +129,7 @@ def backtest(d, start, ende, **kw):
                 zahl = q['n'] * 100.0 * (max(q['K1'] - S, 0) - max(q['K2'] - S, 0))
                 cash -= zahl
                 gewinne.append(q['n'] * (q['kredit'] * 100 - p['fee']) - zahl)
+                trades.append(dict(q, S_end=S, zahlung=zahl, ergebnis=gewinne[-1]))
             else:
                 rest.append(q)
         pos = rest
@@ -158,7 +164,8 @@ def backtest(d, start, ende, **kw):
                 if maxl > 0 and kredit > 0 and budget > 0:
                     n = budget / (maxl * 100.0 + p['fee'])
                     cash += n * (kredit * 100.0 - p['fee'])
-                    pos.append(dict(K1=K1, K2=K2, n=n, exp_idx=j, exp_datum=exp_d, kredit=kredit, maxl=maxl))
+                    pos.append(dict(K1=K1, K2=K2, n=n, exp_idx=j, exp_datum=exp_d, kredit=kredit, maxl=maxl,
+                                    ein_idx=i, S_ein=S, vx_ein=VX[i], w=w))
                     ntr += 1
                     letzter_einstieg = i
         eq = cash - bewerte(i, S, VX[i])
@@ -167,11 +174,14 @@ def backtest(d, start, ende, **kw):
         dd = 1 - min(eq, eq_stress) / peak
         if dd > maxdd:
             maxdd, dd_hoch, dd_tief = dd, peak_dat, idx[i]
+        dd_schluss = max(dd_schluss, 1 - eq / peak)
+        eq_prev = eq
         eq_kurve.append(eq)
     jahre = (tage_arr[i1 - 1] - tage_arr[i0]).astype(int) / 365.25
     cagr = (eq_kurve[-1] / 100000.0) ** (1 / jahre) - 1
     return dict(cagr=cagr, dd=maxdd, ntr=ntr / jahre, dd_hoch=str(dd_hoch.date()), dd_tief=str(dd_tief.date()),
-                trefferquote=float(np.mean(np.array(gewinne) > 0)) if gewinne else None)
+                trefferquote=float(np.mean(np.array(gewinne) > 0)) if gewinne else None,
+                dd_schluss=dd_schluss, trades=trades, offen=pos, kurve=eq_kurve, i0=i0, i1=i1, params=p)
 
 
 H1 = ('2007-01-01', '2016-12-31')

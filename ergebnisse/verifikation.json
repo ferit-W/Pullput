@@ -1,0 +1,257 @@
+{
+ "A1 Put-Preis = Monte-Carlo (2 Mio. Pfade)": {
+  "ok": true,
+  "info": "max. rel. Abw. 0.3157%"
+ },
+ "A2 Strike für Delta 0,8 liefert |Delta| = 0,8": {
+  "ok": true,
+  "info": "Delta -0.800000, K/S 1.0421"
+ },
+ "A3 Delta-Formel = numerische Ableitung": {
+  "ok": true,
+  "info": "-0.800000 vs -0.800000"
+ },
+ "A4 Spreadwert immer zwischen 0 und Breite": {
+  "ok": false,
+  "info": "40 Verletzungen von 480"
+ },
+ "B1 Keine doppelten Handelstage": {
+  "ok": true,
+  "info": ""
+ },
+ "B2 VX1-Lücken ab 2007 (vorwärts gefüllt) < 1 %": {
+  "ok": true,
+  "info": "15 von 4989 Tagen"
+ },
+ "B3 Keine fehlenden Kurse ab 2007": {
+  "ok": true,
+  "info": ""
+ },
+ "B4 low <= close <= high, vx_high >= vx": {
+  "ok": true,
+  "info": ""
+ },
+ "B5 Datumszuordnung VX1: stärkste Gegenbewegung am selben Tag": {
+  "ok": true,
+  "info": "Versatz -1: 0.08, Versatz 0: -0.72, Versatz 1: 0.11"
+ },
+ "B6 Stichprobe 16.03.2020 (SPX −12 %, VX1 stark erhöht)": {
+  "ok": true,
+  "info": "SPX 2386, VX1 58.9"
+ },
+ "C1 H1: Endkapital Engine = Nachrechner": {
+  "ok": true,
+  "info": "409853.11 vs 409853.11"
+ },
+ "C2 H1: alle Trades regelkonform (Strikes, 21 T, Filter, Settlement)": {
+  "ok": true,
+  "info": "0 Abweichungen bei 550 Trades"
+ },
+ "C3 H1: nie mehr als 4 Positionen offen": {
+  "ok": true,
+  "info": "max. 4"
+ },
+ "C4 H1: Einsatz je Trade ≈ 0,85 % des Kontos": {
+  "ok": true,
+  "info": "Median 0.8501%"
+ },
+ "kennzahlen_H1": {
+  "cagr": 0.15165284555747793,
+  "dd": 0.14676594626169714,
+  "dd_schluss": 0.14676419135908292
+ },
+ "C1 H2: Endkapital Engine = Nachrechner": {
+  "ok": true,
+  "info": "666227.20 vs 666227.20"
+ },
+ "C2 H2: alle Trades regelkonform (Strikes, 21 T, Filter, Settlement)": {
+  "ok": true,
+  "info": "0 Abweichungen bei 603 Trades"
+ },
+ "C3 H2: nie mehr als 4 Positionen offen": {
+  "ok": true,
+  "info": "max. 4"
+ },
+ "C4 H2: Einsatz je Trade ≈ 0,85 % des Kontos": {
+  "ok": true,
+  "info": "Median 0.8501%"
+ },
+ "kennzahlen_H2": {
+  "cagr": 0.2130150865814806,
+  "dd": 0.21006322755636742,
+  "dd_schluss": 0.20890712391922506
+ },
+ "D1 Zukunftsdaten verändert -> Equity bis zum Schnitttag identisch": {
+  "ok": true,
+  "info": "Schnitt 01.06.2022"
+ },
+ "D2 Wiederholter Lauf identisch (deterministisch)": {
+  "ok": true,
+  "info": ""
+ },
+ "empfindlichkeit": [
+  {
+   "name": "Kostenmodell (Referenz)",
+   "haelfte": "2007",
+   "cagr": 0.15165284555747793,
+   "dd": 0.14676594626169714,
+   "dd_schluss": 0.14676419135908292
+  },
+  {
+   "name": "Zins nur auf Kontowert",
+   "haelfte": "2007",
+   "cagr": 0.1483710658300239,
+   "dd": 0.14878138851510714,
+   "dd_schluss": 0.14877963744139833
+  },
+  {
+   "name": "Abschlag 0,75 Pkt",
+   "haelfte": "2007",
+   "cagr": 0.12888425376467594,
+   "dd": 0.1512551357291716,
+   "dd_schluss": 0.15125343286937487
+  },
+  {
+   "name": "Abschlag 1,5 Pkt (Demo-Fill)",
+   "haelfte": "2007",
+   "cagr": 0.09884012221126182,
+   "dd": 0.15758913941578434,
+   "dd_schluss": 0.1575875092298915
+  },
+  {
+   "name": "XSP (0,5 Pkt + 36 USD je SPX-Äquiv.)",
+   "haelfte": "2007",
+   "cagr": 0.12571523215794667,
+   "dd": 0.15190081823458057,
+   "dd_schluss": 0.15189912282361961
+  },
+  {
+   "name": "Kalibrierung Nr. 2 (2.800 / −5,5)",
+   "haelfte": "2007",
+   "cagr": 0.14950778166680934,
+   "dd": 0.15129244817045584,
+   "dd_schluss": 0.1512907933830685
+  },
+  {
+   "name": "Kalibrierung Nr. 3 (2.650 / −6,0)",
+   "haelfte": "2007",
+   "cagr": 0.1584006348730631,
+   "dd": 0.1418493198654317,
+   "dd_schluss": 0.14184622166421101
+  },
+  {
+   "name": "Kalibrierung Nr. 4 (2.700 / −6,0)",
+   "haelfte": "2007",
+   "cagr": 0.15620330457950282,
+   "dd": 0.14432704005563113,
+   "dd_schluss": 0.14432524757753207
+  },
+  {
+   "name": "Einsatz 0,80 % (Diagnose)",
+   "haelfte": "2007",
+   "cagr": 0.14558760742470667,
+   "dd": 0.1367285035679856,
+   "dd_schluss": 0.13672683583419598
+  },
+  {
+   "name": "Einsatz 0,90 % (Diagnose)",
+   "haelfte": "2007",
+   "cagr": 0.15764974398813614,
+   "dd": 0.1567207367259097,
+   "dd_schluss": 0.15671889655446836
+  },
+  {
+   "name": "Kostenmodell (Referenz)",
+   "haelfte": "2017",
+   "cagr": 0.2130150865814806,
+   "dd": 0.21006322755636742,
+   "dd_schluss": 0.20890712391922506
+  },
+  {
+   "name": "Zins nur auf Kontowert",
+   "haelfte": "2017",
+   "cagr": 0.2092596285813928,
+   "dd": 0.21346651913844406,
+   "dd_schluss": 0.21231523839360655
+  },
+  {
+   "name": "Abschlag 0,75 Pkt",
+   "haelfte": "2017",
+   "cagr": 0.2024488526593149,
+   "dd": 0.21206075058589768,
+   "dd_schluss": 0.2110194209945463
+  },
+  {
+   "name": "Abschlag 1,5 Pkt (Demo-Fill)",
+   "haelfte": "2017",
+   "cagr": 0.18734151811993693,
+   "dd": 0.21494114483008175,
+   "dd_schluss": 0.21406495504320877
+  },
+  {
+   "name": "XSP (0,5 Pkt + 36 USD je SPX-Äquiv.)",
+   "haelfte": "2017",
+   "cagr": 0.2009196214758764,
+   "dd": 0.2123510207326288,
+   "dd_schluss": 0.21132635246340625
+  },
+  {
+   "name": "Kalibrierung Nr. 2 (2.800 / −5,5)",
+   "haelfte": "2017",
+   "cagr": 0.20983457079150236,
+   "dd": 0.21151035020410647,
+   "dd_schluss": 0.21037182547573485
+  },
+  {
+   "name": "Kalibrierung Nr. 3 (2.650 / −6,0)",
+   "haelfte": "2017",
+   "cagr": 0.2210381277159268,
+   "dd": 0.20818861631897811,
+   "dd_schluss": 0.20702365397778855
+  },
+  {
+   "name": "Kalibrierung Nr. 4 (2.700 / −6,0)",
+   "haelfte": "2017",
+   "cagr": 0.21808783534623455,
+   "dd": 0.20973591409892156,
+   "dd_schluss": 0.20859026387457924
+  },
+  {
+   "name": "Einsatz 0,80 % (Diagnose)",
+   "haelfte": "2017",
+   "cagr": 0.20300340703434538,
+   "dd": 0.1958101858991752,
+   "dd_schluss": 0.19470407758973363
+  },
+  {
+   "name": "Einsatz 0,90 % (Diagnose)",
+   "haelfte": "2017",
+   "cagr": 0.22299710270831286,
+   "dd": 0.2241150737146107,
+   "dd_schluss": 0.22291097185930808
+  }
+ ],
+ "jahresrenditen_H2": {
+  "2017": 0.36967466262716164,
+  "2018": 0.08545345625884604,
+  "2019": 0.4154098715110772,
+  "2020": 0.24130280856328135,
+  "2021": 0.12257997997833914,
+  "2022": -0.17321192011660336,
+  "2023": 0.2549042340402665,
+  "2024": 0.5908958120459942,
+  "2025": 0.25295016442483087,
+  "2026": 0.09859130184433895
+ },
+ "fehlgeschlagen": [
+  "A4 Spreadwert immer zwischen 0 und Breite"
+ ],
+ "F1 H1: tägliche Bewertung innerhalb 0..Breite (Schluss + Stress)": {
+  "ok": true,
+  "info": "0 von 15856 Bewertungen, max. Überschreitung 0.00% der Breite"
+ },
+ "F1 H2: tägliche Bewertung innerhalb 0..Breite (Schluss + Stress)": {
+  "ok": true,
+  "info": "0 von 17410 Bewertungen, max. Überschreitung 0.00% der Breite"
+ }
+}
