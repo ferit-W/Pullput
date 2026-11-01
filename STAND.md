@@ -43,3 +43,7 @@
 
 ## Schritt 7 – AUSWAHL FESTGESCHRIEBEN (vor H2-Auswertung)
 tage 21, delta 0,8, breite 100 (Ref. 2.750), max_pos 4, ema 200, einsatz 0,85 %, Kosten 0,25 Pkt + 3,60 USD, Zins 4 %.
+
+## Schritt 8 – Einmalige H2-Auswertung (`endauswertung.py`, `ergebnisse/endauswertung_neu.json`)
+- Neu: H1 15,17 % / 14,68 %, H2 21,30 % / 21,01 % -> H2-Grenze verfehlt. Basis zum Vergleich: H2 20,23 % / 24,21 %.
+- Kein Nachjustieren. Ergebnis siehe ERGEBNIS.md.
