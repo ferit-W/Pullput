@@ -32,6 +32,7 @@ Wo es Testergebnisse gibt, steht die ehrliche Bilanz dabei, also Trefferquote, F
 - **J6** älterer Tab überschreibt beim Schließen
 - **J7** Vorschau rechnet mit anderem Risiko als die Buchung
 - **J8** Kleinigkeiten
+- **SH1–SH7** Stillhalter-Journal, siehe `PRUEFBERICHT_Stillhalter_v6.2.md`. SH1 (Reset löscht alle Werkzeuge) zuerst.
 - **C1** Euro-Positionen im Cockpit falsch umgerechnet
 - **C2** doppelte Datenkopie im Cockpit
 - **F5 mit V10** Einstellungs-Sync schreibt bei jedem Lauf
@@ -61,7 +62,9 @@ Bisher wurde nur die *Ampel* getestet, also das Marktumfeld, und das am S&P 500.
 - **S2 Ausstieg:** feste Ziele (CRV) gegen Nachziehen des Stopps (EMA20, Swing-Tief, ATR-Trailing). Welche Variante passt zum Trendhandel?
 - **S3 Positionsgröße und Gesamtrisiko:** 0,25 % je Trade und maximal 10 Positionen. Welche Verlustserien und welcher Drawdown sind damit realistisch?
 
-Alle drei gelten mit dem Vorbehalt der Survivorship-Verzerrung (nur heutige Mitglieder) und werden nach dem Grundsatz oben getestet.
+- **S4 52-Wochen-Ausbruch (Lüddemann-Trendhandel):** Einstieg, wenn eine Aktie ein neues 52-Wochen- oder Allzeithoch macht. Die Theorie dahinter: Über dem 52-Wochen-Hoch liegt niemand mehr im Minus, deshalb gibt es weniger Verkaufsdruck. Getestet wird gegen den Rücksetzer-Einstieg aus S1, getrennt nach Ampelzustand und Marktbreite. Die Forschung zur Nähe am 52-Wochen-Hoch (George & Hwang 2004) stützt den Gedanken für Einzelaktien.
+
+Alle vier gelten mit dem Vorbehalt der Survivorship-Verzerrung (nur heutige Mitglieder) und werden nach dem Grundsatz oben getestet.
 
 ## Phase 3 · Archiv als Grundlage für die spätere Auswertung
 
@@ -120,14 +123,14 @@ Alle drei gelten mit dem Vorbehalt der Survivorship-Verzerrung (nur heutige Mitg
 
 Diese Punkte setze ich erst um, wenn du dich entschieden hast:
 
-1. **KI-Anbieter:** Gemini bleibt, Claude kommt dazu, oder beides wählbar? Bis zur Entscheidung baue ich die Server-Schicht so, dass beides möglich ist, und lasse Gemini als Standard.
+1. ~~KI-Anbieter~~ **entschieden:** Gemini und Claude wählbar, Gemini als Standard.
 2. **U6 Handy-Ansicht:** Dafür müsste der Server ins Heimnetz geöffnet werden, mit Passwortschutz. Ohne ausdrückliches Ja bleibt er nur auf dem eigenen Rechner erreichbar.
-3. **W4 Broker-Abgleich:** Du bist noch unsicher. Das wird nicht gebaut, bis du es willst. Falls ja, kommt der Altbestand auf eine eigene Liste „nicht abgleichen“.
-4. **Stillhalter-Journal:** Bitte `stillhalter_journal_v6.html` ins Repository laden, damit ich es genauso prüfen und anpassen kann.
+3. **W4 Broker-Abgleich:** entschieden: **später**. Dann mit eigener Liste „Altbestand, nicht abgleichen“.
+4. ~~Stillhalter-Journal~~ **erledigt:** Die Datei liegt im Repository und ist geprüft (`PRUEFBERICHT_Stillhalter_v6.2.md`).
+5. **DAX-Optionen:** Handelst du ODAX (Multiplikator 5)? Davon hängt SH7 ab.
 
 ## Noch nicht vollständig geprüft
 
-- **Stillhalter-Journal:** die Datei fehlt im Repository.
 - **Trading Journal, HTML-Teil:** Formulare und Bedienelemente, rund 900 Zeilen. Das JavaScript ist vollständig geprüft, der HTML-Teil nur automatisch (alle IDs und Klick-Funktionen vorhanden).
 - **Echter Betrieb unter Windows mit Live-Daten:** Yahoo, CNN und Gemini sind aus der Prüfumgebung gesperrt. Live-Abrufe sind deshalb nur am Code geprüft, nicht im Lauf. Nach jeder Phase ist ein kurzer Probelauf bei dir nötig.
 

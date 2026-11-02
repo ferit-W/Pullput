@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stillhalter Journal v6.2</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e1119;--bg2:#141927;--card:#1b2133;--elev:#232a3d;--brd:rgba(255,255,255,.06);--brd2:rgba(255,255,255,.12);--t1:#eef1f5;--t2:#8d9aad;--t3:#687990;--acc:#20b2aa;--accg:rgba(32,178,170,.15);--grn:#84cc16;--red:#f43f5e;--amb:#f59e0b;--vio:#8b5cf6;--r:10px;--rs:6px;--tr:.18s cubic-bezier(.4,0,.2,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;-webkit-font-smoothing:antialiased}
+.mono{font-family:'IBM Plex Mono',monospace}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);transition:border-color var(--tr)}.card:hover{border-color:var(--brd2)}
+.inp{font-family:'IBM Plex Mono',monospace;font-size:.78rem;background:var(--bg);border:1px solid var(--brd);border-radius:var(--rs);padding:7px 11px;color:var(--t1);width:100%;outline:none;transition:border-color var(--tr),box-shadow var(--tr)}.inp:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--accg)}.inp::placeholder{color:var(--t3)}
+.lbl{display:block;font-size:.65rem;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:var(--rs);font-size:.8rem;font-weight:600;border:none;cursor:pointer;transition:all var(--tr);outline:none;font-family:inherit}
+.btn-p{background:var(--acc);color:#0e1119}.btn-p:hover{background:#36d2cf;transform:translateY(-1px);box-shadow:0 4px 14px var(--accg)}
+.btn-g{background:transparent;color:var(--t2);border:1px solid var(--brd)}.btn-g:hover{background:var(--elev);color:var(--t1);border-color:var(--brd2)}
+.btn-d{background:rgba(244,63,94,.1);color:var(--red)}.btn-d:hover{background:rgba(244,63,94,.2)}
+.btn-s{padding:3px 9px;font-size:.7rem}
+.badge{display:inline-flex;align-items:center;font-size:.58rem;font-weight:600;padding:2px 7px;border-radius:100px;text-transform:uppercase;letter-spacing:.05em}
+.nav-t{padding:9px 15px;font-size:.8rem;font-weight:500;color:var(--t3);border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all var(--tr);white-space:nowrap;background:none}
+.nav-t:hover{color:var(--t2)}.nav-t.on{color:var(--acc);border-bottom-color:var(--acc)}
+.dtb{width:100%;border-collapse:collapse;font-size:.78rem}
+.dtb thead th{font-size:.62rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:9px 7px;border-bottom:1px solid var(--brd);text-align:left;user-select:none}
+.dtb thead th.srt{cursor:pointer}.dtb thead th.srt:hover{color:var(--acc)}
+.dtb tbody tr{border-bottom:1px solid var(--brd);transition:background var(--tr);cursor:pointer}.dtb tbody tr:hover{background:rgba(255,255,255,.02)}
+.dtb tbody td{padding:9px 7px;vertical-align:middle}
+.s-cc{border-left:3px solid var(--grn)}.s-csp{border-left:3px solid var(--acc)}.s-vs{border-left:3px solid var(--vio)}.s-ic{border-left:3px solid var(--amb)}
+.rg{height:6px;border-radius:3px;background:rgba(255,255,255,.05);overflow:hidden}.rg-f{height:100%;border-radius:3px;transition:width .5s ease}
+.db{height:3px;border-radius:2px;background:rgba(255,255,255,.05);overflow:hidden}.db-f{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--grn),var(--amb),var(--red));transition:width .3s}
+.pb{height:5px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden}.pb-f{height:100%;border-radius:3px;transition:width .5s}
+.mo{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.on{opacity:1;pointer-events:auto}
+.mp{background:var(--card);border:1px solid var(--brd2);border-radius:14px;padding:22px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;transform:translateY(8px) scale(.98);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+.mo.on .mp{transform:translateY(0) scale(1)}
+.toast-c{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:var(--rs);font-size:.76rem;font-weight:500;animation:ti .3s ease,to .3s ease 2.7s forwards;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+@keyframes ti{from{transform:translateX(30px);opacity:0}}@keyframes to{to{transform:translateX(30px);opacity:0}}
+.t-ok{background:var(--grn);color:#0e1119}.t-err{background:var(--red);color:#fff}.t-info{background:var(--acc);color:#0e1119}
+.fu{animation:fu .3s cubic-bezier(.4,0,.2,1)}@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.empty{text-align:center;padding:44px 20px;color:var(--t3)}.empty h3{font-size:1rem;font-weight:600;color:var(--t2);margin-bottom:6px}.empty p{font-size:.82rem;max-width:360px;margin:0 auto 14px;line-height:1.5}
+@media(max-width:768px){.hm{display:none!important}.dtb{font-size:.7rem}.dtb td,.dtb th{padding:7px 4px}.nav-t{padding:7px 9px;font-size:.73rem}}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.012;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+</style>
+</head>
+<body>
+<div id="app">
+<header style="background:var(--bg2);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)">
+  <div style="max-width:1480px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--vio));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.88rem">Θ</div>
+      <div><div style="font-size:.92rem;font-weight:700;line-height:1.2">Stillhalter Journal</div><div class="mono" style="font-size:.57rem;color:var(--t3)">v6.1 · IB/CapTrader · Risk Engine</div><!-- v6.1: Woher der sichtbare Datenstand stammt. Bei zwei Rechnern am geteilten Ordner die wichtigste Angabe. --><span id="sync-badge" class="mono" title="Datenstand wird geprüft …" style="display:inline-block;margin-top:3px;padding:1px 8px;border-radius:9999px;font-size:.56rem;font-weight:700;background:rgba(255,255,255,.06);color:var(--t3)">Datenstand …</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <button class="btn btn-g btn-s" onclick="openSettings()">⚙</button>
+      <button class="btn btn-g btn-s" onclick="exportCSV()">CSV</button>
+      <button class="btn btn-g btn-s" onclick="exportJSON()">💾</button>
+      <button class="btn btn-g btn-s" onclick="loadFromServer()" title="daten/stillhalter_journal.json vom lokalen Server (Port 8765) zurücklesen — Desaster-Recovery / PC-Umzug">⬇</button>
+      <label class="btn btn-g btn-s" style="cursor:pointer">📂<input type="file" accept=".json" onchange="importJSON(event)" style="display:none"></label>
+    </div>
+  </div>
+  <nav style="max-width:1480px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto" id="nav"></nav>
+</header>
+<main style="max-width:1480px;margin:0 auto;padding:18px 20px" id="main"></main>
+<div class="toast-c" id="toasts"></div>
+</div>
+
+<!-- MODAL: Trade Detail -->
+<div class="mo" id="M-det" onclick="if(event.target===this)cm('M-det')"><div class="mp" style="max-width:540px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <h3 id="det-title" style="font-size:1rem;font-weight:700"></h3>
+    <button onclick="cm('M-det')" style="color:var(--t3);background:none;border:none;cursor:pointer;font-size:1.1rem">✕</button>
+  </div>
+  <div id="det-body"></div>
+  <div style="display:flex;gap:6px;margin-top:14px;padding-top:10px;border-top:1px solid var(--brd)">
+    <button id="det-edit" class="btn btn-g btn-s">✎ Bearbeiten</button>
+    <button id="det-close" class="btn btn-s" style="background:rgba(32,178,170,.12);color:var(--acc)">✓ Schließen</button>
+    <button id="det-adj" class="btn btn-s" style="background:rgba(139,92,246,.12);color:var(--vio)">⚡ Adjustment</button>
+    <button id="det-dup" class="btn btn-g btn-s">⧉ Duplizieren</button>
+  </div>
+</div></div>
+
+<!-- MODAL: Close -->
+<div class="mo" id="M-cl" onclick="if(event.target===this)cm('M-cl')"><div class="mp">
+  <h3 style="font-size:1rem;font-weight:700;margin-bottom:14px">Trade schließen</h3>
+  <input type="hidden" id="cl-id">
+  <div style="display:grid;gap:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label class="lbl">Close-Datum</label><input type="date" id="cl-dt" class="inp"></div>
+      <div><label class="lbl">Close-Typ</label><select id="cl-tp" class="inp" onchange="clTypeChg()"><option value="BTC">Buy to Close</option><option value="EXPIRED">Expired</option><option value="ASSIGNED">Assigned</option><option value="ROLLED">Roll → neu</option></select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label class="lbl">Close-Preis ($/K)</label><input type="number" id="cl-px" step="0.01" value="0" class="inp" oninput="clPrev()"></div>
+      <div><label class="lbl">Kommission ($)</label><input type="number" id="cl-cm" step="0.01" value="0" class="inp" oninput="clPrev()"></div>
+    </div>
+    <div style="margin-top:8px"><label class="lbl">EUR/USD-Kurs beim Close (exakte EUR-Umrechnung im Cockpit)</label><input type="number" id="cl-fx" step="0.0001" class="inp" placeholder="z.B. 1.0850"></div>
+    <div id="cl-af" style="display:none">
+      <div><label class="lbl">Assignment-Preis</label><input type="number" id="cl-ap" step="0.01" class="inp"></div>
+      <div><label class="lbl">Shares</label><input type="number" id="cl-sh" value="100" class="inp"></div>
+    </div>
+    <div><label class="lbl">Notiz</label><textarea id="cl-nt" rows="2" class="inp" style="resize:none"></textarea></div>
+    <div style="background:var(--elev);border-radius:var(--rs);padding:10px;text-align:center">
+      <div style="font-size:.58rem;color:var(--t3);text-transform:uppercase;margin-bottom:3px">P&L Vorschau</div>
+      <div id="cl-pv" class="mono" style="font-size:1.3rem;font-weight:700">$0</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-p" onclick="execClose()">Bestätigen</button><button class="btn btn-g" onclick="cm('M-cl')">Abbrechen</button></div>
+</div></div>
+
+<!-- MODAL: Adjustment -->
+<div class="mo" id="M-adj" onclick="if(event.target===this)cm('M-adj')"><div class="mp">
+  <h3 style="font-size:1rem;font-weight:700;margin-bottom:14px">Adjustment</h3>
+  <input type="hidden" id="adj-id">
+  <div style="display:grid;gap:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label class="lbl">Datum</label><input type="date" id="adj-dt" class="inp"></div>
+      <div><label class="lbl">Typ</label><select id="adj-tp" class="inp"><option value="ROLL_UP">Roll Up</option><option value="ROLL_DOWN">Roll Down</option><option value="ROLL_OUT">Roll Out</option><option value="ADD_LEG">Leg hin</option><option value="CLOSE_LEG">Leg zu</option><option value="OTHER">Sonstiges</option></select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label class="lbl">Kosten/Credit ($)</label><input type="number" id="adj-co" step="0.01" value="0" class="inp"></div>
+      <div><label class="lbl">Neuer Strike</label><input type="number" id="adj-st" step="0.5" class="inp"></div>
+    </div>
+    <div><label class="lbl">Notiz</label><textarea id="adj-nt" rows="2" class="inp" style="resize:none"></textarea></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-p" style="background:var(--vio)" onclick="saveAdj()">Speichern</button><button class="btn btn-g" onclick="cm('M-adj')">Abbrechen</button></div>
+</div></div>
+
+<!-- MODAL: Settings -->
+<div class="mo" id="M-set" onclick="if(event.target===this)cm('M-set')"><div class="mp">
+  <h3 style="font-size:1rem;font-weight:700;margin-bottom:14px">Einstellungen</h3>
+  <div style="display:grid;gap:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div><label class="lbl">Kontogröße (€) *</label><input type="number" id="s-ac" step="100" placeholder="50000" class="inp"></div>
+      <div><label class="lbl">Monatl. Ziel (€)</label><input type="number" id="s-tg" step="100" placeholder="2000" class="inp"></div>
+      <div><label class="lbl">EUR/USD Kurs</label><input type="number" id="s-fx" step="0.0001" placeholder="1.0850" class="inp"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+      <div><label class="lbl">DTE Warn (Tage)</label><input type="number" id="s-dw" value="7" class="inp"></div>
+      <div><label class="lbl">Max Risk/Trade %</label><input type="number" id="s-mr" value="5" step="0.5" min="0" max="100" class="inp"></div>
+      <div><label class="lbl">Max Risk/Konto %</label><input type="number" id="s-ma" value="25" step="1" min="0" max="100" class="inp"></div>
+    </div>
+    <div><label class="lbl">Gemini API Key</label><input type="password" id="s-gm" placeholder="AIza…" class="inp"></div>
+    <div><label class="lbl">KI-Modell</label><select id="s-gmm" class="inp"><option value="gemini-2.5-flash">Gemini 2.5 Flash (empfohlen)</option><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (günstig)</option><option value="gemini-2.5-pro">Gemini 2.5 Pro (stark)</option><option value="gemini-3.5-flash">Gemini 3.5 Flash (neueste)</option></select></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-p" onclick="saveSet()">Speichern</button><button class="btn btn-g" onclick="cm('M-set')">Abbrechen</button></div>
+  <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--brd);display:flex;justify-content:space-between">
+    <button class="btn btn-d btn-s" onclick="if(confirm('ALLE Daten löschen?')){localStorage.clear();location.reload()}">⚠ Reset</button>
+    <span class="mono" style="font-size:.55rem;color:var(--t3)" id="s-cnt"></span>
+  </div>
+</div></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA LAYER
+// ═══════════════════════════════════════════════════════
+const TK='soj4_t',SK='soj4_s',GK='soj4_g',MUL=100;
+// ── v6.2 (EUR/USD-NOTWERT SICHTBAR GEMACHT) ─────────────────────────────────
+// Bisher steckte 1,085 an fünf Stellen als stiller Standard — Stand vom Bauzeitpunkt.
+// Fehlte der Kurs in den Settings, wurde damit gerechnet, ohne dass man es sah.
+// Jetzt: EIN benannter Notwert, Settings speichern "leer" wirklich als leer, und
+// das Dashboard zeigt einen Hinweis, solange mit dem Notwert gerechnet wird.
+const FX_NOTWERT=1.085;
+const fxFehlt=()=>{const e=ls().eurusd;return !(isFinite(e)&&e>0);};
+const $=id=>document.getElementById(id);
+let _corruptWarned=false;
+// v4.3 FIX (Datenverlust-Pfad): korrupter Key wurde still zu [] — das naechste sv() haette die
+// Originaldaten endgueltig ueberschrieben. Jetzt: Rohdaten-Rettungskopie + einmalige deutliche Warnung.
+const ld=()=>{const raw=localStorage.getItem(TK);if(raw===null)return[];
+  try{return JSON.parse(raw)||[]}
+  catch(e){try{localStorage.setItem(TK+'__corrupt_'+Date.now(),raw)}catch(e2){}
+    if(!_corruptWarned){_corruptWarned=true;
+      try{alert('⚠ Trade-Daten defekt! Rohdaten wurden als Rettungskopie gesichert ('+TK+'__corrupt_…).\nNICHTS speichern — zuerst Backup importieren oder ⬇ Vom Laufwerk laden.')}catch(e3){}}
+    return[]}};
+const SYNC_TS='soj4_syncts';
+const localTs=()=>{const v=parseInt(localStorage.getItem(SYNC_TS),10);return isFinite(v)?v:0;};
+const setLocalTs=t=>{try{localStorage.setItem(SYNC_TS,String(t||Date.now()))}catch(e){}};
+
+const sv=t=>{try{localStorage.setItem(TK,JSON.stringify(t))}catch(e){alert('\u26a0 Speicher voll! Bitte altes Backup exportieren und Daten bereinigen.\n\n'+e.message)}
+  // ── v6.1: CLOUD-BETRIEB ───────────────────────────────────────────────────
+  // Vorher wurde blind auf den Server geschrieben. Bei zwei Rechnern am selben
+  // Cloud-Ordner haette der zweite die Arbeit des ersten kommentarlos ueberschrieben.
+  // Neu: erst pruefen, ob die Datei inzwischen von woanders geaendert wurde.
+  // Der Zeitstempel wird lokal gemerkt und ergibt beim naechsten Start den Vergleich.
+  (async()=>{
+    const jetzt=Date.now();
+    try{
+      const p=await fetch('http://localhost:8765/data/load?name=stillhalter_journal',{cache:'no-store'});
+      if(p.ok){
+        const fremd=await p.json();
+        const fernTs=(fremd&&typeof fremd.ts==='number')?fremd.ts:0;
+        if(fernTs>localTs()+1000){
+          const wann=new Date(fernTs).toLocaleString('de-DE');
+          if(!confirm('ACHTUNG \u2014 Fremder Stand auf dem Laufwerk\n\n'
+            +'Die Datei wurde am '+wann+' von einem anderen Rechner geaendert ('
+            +((fremd.trades||[]).length)+' Positionen dort, '+t.length+' hier).\n\n'
+            +'Wenn du jetzt speicherst, werden die dortigen Aenderungen ueberschrieben.\n\n'
+            +'Trotzdem speichern?')){
+            toast('Nicht aufs Laufwerk geschrieben \u2014 fremder Stand ist neuer','t-err');
+            return;
+          }
+        }
+      }
+    }catch(e){ /* Server aus -> nur lokal, wie bisher */ }
+    try{
+      const r=await fetch('http://localhost:8765/data/save?name=stillhalter_journal',{method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({trades:t,settings:(()=>{try{return JSON.parse(localStorage.getItem(SK))}catch(e){return null}})(),ts:jetzt})});
+      if(r&&r.ok){ setLocalTs(jetzt); syncBadge('gespeichert',jetzt); }
+    }catch(e){}
+  })();
+};
+
+// v6.1: Beim Start das Laufwerk fragen. Der neuere Stand gewinnt.
+async function syncFromDrive(){
+  let d=null;
+  try{ const r=await fetch('http://localhost:8765/data/load?name=stillhalter_journal',{cache:'no-store'});
+       if(r.ok) d=await r.json(); }catch(e){}
+  if(!d||!Array.isArray(d.trades)){ syncBadge('nur lokal',null); return false; }
+  const fern=(typeof d.ts==='number')?d.ts:0, lokal=localTs();
+  if(fern>lokal){
+    try{ localStorage.setItem(TK,JSON.stringify(d.trades));
+         if(d.settings) localStorage.setItem(SK,JSON.stringify(d.settings)); }catch(e){}
+    setLocalTs(fern); syncBadge('vom Laufwerk',fern); return true;
+  }
+  syncBadge(lokal>fern?'lokal neuer':'synchron',lokal||fern);
+  return false;
+}
+
+function syncBadge(zustand,ts){
+  const el=document.getElementById('sync-badge'); if(!el) return;
+  const zeit=ts?new Date(ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+  const warn=(zustand==='lokal neuer'||zustand==='nur lokal');
+  el.textContent=zustand+(zeit?' \u00b7 '+zeit:'');
+  el.style.background=warn?'rgba(245,158,11,.15)':'rgba(63,185,106,.15)';
+  el.style.color='var('+(warn?'--amb':'--grn')+')';
+  el.title=zustand==='lokal neuer'
+    ? 'Dieser Browser hat einen neueren Stand als die Datei auf dem Laufwerk. Meist hat die Cloud noch nicht fertig synchronisiert.'
+    : (zustand==='nur lokal' ? 'Kein Laufwerk-Stand gefunden. Laeuft der Server?' : 'Browser und Laufwerk stimmen ueberein.');
+}
+const ls=()=>{const raw=localStorage.getItem(SK);const FB={accountSize:null,monthlyTarget:null,dteWarn:7,maxTR:5,maxAR:25,eurusd:null,geminiModel:'gemini-2.5-flash'};if(raw===null)return FB;try{return JSON.parse(raw)||FB}catch(e){try{localStorage.setItem(SK+'__corrupt_'+Date.now(),raw)}catch(e2){};return FB}}; // v4.3: Rettungskopie
+const gid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
+const f$=(v,d=0)=>'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const f2=v=>f$(v,2);
+const fp=(v,d=1)=>v.toFixed(d)+'%';
+// v6.1.1 FIX (ZEITZONE): toISOString() rechnet nach UTC. Zwischen 00:00 und
+// 02:00 mitteleuropaeischer Zeit lieferte today() den VORTAG — und damit ein
+// falsches Vorgabedatum fuer Einstieg, Ausstieg und Rollen.
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const escHtml=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fE=(v,d=0)=>Number(v).toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d})+'€';
+const fE2=v=>fE(v,2);
+// v4.3.1: Barabgerechnete Index-Optionen (Cash Settlement, europäisch) — dort gibt es KEIN
+// Aktien-Assignment und damit keinen Wheel-Zyklus. Erkennung über gängige CBOE-Ticker.
+const CASH_SETTLED=new Set(['SPX','SPXW','XSP','NDX','NDXP','RUT','RUTW','DJX','VIX','VIXW','OEX','XEO']);
+const isCashSettled=u=>CASH_SETTLED.has(String(u||'').trim().toUpperCase());
+function toEUR(v,ccy,fx){if(!ccy||ccy==='EUR')return v;const e=ls().eurusd;const k=(isFinite(fx)&&fx>0)?fx:((isFinite(e)&&e>0)?e:FX_NOTWERT);return v/k;} // v4.3 FIX: Per-Trade-fxClose wird jetzt WIRKLICH angewendet (war nur gespeichert)
+function fCcy(v,ccy,d=0){return ccy==='EUR'?fE(v,d):(ccy==='USD'?'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}):f$(v,d));}
+
+// ═══ STRATEGY CONFIG ═══
+const ST={
+  CC:{n:'Covered Call',bg:'background:rgba(132,204,22,.14);color:var(--grn)',c:'s-cc',legs:[{type:'CALL',side:'SELL',label:'Short Call'}]},
+  CSP:{n:'Cash-Sec. Put',bg:'background:rgba(32,178,170,.14);color:var(--acc)',c:'s-csp',legs:[{type:'PUT',side:'SELL',label:'Short Put'}]},
+  BPS:{n:'Bull Put Spread',bg:'background:rgba(139,92,246,.14);color:var(--vio)',c:'s-vs',legs:[{type:'PUT',side:'SELL',label:'Short Put'},{type:'PUT',side:'BUY',label:'Long Put'}]},
+  BCS:{n:'Bear Call Spread',bg:'background:rgba(139,92,246,.14);color:var(--vio)',c:'s-vs',legs:[{type:'CALL',side:'SELL',label:'Short Call'},{type:'CALL',side:'BUY',label:'Long Call'}]},
+  IC:{n:'Iron Condor',bg:'background:rgba(245,158,11,.14);color:var(--amb)',c:'s-ic',legs:[{type:'PUT',side:'SELL',label:'Short Put'},{type:'PUT',side:'BUY',label:'Long Put'},{type:'CALL',side:'SELL',label:'Short Call'},{type:'CALL',side:'BUY',label:'Long Call'}]},
+  STRANGLE:{n:'Short Strangle',bg:'background:rgba(245,158,11,.14);color:var(--amb)',c:'s-ic',legs:[{type:'PUT',side:'SELL',label:'Short Put'},{type:'CALL',side:'SELL',label:'Short Call'}]},
+  STOCK:{n:'Aktien (Bestand)',bg:'background:rgba(255,255,255,.1);color:var(--t1)',c:'',legs:[]}
+};
+const SB={OPEN:'background:rgba(32,178,170,.12);color:var(--acc)',CLOSED:'background:rgba(255,255,255,.06);color:var(--t2)',ROLLED:'background:rgba(139,92,246,.12);color:var(--vio)',ASSIGNED:'background:rgba(245,158,11,.12);color:var(--amb)',EXPIRED:'background:rgba(132,204,22,.12);color:var(--grn)'};
+
+// ═══ RISK ENGINE ═══
+function calcRisk(t){
+  if(t.maxRisk) return t.maxRisk;
+  const {strategy:s,legs:l,contracts:c,premium:p}=t;
+  if(!l||!l.length||!c||!p) return null;
+  const strikes=l.map(x=>x.strike).filter(Boolean);
+  if(s==='CSP'){const ss=l.find(x=>x.side==='SELL')?.strike;if(!ss)return null;const r=(ss*MUL*c)-(p*MUL*c);return r>0?r:null;}
+  if(s==='CC') return null;
+  if(s==='BPS'||s==='BCS'){if(strikes.length>=2){const w=Math.abs(strikes[0]-strikes[1]);if(w<=0)return null;const r=(w*MUL*c)-(p*MUL*c);return r>0?r:null;}return null;}
+  if(s==='IC'){
+    const pS=l.filter(x=>x.type==='PUT').map(x=>x.strike).filter(Boolean);
+    const cS=l.filter(x=>x.type==='CALL').map(x=>x.strike).filter(Boolean);
+    const pw=pS.length>=2?Math.abs(pS[0]-pS[1]):0;
+    const cw=cS.length>=2?Math.abs(cS[0]-cS[1]):0;
+    const maxW=Math.max(pw,cw);if(maxW<=0)return null;
+    const r=(maxW*MUL*c)-(p*MUL*c);return r>0?r:null;
+  }
+  if(s==='STRANGLE') return null;
+  return null;
+}
+
+// ── v6.1.1 FIX (WÄHRUNGSVERMISCHUNG IN DER RISIKO-ENGINE) ───────────────────
+// calcRisk() liefert das Nominalrisiko in der Währung des Basiswerts — bei
+// US-Optionen also in Dollar. Die Kontogröße ist ausdrücklich in Euro erfasst
+// ("Kontogröße (€)"). Beides wurde bisher ungerechnet verrechnet:
+// Auslastungsprozente kamen rund 8,5 % zu HOCH heraus, das freie Budget
+// entsprechend zu niedrig — und bei posSize() wurde ein Euro-Budget durch ein
+// Dollar-Risiko geteilt, was zu wenige Kontrakte ergab.
+// Neu: calcRiskEUR() rechnet über die vorhandene toEUR()-Funktion um, inklusive
+// des am Trade gespeicherten fxClose, falls vorhanden.
+function calcRiskEUR(t){ const r=calcRisk(t); return r==null?null:toEUR(r,t.currency||'USD',t.fxClose); }
+
+function tradeRiskPct(t){const a=ls().accountSize;const r=calcRiskEUR(t);if(!a||!r)return null;return(r/a)*100;}
+function isOverTrade(t){const p=tradeRiskPct(t);return p!==null&&p>(ls().maxTR||5);}
+function totalRisk(){return ld().filter(t=>t.status==='OPEN').reduce((s,t)=>s+(calcRiskEUR(t)||0),0);} // v6.1.1: liefert jetzt EUR
+function portRiskPct(){const a=ls().accountSize;return a?(totalRisk()/a*100):null;}
+function isOverAcct(){const p=portRiskPct();return p!==null&&p>(ls().maxAR||25);}
+function totalDelta(){return ld().filter(t=>t.status==='OPEN').reduce((s,t)=>s+((t.delta||0)*t.contracts*MUL),0);}
+function availBudget(){const s=ls();if(!s.accountSize)return null;return Math.max(0,s.accountSize*(s.maxAR||25)/100-totalRisk());}
+function returnOnRisk(t){if(t.pnl===null||t.pnl===undefined||!t.entryDate||!t.closeDate)return null;const r=calcRisk(t);if(!r||r<=0)return null;const d=Math.max(1,(new Date(t.closeDate)-new Date(t.entryDate))/864e5);return(t.pnl/r)*(365/d)*100;}
+// v6.1.1: Der Rechner arbeitet mit Dollar-Strikes, das Budget steht in Euro.
+// rpc bleibt in Dollar (so wird es angezeigt), für die Kontraktzahl wird umgerechnet.
+function posSize(w,p){const s=ls();if(!s.accountSize)return{rpc:0,rpcEur:0,mc:0,pr:0};
+  const rpc=(w-p)*MUL; const rpcEur=toEUR(rpc,'USD');
+  const mx=s.accountSize*(s.maxTR||5)/100;
+  return{rpc,rpcEur,mc:rpcEur>0?Math.floor(mx/rpcEur):0,pr:rpc>0?(p*MUL/rpc*100):0};}
+
+// ═══ FORMATTING ═══
+// v6.0 FIX: DTE zaehlte bis zum Zeitpunkt 16:00 des Verfallstags und rundete auf.
+// Dadurch sprang der Wert JEDEN TAG um 16:00 Uhr um eins und lag den ganzen
+// Handelstag ueber einen Tag zu hoch: am 31.07. wurden bis zum 21.08. 22 statt 21
+// Tage angezeigt, und am Verfallstag selbst stand morgens noch "1 DTE" statt "0".
+// Bei DTE-gesteuerter Verwaltung (21-DTE-Regel) verschiebt das jede Entscheidung
+// um einen Tag. Neu: Differenz in KALENDERTAGEN, wie der Broker sie ausweist.
+function dte(exp){
+  if(!exp) return null;
+  const e=new Date(exp+'T00:00:00'); if(isNaN(e)) return null;
+  const n=new Date(); const heute=new Date(n.getFullYear(),n.getMonth(),n.getDate());
+  return Math.round((e-heute)/864e5);
+}
+function dteS(d){const w=ls().dteWarn||7;if(d<=0)return'color:var(--red);font-weight:700';if(d<=w)return'color:var(--amb);font-weight:600';return'color:var(--grn)';}
+function decayPct(en,ex){if(!en||!ex)return 0;const t=Math.max(1,(new Date(ex)-new Date(en))/864e5);return Math.min(100,Math.max(0,((new Date()-new Date(en))/864e5/t)*100));}
+function pnlC(v){return v>=0?'color:var(--grn)':'color:var(--red)';}
+function riskC(p){if(p===null)return'color:var(--t3)';const m=ls().maxTR||5;if(p>m)return'color:var(--red);font-weight:600';if(p>m*.7)return'color:var(--amb)';return'color:var(--grn)';}
+function strikesFmt(legs){return(legs||[]).map(l=>`${l.side==='SELL'?'−':'+'}${l.strike||'?'}${(l.type||'?')[0]}`).join(' / ');}
+
+// ═══ NAVIGATION ═══
+const TABS=[{id:'dash',l:'Dashboard'},{id:'trades',l:'Trades'},{id:'new',l:'+ Neu'},{id:'risk',l:'⚠ Risiko'},{id:'ul',l:'Underlyings'},{id:'wheel',l:'Wheel'},{id:'cal',l:'📅 Kalender'},{id:'stats',l:'Analytics'},{id:'ai',l:'KI-Coach'}];
+let tab='dash',sortF='entryDate',sortD='desc',sel=new Set(),editId=null,fLegs=[];
+// v6.0 FIX (ROLL-KETTE WAR TOT): saveTrade() hat rolledFrom hart auf null gesetzt.
+// Dadurch bekam KEIN neuer Trade je eine Verknuepfung zum Vorgaenger — und
+// getRollChain() konnte folglich nie eine Kette finden. Die gesamte Roll-Historie
+// war unsichtbar, obwohl die Auswertung dafuer schon existierte.
+// pendingRollFrom haelt die ID des gerollten Vorgaengers bis zum Speichern fest.
+let pendingRollFrom=null;
+const charts={};
+
+function go(t){tab=t;sel.clear();$('nav').innerHTML=TABS.map(x=>`<button class="nav-t ${x.id===t?'on':''}" onclick="go('${x.id}')">${x.l}</button>`).join('');render();}
+// v4.2.20 FIX (BUG): Trades-Filter lagen IM neu gerenderten Bereich -> Selects sprangen
+// nach jeder Auswahl optisch zurueck, Suchfeld verlor nach 1 Buchstaben Fokus+Eingabe,
+// Sortieren warf alle Filter weg. Status jetzt persistent in Variablen.
+let fS='',fSt='',fU='',fQ='';
+function flq(el){fQ=el.value;render();const i=$('fl-q');if(i){i.value=fQ;i.focus();const L=fQ.length;try{i.setSelectionRange(L,L)}catch(_){}}}
+function render(){const m=$('main');if(tab==='dash')m.innerHTML=rDash();else if(tab==='trades')m.innerHTML=rTrades();else if(tab==='new'){editId=null;fLegs=[];m.innerHTML=rForm();}else if(tab==='risk')m.innerHTML=rRisk();else if(tab==='ul')m.innerHTML=rUL();else if(tab==='wheel')m.innerHTML=rWheel();else if(tab==='cal')m.innerHTML=rCal();else if(tab==='stats')m.innerHTML=rStats();else if(tab==='ai')m.innerHTML=rAI();if(tab==='trades'){const a=$('fl-s'),b=$('fl-st'),c=$('fl-u'),d=$('fl-q');if(a)a.value=fS;if(b)b.value=fSt;if(c)c.value=fU;if(d)d.value=fQ;}setTimeout(()=>{initCharts();updDTE();calcLive();},60);}
+
+// ═══ TRADE DETAIL MODAL ═══
+function openDetail(id){
+  const t=ld().find(x=>x.id===id);if(!t)return;
+  const m=ST[t.strategy]||{},d=t.status==='OPEN'?dte(t.expiry):null,r=calcRisk(t),rp=tradeRiskPct(t),dc=decayPct(t.entryDate,t.expiry);
+  const tp=t.premium*t.contracts*MUL,adjCost=(t.adjustments||[]).reduce((s,a)=>s+(a.cost||0),0);
+  const ror=returnOnRisk(t),chain=getRollChain(id);
+  const dr=(l,v)=>`<div style="display:grid;grid-template-columns:130px 1fr;gap:6px;padding:5px 0;border-bottom:1px solid var(--brd)"><span style="font-size:.63rem;color:var(--t3);text-transform:uppercase;letter-spacing:.04em">${l}</span><span class="mono" style="font-size:.73rem">${v}</span></div>`;
+  const entryDTEval=t.entryDate&&t.expiry?Math.ceil((new Date(t.expiry)-new Date(t.entryDate))/864e5):null;
+  let h=dr('Entry',`${t.entryDate}${entryDTEval!==null?` <span style="color:var(--t3);font-size:.65rem">(${entryDTEval}d DTE bei Eröffnung)</span>`:''}`);
+  h+=dr('Expiry',`${t.expiry} ${d!==null?`<span style="${dteS(d)}">(${d} DTE)</span>`:''}`);
+  h+=dr('Legs',strikesFmt(t.legs))+dr('Kontrakte',t.contracts)+dr('Prämie',`${f2(t.premium)}/K → ${f$(Math.round(tp))} total`);
+  if(t.underlyingPrice)h+=dr('UL-Preis',f2(t.underlyingPrice));
+  h+=dr('Greeks',`Δ ${t.delta||'–'} · Θ ${t.theta||'–'} · IV ${t.iv?t.iv+'%':'–'} · IVR ${t.ivRank?t.ivRank+'%':'–'}`);
+  if(r)h+=dr('Max Risk',`<span style="${riskC(rp)}">${f$(Math.round(r))}${rp?' ('+fp(rp)+' Konto)':''}</span>`);
+  // Commissions
+  const totalCommTrade=(t.commission||0)+(t.closeCommission||0);
+  if(totalCommTrade>0){h+=dr('Gebühren',`<span style="color:var(--red)">Entry: ${f2(t.commission||0)}${t.closeCommission?' · Close: '+f2(t.closeCommission):''} · <span style="font-weight:600">Σ ${f2(totalCommTrade)}</span></span>`);}
+  if(t.tags?.length)h+=dr('Tags',t.tags.map(tg=>`<span class="badge" style="background:var(--elev);color:var(--t2);margin-right:3px">${escHtml(tg)}</span>`).join(''));
+  if(t.notes)h+=dr('Notizen',`<span style="color:var(--t2)">${escHtml(t.notes)}</span>`);
+  // Wheel cost basis context - show if this underlying has wheel data
+  if(t.strategy==='CSP'||t.strategy==='CC'||t.strategy==='STOCK'){
+    const allT=ld().filter(x=>x.underlying===t.underlying);
+    const wd=calcWheelData(t.underlying,allT);
+    if(wd&&wd.hasShares){
+      h+=`<div style="margin-top:10px;padding:8px;background:var(--elev);border-radius:var(--rs);font-size:.72rem">
+        <div style="font-size:.55rem;color:var(--t3);text-transform:uppercase;margin-bottom:4px">Wheel · ${escHtml(t.underlying)}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <div><span style="color:var(--t3)">Brutto</span><div class="mono" style="color:var(--t1)">${f2(wd.bruttoPrice)}</div></div>
+          <div><span style="color:var(--t3)">Effektiv</span><div class="mono" style="color:var(--acc);font-weight:700">${f2(wd.effektivPrice)}</div></div>
+          <div><span style="color:var(--t3)">Reduktion</span><div class="mono" style="color:var(--grn)">${f2(wd.bruttoPrice-wd.effektivPrice)}</div></div>
+        </div></div>`;
+    }
+  }
+  // Theta decay
+  if(t.status==='OPEN')h+=`<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--t3);margin-bottom:3px"><span>Θ Time Decay</span><span>${dc.toFixed(0)}%</span></div><div class="db"><div class="db-f" style="width:${dc}%"></div></div></div>`;
+  // Profit target tracking
+  if(t.status==='OPEN'){const pt50=tp*0.5;h+=`<div style="margin-top:8px;padding:8px;background:var(--elev);border-radius:var(--rs);font-size:.72rem"><span style="color:var(--t3)">50% Profit Target:</span> <span class="mono" style="color:var(--acc)">Close bei ${f2(t.premium*0.5)}/K = ${f$(Math.round(pt50))} Gewinn</span></div>`;}
+  // Adjustments
+  if((t.adjustments||[]).length){h+=`<div style="margin-top:10px"><div style="font-size:.62rem;color:var(--t3);text-transform:uppercase;margin-bottom:6px">Adjustments (${t.adjustments.length})</div>`;
+    t.adjustments.forEach((a,i)=>{h+=`<div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg);border-radius:var(--rs);padding:5px 8px;margin-bottom:3px;font-size:.7rem"><span>${a.date} · ${a.type}${a.strike?' → '+a.strike:''} ${a.notes?'<span style="color:var(--t3)">'+escHtml(a.notes)+'</span>':''}</span><div style="display:flex;align-items:center;gap:6px"><span class="mono" style="${a.cost>=0?'color:var(--grn)':'color:var(--red)'}">${f2(a.cost)}</span><button onclick="delAdj('${id}',${i})" style="color:var(--red);background:none;border:none;cursor:pointer;font-size:.65rem">✕</button></div></div>`;});
+    h+=`<div style="font-size:.68rem;color:var(--t3);margin-top:4px">Adj. Netto: <span class="mono" style="${adjCost>=0?'color:var(--grn)':'color:var(--red)'}">${f2(adjCost)}</span></div></div>`;}
+  // Close info
+  if(t.status!=='OPEN'){
+    const holdDays=t.entryDate&&t.closeDate?Math.ceil((new Date(t.closeDate)-new Date(t.entryDate))/864e5):null;
+    const entryDTE=t.entryDate&&t.expiry?Math.ceil((new Date(t.expiry)-new Date(t.entryDate))/864e5):null;
+    h+=`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--brd)">`;
+    h+=dr('Close',`${t.closeDate} · ${t.closeType}`);
+    if(t.closePrice)h+=dr('Close-Preis',f2(t.closePrice)+'/K');
+    h+=dr('P&L',`<span style="font-weight:700;${pnlC(t.pnl||0)}">${fCcy(Math.round(t.pnl||0),t.currency||'USD')}</span>${t.currency==='USD'?' <span style="color:var(--t3);font-size:.6rem">≈ '+fE(Math.round(toEUR(t.pnl||0,'USD',t.fxClose)))+'</span>':''}`);
+    if(ror)h+=dr('Return on Risk',`<span style="color:var(--acc)">${fp(ror)} ann.</span>`);
+    // Realized yield on capital
+    const ccy=t.currency||'USD',mul2=ccy==='EUR'?100:MUL;
+    const sellStrike=t.legs?.find(l=>l.side==='SELL')?.strike;
+    const cap2=sellStrike?(sellStrike*t.contracts*mul2):(t.underlyingPrice?(t.underlyingPrice*t.contracts*mul2):0);
+    if(cap2>0&&holdDays){const yieldOnCap=((t.pnl||0)/cap2*100);const yieldPA=yieldOnCap*(365/holdDays);
+      h+=dr('Realisierte Rendite',`<span style="color:var(--acc);font-weight:600">${yieldOnCap.toFixed(2)}% in ${holdDays}d</span> · <span style="color:var(--vio)">${yieldPA.toFixed(1)}% p.a.</span> auf ${fCcy(cap2,ccy,0)}`);}
+    h+=dr('Laufzeit',`${entryDTE!==null?entryDTE+'d DTE bei Entry':'–'} · <span style="color:var(--acc)">${holdDays!==null?holdDays+'d gehalten':'–'}</span>`);
+    if(t.closeNotes)h+=dr('Close-Notiz',`<span style="color:var(--t2)">${escHtml(t.closeNotes)}</span>`);
+    h+='</div>';}
+  // Roll chain
+  if(chain.length>1){h+=`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--brd)"><div style="font-size:.62rem;color:var(--t3);text-transform:uppercase;margin-bottom:6px">Roll-Kette (${chain.length})</div><div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px">`;
+    chain.forEach((r,i)=>{const isMe=r.id===id;h+=`${i>0?'<span style="color:var(--t3);font-size:.6rem">→</span>':''}
+      <div onclick="cm('M-det');setTimeout(()=>openDetail('${r.id}'),100)" class="mono" style="padding:3px 7px;border-radius:var(--rs);font-size:.6rem;cursor:pointer;${isMe?'background:rgba(139,92,246,.15);color:var(--vio);font-weight:700':'background:var(--elev);color:var(--t3)'}">${r.entryDate.substring(5)} ${r.strategy} ${f$(Math.round(r.premium*r.contracts*MUL))}</div>`;});
+    h+='</div>';
+    // v6.0: Der Netto-Credit ueber die GANZE Kette. Beim Rollen zeigt das Einzelglied
+    // oft einen dicken Verlust (Rueckkauf teurer als der urspruengliche Credit) —
+    // aussagekraeftig ist aber nur, was ueber alle Glieder zusammen haengengeblieben ist.
+    const chRealisiert = chain.reduce((s,r)=>s + (typeof r.pnl==='number' ? r.pnl : 0), 0);
+    const chOffen = chain.filter(r=>r.status==='OPEN').reduce((s,r)=>s + r.premium*r.contracts*MUL, 0);
+    const chNetto = chRealisiert + chOffen;
+    h+=`<div style="margin-top:8px;font-size:.68rem;color:var(--t2);line-height:1.6">
+      realisiert über die Kette: <span class="mono" style="color:var(${chRealisiert>=0?'--grn':'--red'})">${f$(Math.round(chRealisiert))}</span>
+      ${chOffen?` · offene Prämie: <span class="mono">${f$(Math.round(chOffen))}</span>` : ''}
+      <br><b>Netto-Credit gesamt: <span class="mono" style="color:var(${chNetto>=0?'--grn':'--red'})">${f$(Math.round(chNetto))}</span></b>
+    </div>`;
+    h+='</div>';}
+  // Render into modal
+  $('det-title').innerHTML=`<span class="badge" style="${m.bg||''};margin-right:6px">${t.strategy}</span>${t.underlying}`;
+  $('det-body').innerHTML=h;
+  $('det-edit').onclick=()=>{cm('M-det');editTrade(id);};
+  $('det-close').onclick=()=>{cm('M-det');openCl(id);};
+  $('det-close').style.display=t.status==='OPEN'?'':'none';
+  $('det-adj').onclick=()=>{cm('M-det');openAdj(id);};
+  $('det-adj').style.display=t.status==='OPEN'?'':'none';
+  $('det-dup').onclick=()=>{cm('M-det');dupTrade(id);};
+  om('M-det');
+}
+// v6.0: Verwaiste Rolls finden — Status ROLLED, aber kein Nachfolger vorhanden.
+// Passiert, wenn nach dem Schliessen das Formular fuer die neue Position abgebrochen
+// oder der Browser geschlossen wird: Die Position gilt im Journal als erledigt,
+// steht beim Broker aber weiter offen. Genau die Luecke, die im Risiko-Dashboard
+// zu wenig Exposure ausweist.
+function orphanRolls(){
+  const T=ld();
+  return T.filter(t=>t.status==='ROLLED' && !t.rolledTo && !T.some(x=>x.rolledFrom===t.id));
+}
+
+function getRollChain(id){const T=ld(),chain=[],seen=new Set();let cur=T.find(t=>t.id===id);let guard=50;while(cur?.rolledFrom&&guard-->0){if(seen.has(cur.rolledFrom))break;seen.add(cur.rolledFrom);const p=T.find(t=>t.id===cur.rolledFrom);if(p)chain.unshift(p);cur=p;}cur=T.find(t=>t.id===id);if(cur)chain.push(cur);seen.clear();seen.add(id);let nxt=T.find(t=>t.rolledFrom===id);guard=50;while(nxt&&guard-->0){if(seen.has(nxt.id))break;seen.add(nxt.id);chain.push(nxt);nxt=T.find(t=>t.rolledFrom===nxt.id);}return chain;}
+function delAdj(tid,idx){const T=ld();const t=T.find(x=>x.id===tid);if(!t||!t.adjustments)return;t.adjustments.splice(idx,1);sv(T);cm('M-det');toast('Adjustment gelöscht');openDetail(tid);}
+
+// ═══ UNDERLYING ANALYSIS ═══
+function rUL(){
+  const T=ld(),byU={};T.forEach(t=>{if(!byU[t.underlying])byU[t.underlying]=[];byU[t.underlying].push(t)});
+  if(!Object.keys(byU).length)return'<div class="empty fu"><h3>Noch keine Trades</h3><p>Erfasse Trades, um die Underlying-Analyse zu sehen.</p></div>';
+  let h='<div class="fu"><h2 style="font-size:1.05rem;font-weight:700;margin-bottom:14px">Underlying-Analyse</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">';
+  Object.entries(byU).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([sym,tds])=>{
+    const o=tds.filter(t=>t.status==='OPEN').length,c=tds.filter(t=>t.status!=='OPEN');
+    const tp=tds.reduce((s,t)=>s+t.premium*t.contracts*MUL,0),tpnl=c.reduce((s,t)=>s+(t.pnl||0),0);
+    const wr=c.length?c.filter(t=>(t.pnl||0)>0).length/c.length*100:0;
+    const risk=tds.filter(t=>t.status==='OPEN').reduce((s,t)=>s+(calcRiskEUR(t)||0),0),rp=ls().accountSize?(risk/ls().accountSize*100):null; // v6.1.1: EUR
+    const strats=[...new Set(tds.map(t=>t.strategy))];
+    h+=`<div class="card" style="padding:14px;cursor:pointer" onclick="go('trades');setTimeout(()=>{const e=$('fl-u');if(e){e.value='${sym}';render();}},30)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:1.05rem;font-weight:700">${sym}</span><div style="display:flex;gap:3px">${strats.map(s=>`<span class="badge" style="${(ST[s]||{}).bg||''}">${s}</span>`).join('')}</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:.72rem">
+        <div><span style="color:var(--t3)">Trades</span><div class="mono">${tds.length} (${o} offen)</div></div>
+        <div><span style="color:var(--t3)">Prämien</span><div class="mono" style="color:var(--vio)">${f$(Math.round(tp))}</div></div>
+        <div><span style="color:var(--t3)">P&L</span><div class="mono" style="${pnlC(tpnl)}">${f$(Math.round(tpnl))}</div></div>
+        <div><span style="color:var(--t3)">Win%</span><div class="mono" style="${wr>=60?'color:var(--grn)':wr>=40?'color:var(--amb)':'color:var(--red)'}">${wr.toFixed(0)}%</div></div>
+        <div><span style="color:var(--t3)">Off. Risk</span><div class="mono" style="${riskC(rp)}">${fE(Math.round(risk))}</div></div>
+        <div><span style="color:var(--t3)">% Konto</span><div class="mono" style="${riskC(rp)}">${rp?fp(rp):'–'}</div></div>
+      </div></div>`;
+  });
+  return h+'</div></div>';
+}
+
+// ═══ EXPIRY CALENDAR ═══
+function rCal(){
+  const O=ld().filter(t=>t.status==='OPEN');
+  if(!O.length)return'<div class="empty fu"><h3>Keine offenen Trades</h3><p>Der Kalender zeigt Expiry-Daten deiner offenen Positionen.</p></div>';
+  // Group by expiry week
+  const byWeek={};O.forEach(t=>{const exp=t.expiry;if(!exp)return;const d=new Date(exp);const day=d.getDay();const diff=day===0?-6:1-day;const weekStart=new Date(d);weekStart.setDate(d.getDate()+diff);const wk=weekStart.toISOString().split('T')[0];if(!byWeek[wk])byWeek[wk]=[];byWeek[wk].push(t);});
+  let h='<div class="fu"><h2 style="font-size:1.05rem;font-weight:700;margin-bottom:5px">📅 Expiry-Kalender</h2><p style="font-size:.78rem;color:var(--t3);margin-bottom:14px">Offene Positionen nach Expiry-Woche · DTE-Cluster erkennen</p>';
+  Object.entries(byWeek).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([week,trades])=>{
+    const weekEnd=new Date(week);weekEnd.setDate(weekEnd.getDate()+4);
+    const weekRisk=trades.reduce((s,t)=>s+(calcRiskEUR(t)||0),0); // v6.1.1: EUR
+    const weekContracts=trades.reduce((s,t)=>s+t.contracts,0);
+    const minDTE=Math.min(...trades.map(t=>dte(t.expiry)||999));
+    h+=`<div class="card" style="padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-weight:700;font-size:.88rem">${week} — ${weekEnd.toISOString().split('T')[0]}</span><span class="badge" style="${dteS(minDTE)}">${minDTE}d min</span></div>
+      <div style="display:flex;gap:12px;font-size:.72rem"><span style="color:var(--t3)">${trades.length} Pos · ${weekContracts} K</span><span class="mono" style="${riskC(ls().accountSize?(weekRisk/ls().accountSize*100):null)}">${fE(Math.round(weekRisk))} Risk</span></div>
+    </div><div style="display:flex;flex-wrap:wrap;gap:5px">`;
+    trades.sort((a,b)=>a.expiry.localeCompare(b.expiry)).forEach(t=>{
+      const m=ST[t.strategy]||{},d=dte(t.expiry);
+      h+=`<div class="${m.c||''}" style="display:flex;align-items:center;gap:5px;padding:5px 9px;border-radius:var(--rs);background:var(--elev);font-size:.7rem;cursor:pointer" onclick="openDetail('${t.id}')">
+        <span class="badge" style="${m.bg}">${t.strategy}</span><span style="font-weight:600">${t.underlying}</span>
+        <span class="mono" style="color:var(--t3)">${t.expiry.substring(5)}</span>
+        <span class="mono" style="${d!==null?dteS(d):'color:var(--t3)'}">${d!==null?d+'d':'–'}</span></div>`;
+    });
+    h+='</div></div>';
+  });
+  return h+'</div>';
+}
+function toast(msg,cls='t-ok'){const e=document.createElement('div');e.className='toast '+cls;e.textContent=msg;$('toasts').appendChild(e);setTimeout(()=>e.remove(),3200);}
+function cm(id){$(id).classList.remove('on');}
+function om(id){$(id).classList.add('on');}
+
+// ═══ DASHBOARD ═══
+let dashPeriod='all',dashWfCount=30;
+// ═══ v6.0: SELBSTKONTROLLE (OPTIONSBEZUG) ═══════════════════════════════════
+// Prueft, ob die gespeicherten Optionsdaten in sich stimmig sind. Aendert nichts.
+// Der wichtigste Test rechnet den gespeicherten P&L aus Praemie, Rueckkauf,
+// Gebuehren und Adjustments nach — exakt nach der Formel aus execClose().
+// Schweregrade: 'hoch' = Zahlen falsch oder Position fehlt im Risiko
+//               'mittel' = Auswertung verzerrt
+//               'hinweis' = pruefenswert, meist Absicht
+function optIntegrityChecks(){
+  const T=ld(), F=[];
+  const add=(stufe,titel,text)=>F.push({stufe,titel,text});
+  if(!T.length) return F;
+  const lbl=t=>`${t.underlying||'?'} ${t.strategy||''}`.trim();
+  const heute=new Date(); heute.setHours(0,0,0,0);
+
+  // ── 1. P&L aus den Rohdaten nachrechnen ───────────────────────────────────
+  const abw=[];
+  T.filter(t=>t.status&&t.status!=='OPEN'&&typeof t.pnl==='number').forEach(t=>{
+    const n=+t.contracts, pm=+t.premium;
+    if(!isFinite(n)||!isFinite(pm)||n<=0) return;
+    const adj=(t.adjustments||[]).reduce((s,a)=>s+(+a.cost||0),0);
+    const tp=pm*n*MUL, tc=(+t.closePrice||0)*n*MUL;
+    const cc=+t.closeCommission||0, cm=+t.commission||0;
+    // EXPIRED zieht bewusst KEINEN Rueckkauf und keine Schliessungsgebuehr ab.
+    const soll = (t.status==='EXPIRED') ? (tp-cm+adj) : (tp-tc-cm-cc+adj);
+    const d=t.pnl-soll;
+    if(Math.abs(d) > Math.max(0.01, Math.abs(soll)*0.005)) abw.push({t,d});
+  });
+  if(abw.length){
+    const s=abw.reduce((a,x)=>a+x.d,0);
+    add('hoch','Gespeicherter P&L passt nicht zur Nachrechnung',
+      `${abw.length} geschlossene Positionen. Aus Prämie, Rückkaufkurs, Gebühren und Adjustments ergibt sich ein anderer Wert als gespeichert. `
+      +`Summe der Abweichungen: ${f$(Math.round(s))}. Prüfen: `
+      +abw.slice(0,6).map(x=>lbl(x.t)+' ('+f$(Math.round(x.d))+')').join(', ')+(abw.length>6?' …':''));
+  }
+
+  // ── 2. EXPIRED mit Rueckkaufkurs ──────────────────────────────────────────
+  const expPx=T.filter(t=>t.status==='EXPIRED' && +t.closePrice>0);
+  if(expPx.length) add('mittel','Wertlos verfallen, aber mit Rückkaufkurs',
+    `${expPx.length} Positionen stehen auf EXPIRED und haben trotzdem einen Schlusskurs. Bei wertlosem Verfall gibt es keinen Rückkauf. `
+    +`Betroffen: ${expPx.slice(0,6).map(lbl).join(', ')}`);
+
+  // ── 3. Assignment ohne erfasste Aktien ────────────────────────────────────
+  const asgLeer=T.filter(t=>t.status==='ASSIGNED' && (!(+t.assignmentShares>0) || !(+t.assignmentPrice>0)));
+  if(asgLeer.length) add('hoch','Eingebucht, aber Aktien nicht erfasst',
+    `${asgLeer.length} Positionen sind als ASSIGNED gebucht, ohne Stückzahl oder Einbuchungskurs. Ohne diese Werte fehlt die Kostenbasis für den Wheel-Zyklus und die Aktienposition taucht nirgends auf. `
+    +`Betroffen: ${asgLeer.slice(0,6).map(lbl).join(', ')}`);
+
+  // ── 4. Stueckzahl passt nicht zu den Kontrakten ───────────────────────────
+  const asgMis=T.filter(t=>t.status==='ASSIGNED' && +t.assignmentShares>0 && +t.contracts>0
+    && +t.assignmentShares !== +t.contracts*MUL);
+  if(asgMis.length) add('mittel','Eingebuchte Stückzahl passt nicht zu den Kontrakten',
+    `${asgMis.length} Positionen. Bei ${MUL} Aktien je Kontrakt sollte die Stückzahl der Kontraktzahl mal ${MUL} entsprechen. Teilzuweisungen sind möglich — dann ist das in Ordnung. `
+    +`Betroffen: ${asgMis.slice(0,6).map(t=>lbl(t)+' ('+t.assignmentShares+' bei '+t.contracts+' Kontrakten)').join(', ')}`);
+
+  // ── 5. Assignment bei barabgerechnetem Basiswert ──────────────────────────
+  const asgCash=T.filter(t=>t.status==='ASSIGNED' && isCashSettled(t.underlying));
+  if(asgCash.length) add('hoch','Aktien-Assignment bei barabgerechnetem Index',
+    `${asgCash.length} Positionen. ${asgCash.map(t=>t.underlying).join(', ')} wird bar abgerechnet — ein Aktien-Assignment gibt es dort nicht. `
+    +`Solche Altbuchungen sollten als Buy to Close mit dem Settlement-Wert nacherfasst werden.`);
+
+  // ── 6. Roll ohne Nachfolger ───────────────────────────────────────────────
+  const orph=orphanRolls();
+  if(orph.length) add('hoch','Roll ohne Anschlussposition',
+    `${orph.length} Positionen sind als gerollt gebucht, aber die Anschlussposition wurde nie erfasst. Läuft sie beim Broker noch, fehlt sie hier im offenen Risiko — das Dashboard weist dann zu wenig Exposure aus. `
+    +`Betroffen: ${orph.slice(0,6).map(t=>lbl(t)+' vom '+(t.closeDate||'?')).join(', ')}`);
+
+  // ── 7. Offen, aber Verfall liegt in der Vergangenheit ─────────────────────
+  const abgelaufen=T.filter(t=>t.status==='OPEN' && t.expiry && new Date(t.expiry+'T00:00:00') < heute);
+  if(abgelaufen.length) add('hoch','Offene Position mit abgelaufenem Verfall',
+    `${abgelaufen.length} Positionen gelten als offen, ihr Verfallsdatum liegt aber in der Vergangenheit. Sie blähen das offene Risiko auf und verfälschen Delta und Auslastung. `
+    +`Betroffen: ${abgelaufen.slice(0,6).map(t=>lbl(t)+' ('+t.expiry+', '+dte(t.expiry)+' Tage)').join(', ')}`);
+
+  // ── 8. Legs ohne Strike ───────────────────────────────────────────────────
+  const ohneStrike=T.filter(t=>t.status==='OPEN' && t.strategy!=='STOCK'
+    && (t.legs||[]).some(l=>!(+l.strike>0)));
+  if(ohneStrike.length) add('hoch','Offene Position mit Leg ohne Strike',
+    `${ohneStrike.length} Positionen. Ohne Strike lässt sich das Risiko nicht berechnen — sie fehlen in der Summe des gebundenen Kapitals. `
+    +`Betroffen: ${ohneStrike.slice(0,6).map(lbl).join(', ')}`);
+
+  // ── 9. Risiko nicht berechenbar ───────────────────────────────────────────
+  const risikoLos=T.filter(t=>t.status==='OPEN' && !(calcRisk(t)>0));
+  if(risikoLos.length) add('mittel','Offene Position ohne berechenbares Risiko',
+    `${risikoLos.length} Positionen liefern kein Risiko. Die Auslastung gegen die Kontogröße wird dadurch zu niedrig ausgewiesen. `
+    +`Betroffen: ${risikoLos.slice(0,6).map(lbl).join(', ')}`);
+
+  // ── 10. Negative oder fehlende Praemie bei Credit-Strategien ──────────────
+  const creditStrat=new Set(['CSP','CC','IC','BPS','BCS','STRANGLE','STRADDLE']);
+  const pmBad=T.filter(t=>creditStrat.has(t.strategy) && !(+t.premium>0));
+  if(pmBad.length) add('mittel','Stillhalter-Position ohne Prämie',
+    `${pmBad.length} Positionen einer Prämienstrategie haben keine oder eine negative Prämie. Verzerrt jede Prämien-Kennzahl. `
+    +`Betroffen: ${pmBad.slice(0,6).map(lbl).join(', ')}`);
+
+  // ── 11. Zeitliche Unmoeglichkeiten ────────────────────────────────────────
+  const zeitBad=T.filter(t=>t.entryDate && t.closeDate && new Date(t.closeDate) < new Date(t.entryDate));
+  if(zeitBad.length) add('hoch','Schlussdatum liegt vor der Eröffnung',
+    `${zeitBad.length} Positionen. Verzerrt Haltedauer und jede zeitbezogene Auswertung. `
+    +`Betroffen: ${zeitBad.slice(0,6).map(lbl).join(', ')}`);
+  const expBad=T.filter(t=>t.entryDate && t.expiry && new Date(t.expiry) < new Date(t.entryDate));
+  if(expBad.length) add('hoch','Verfall liegt vor der Eröffnung',
+    `${expBad.length} Positionen. Meist ein Tippfehler im Jahr. Betroffen: ${expBad.slice(0,6).map(lbl).join(', ')}`);
+
+  // ── 12. Doppelte Kennungen ────────────────────────────────────────────────
+  const seen={}, dup=[];
+  T.forEach(t=>{ if(seen[t.id]) dup.push(t); else seen[t.id]=1; });
+  if(dup.length) add('hoch','Doppelte Positions-IDs',
+    `${dup.length} Datensätze teilen sich eine ID. Bearbeiten, Schließen und Löschen treffen dann die falsche Position.`);
+
+  // ── 13. Geschlossen ohne Datum ────────────────────────────────────────────
+  const ohneDatum=T.filter(t=>t.status&&t.status!=='OPEN'&&!t.closeDate);
+  if(ohneDatum.length) add('mittel','Geschlossene Position ohne Schlussdatum',
+    `${ohneDatum.length} Positionen. Sie fehlen in Monats- und Jahresauswertungen und im Steuerjahr-Filter des Cockpits. `
+    +`Betroffen: ${ohneDatum.slice(0,6).map(lbl).join(', ')}`);
+
+  return F;
+}
+
+function rIntegrity(){
+  const F=optIntegrityChecks();
+  const hoch=F.filter(f=>f.stufe==='hoch').length, mit=F.filter(f=>f.stufe==='mittel').length;
+  let h=`<div class="card" style="padding:16px 18px;margin-bottom:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+      <div style="font-weight:700;font-size:.95rem">🔍 Selbstkontrolle</div>
+      <span style="padding:2px 12px;border-radius:9999px;font-size:.7rem;font-weight:700;
+        background:${hoch?'rgba(224,82,82,.15)':(mit?'rgba(245,158,11,.15)':'rgba(63,185,106,.15)')};
+        color:var(${hoch?'--red':(mit?'--amb':'--grn')})">
+        ${F.length?`${hoch} kritisch · ${mit} auffällig · ${F.length-hoch-mit} Hinweis`:'ohne Befund'}</span>
+    </div>`;
+  if(!F.length){
+    h+=`<div style="font-size:.76rem;color:var(--t2);line-height:1.6">
+      Keine Unstimmigkeiten. Geprüft wurden P&amp;L-Nachrechnung aus Prämie und Rückkauf, Assignment-Daten,
+      Roll-Ketten, Verfallsdaten, Strikes, Risikoberechnung und Datumsfolge.<br>
+      <span style="color:var(--t3)">Das heißt: die Daten sind in sich stimmig. Ob sie mit dem Broker übereinstimmen,
+      kann die Prüfung nicht wissen — dafür bleibt der monatliche Abgleich nötig.</span></div>`;
+  } else {
+    const farbe={hoch:['--red','kritisch'],mittel:['--amb','auffällig'],hinweis:['--blue','Hinweis']};
+    h+=F.map(f=>{const c=farbe[f.stufe];
+      return `<div style="border-left:3px solid var(${c[0]});padding:8px 12px;margin-bottom:9px;background:rgba(255,255,255,.02)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
+          <span style="font-size:.62rem;font-weight:700;text-transform:uppercase;color:var(${c[0]})">${c[1]}</span>
+          <span style="font-weight:600;font-size:.82rem">${escHtml(f.titel)}</span></div>
+        <div style="font-size:.74rem;color:var(--t2);line-height:1.55">${escHtml(f.text)}</div></div>`;
+    }).join('');
+    h+=`<div style="font-size:.68rem;color:var(--t3);margin-top:8px">Die Prüfung verändert nichts — sie liest und rechnet nach.</div>`;
+  }
+  return h+'</div>';
+}
+
+function rDash(){
+  const T=ld(),S=ls(),O=T.filter(t=>t.status==='OPEN'),allC=T.filter(t=>t.status!=='OPEN');
+  if(!T.length) return`<div class="empty fu"><div style="font-size:2.5rem;opacity:.5;margin-bottom:12px">Θ</div><h3>Willkommen im Stillhalter Journal</h3><p>Erfasse deinen ersten Options-Trade. Vergiss nicht, deine Kontogröße in den Settings zu hinterlegen.</p><div style="display:flex;gap:8px;justify-content:center"><button class="btn btn-p" onclick="go('new')">+ Ersten Trade</button><button class="btn btn-g" onclick="openSettings()">⚙ Settings</button></div></div>`;
+
+  // Period filter
+  const now=new Date();let periodStart=null,periodLabel='Gesamt';
+  if(dashPeriod==='week'){periodStart=new Date(now);periodStart.setDate(now.getDate()-7);periodLabel='Letzte 7 Tage';}
+  else if(dashPeriod==='month'){periodStart=new Date(now.getFullYear(),now.getMonth(),1);periodLabel=now.toISOString().substring(0,7);}
+  else if(dashPeriod==='quarter'){const qm=Math.floor(now.getMonth()/3)*3;periodStart=new Date(now.getFullYear(),qm,1);periodLabel='Q'+Math.ceil((now.getMonth()+1)/3)+' '+now.getFullYear();}
+  else if(dashPeriod==='year'){periodStart=new Date(now.getFullYear(),0,1);periodLabel=''+now.getFullYear();}
+
+  const inPeriod=t=>!periodStart||new Date(t.closeDate||t.entryDate)>=periodStart;
+  const C=allC.filter(inPeriod);
+  const Tp=T.filter(inPeriod);
+
+  const tp=Tp.reduce((s,t)=>s+t.premium*t.contracts*MUL,0);
+  const tpnl=C.reduce((s,t)=>s+(t.pnl||0),0);
+  // EUR total: convert each trade's P&L and premiums to EUR
+  const fx=S.eurusd||FX_NOTWERT;
+  const tpnlEUR=C.reduce((s,t)=>s+toEUR(t.pnl||0,t.currency||'USD',t.fxClose),0);
+  const tpEUR=Tp.reduce((s,t)=>s+toEUR(t.premium*t.contracts*MUL,t.currency||'USD',t.fxClose),0);
+  const wins=C.filter(t=>(t.pnl||0)>0),losses=C.filter(t=>(t.pnl||0)<0);
+  const wr=C.length?wins.length/C.length*100:0;
+  const aw=wins.length?wins.reduce((s,t)=>s+t.pnl,0)/wins.length:0;
+  const al=losses.length?losses.reduce((s,t)=>s+t.pnl,0)/losses.length:0;
+  // ── v6.2 FIX (PROFIT FACTOR WAR DIE PAYOFF-RATIO) ─────────────────────
+  // Vorher: Ø Gewinn / Ø Verlust. Das ist die Payoff-Ratio. Der Profit Factor ist
+  // Σ Gewinne / Σ Verluste. Beim Stillhalten (hohe Trefferquote, kleine Gewinne)
+  // klaffen beide weit auseinander: 80 % Treffer, Ø +100 / Ø −200 → Payoff 0,50
+  // (rot), echter Profit Factor 2,0 (grün). Die Kennzahl stand bei einem gesunden
+  // Konto systematisch auf Rot. Payoff-Ratio bleibt als Zusatz in der Unterzeile.
+  const sumW=wins.reduce((s,t)=>s+t.pnl,0), sumL=Math.abs(losses.reduce((s,t)=>s+t.pnl,0));
+  const pf=sumL>0?sumW/sumL:(sumW>0?Infinity:0);
+  const payoff=Math.abs(al)>0?aw/Math.abs(al):0;
+  const op=O.reduce((s,t)=>s+t.premium*t.contracts*MUL,0);
+  const oR=totalRisk(),rP=portRiskPct();
+  const totalCommAll=Tp.reduce((s,t)=>s+(t.commission||0)+(t.closeCommission||0),0);
+
+  let h='<div class="fu">';
+  // Period selector
+  const pBtns=[['all','Alle'],['week','Woche'],['month','Monat'],['quarter','Quartal'],['year','Jahr']];
+  h+=`<div style="display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap;align-items:center"><span style="font-size:.68rem;color:var(--t3);margin-right:4px">Zeitraum:</span>${pBtns.map(([k,l])=>`<button class="btn btn-s ${dashPeriod===k?'btn-p':'btn-g'}" onclick="dashPeriod='${k}';render()" style="padding:4px 10px">${l}</button>`).join('')}<span class="mono" style="font-size:.68rem;color:var(--t2);margin-left:8px">${periodLabel} · ${C.length} Trades</span></div>`;
+
+  // Monthly target
+  const tm=new Date().toISOString().substring(0,7);
+  const mp=T.filter(t=>t.entryDate.startsWith(tm)).reduce((s,t)=>s+t.premium*t.contracts*MUL,0);
+  if(S.monthlyTarget){const pc=Math.min(100,mp/S.monthlyTarget*100);
+    h+=`<div class="card" style="padding:12px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><span style="font-size:.76rem;color:var(--t2)">Prämien-Ziel ${tm}</span><span class="mono" style="font-size:.76rem;${pc>=100?'color:var(--grn)':'color:var(--acc)'}">${f$(Math.round(mp))} / ${f$(S.monthlyTarget)} (${pc.toFixed(0)}%)</span></div><div class="pb"><div class="pb-f" style="width:${pc}%;background:${pc>=100?'var(--grn)':'var(--acc)'}"></div></div></div>`;}
+
+  if(fxFehlt()) h+=`<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:10px 12px;margin-bottom:14px;font-size:.76rem;color:var(--amb)">⚠ Kein EUR/USD-Kurs in den Settings — Euro-Werte (Risiko, Budget, P&amp;L in €) werden mit dem Notwert ${FX_NOTWERT} gerechnet. <a href="#" onclick="openSettings();return false" style="color:var(--amb);font-weight:700">Kurs eintragen</a></div>`;
+  // Risk alert
+  if(isOverAcct()) h+=`<div style="background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.25);border-radius:var(--r);padding:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:1.5rem">🚨</span><div><div style="font-size:.86rem;font-weight:700;color:var(--red)">Konto-Risiko überschritten</div><div style="font-size:.76rem;color:var(--red);opacity:.8">Offenes Risiko ${fE(Math.round(oR))} = ${fp(rP)} (Max: ${S.maxAR||25}%)</div></div></div>`;
+
+  // KPIs
+  h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-bottom:18px">`;
+  h+=kpi('Offene Trades',O.length,'','--acc')+kpi('Offene Prämie',f$(Math.round(op)),'unrealisiert','--acc');
+  h+=kpi('Gesamtprämie',fE(Math.round(tpEUR)),periodLabel,'--vio')+kpi('Realisiert P&L',fE(Math.round(tpnlEUR)),C.length+' Trades',tpnlEUR>=0?'--grn':'--red');
+  h+=kpi('Win Rate',fp(wr),wins.length+'/'+C.length,wr>=60?'--grn':wr>=40?'--amb':'--red');
+  h+=kpi('Avg Win/Loss',f$(Math.round(aw))+' / '+f$(Math.round(al)),'','--grn');
+  h+=kpi('Profit Factor',isFinite(pf)?pf.toFixed(2):'∞','Payoff '+payoff.toFixed(2),pf>=1.5?'--grn':pf>=1?'--amb':'--red');
+  h+=kpi('Offenes Risiko',fE(Math.round(oR)),rP!==null?fp(rP)+' Konto':'Konto setzen!',rP>(S.maxAR||25)?'--red':'--grn');
+  h+=kpi('Σ Gebühren',f$(Math.round(totalCommAll)),periodLabel,'--red');
+  h+='</div>';
+
+  // v6.0: Selbstkontrolle direkt unter den Kennzahlen. Sie enthaelt auch die
+  // Warnung zu Rolls ohne Nachfolger, deshalb steht dafuer kein zweiter Kasten mehr.
+  h+=rIntegrity();
+
+  // Charts row 1: Prämien + Strategie
+  h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:18px"><div class="card" style="padding:14px"><div style="font-size:.8rem;font-weight:600;margin-bottom:8px">Prämien-Entwicklung</div><div style="position:relative;height:190px"><canvas id="ch-pr"></canvas></div></div><div class="card" style="padding:14px"><div style="font-size:.8rem;font-weight:600;margin-bottom:8px">P&L nach Strategie</div><div style="position:relative;height:190px"><canvas id="ch-st"></canvas></div></div></div>`;
+
+  // NEW: P&L per trade bar chart with zero line
+  h+=`<div class="card" style="padding:14px;margin-bottom:18px"><div style="font-size:.8rem;font-weight:600;margin-bottom:8px">P&L pro Trade · ${periodLabel}</div><div style="position:relative;height:200px"><canvas id="ch-pnl"></canvas></div></div>`;
+
+  // Waterfall with configurable count
+  h+=`<div class="card" style="padding:14px;margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:.8rem;font-weight:600">P&L Waterfall (kumuliert)</span><div style="display:flex;align-items:center;gap:6px"><label class="lbl" style="margin:0">Trades:</label><select id="wf-cnt" onchange="dashWfCount=parseInt(this.value);render()" class="inp" style="width:70px;padding:3px 7px;font-size:.7rem">${[10,20,30,50,100,9999].map(n=>`<option value="${n}" ${dashWfCount===n?'selected':''}>${n===9999?'Alle':n}</option>`).join('')}</select></div></div><div style="position:relative;height:180px"><canvas id="ch-wf"></canvas></div></div>`;
+
+  // Open positions
+  h+=`<div class="card" style="padding:14px"><div style="font-size:.8rem;font-weight:600;margin-bottom:10px">Offene Positionen</div><div style="display:flex;flex-direction:column;gap:5px;max-height:300px;overflow-y:auto">`;
+  if(!O.length) h+='<div class="empty" style="padding:20px"><p>Keine offenen Positionen</p></div>';
+  else [...O].sort((a,b)=>(dte(a.expiry)||999)-(dte(b.expiry)||999)).forEach(t=>{
+    const d=dte(t.expiry),m=ST[t.strategy]||{},r=calcRisk(t),rp=tradeRiskPct(t),dc=decayPct(t.entryDate,t.expiry);
+    const stk=(t.legs||[]).map(l=>l.strike).filter(Boolean).join('/');
+    h+=`<div class="${m.c||''}" style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:var(--rs);background:var(--elev);cursor:pointer;transition:background var(--tr)" onclick="openDetail('${t.id}')" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='var(--elev)'">
+      <div style="display:flex;align-items:center;gap:7px;flex:1;min-width:0">
+        <span class="badge" style="${m.bg}">${t.strategy}</span>
+        <span style="font-weight:600;font-size:.83rem">${escHtml(t.underlying)}</span>
+        <span style="font-size:.7rem;color:var(--t3)">${stk} · ${t.contracts}x</span>
+        ${r?`<span class="mono" style="font-size:.6rem;${riskC(rp)}">⚠${f$(Math.round(r))}</span>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:48px"><div class="db"><div class="db-f" style="width:${dc}%"></div></div></div>
+        <span class="mono" style="font-size:.8rem;width:40px;text-align:right;${dteS(d)}">${d!==null?d+'d':'–'}</span>
+        <button class="btn btn-g btn-s" onclick="event.stopPropagation();openCl('${t.id}')" style="padding:2px 7px">✓</button>
+      </div></div>`;
+  });
+  h+='</div></div></div>';
+  return h;
+}
+
+function kpi(l,v,sub,cv){return`<div class="card" style="padding:10px"><div style="font-size:.58rem;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${l}</div><div class="mono" style="font-size:1rem;font-weight:700;color:var(${cv});line-height:1.2">${v}</div>${sub?`<div style="font-size:.55rem;color:var(--t3);margin-top:2px">${sub}</div>`:''}</div>`;}
+
+// ═══ TRADE LIST ═══
+function rTrades(){
+  const T=ld();
+  let h=`<div class="fu"><div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;align-items:center">
+    <select id="fl-s" onchange="fS=this.value;render()" class="inp" style="width:auto;padding:5px 9px;font-size:.73rem"><option value="">Alle Strategien</option>${Object.entries(ST).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('')}</select>
+    <select id="fl-st" onchange="fSt=this.value;render()" class="inp" style="width:auto;padding:5px 9px;font-size:.73rem"><option value="">Alle Status</option><option value="OPEN">Offen</option><option value="CLOSED">Geschlossen</option><option value="ROLLED">Gerollt</option><option value="ASSIGNED">Assigned</option><option value="EXPIRED">Expired</option></select>
+    <select id="fl-u" onchange="fU=this.value;render()" class="inp" style="width:auto;padding:5px 9px;font-size:.73rem"><option value="">Alle UL</option>${[...new Set(T.map(t=>t.underlying))].sort().map(u=>`<option value="${u}">${u}</option>`).join('')}</select>
+    <input type="text" id="fl-q" oninput="flq(this)" placeholder="Suche…" class="inp" style="width:130px;padding:5px 9px;font-size:.73rem">
+    <span style="margin-left:auto;font-size:.68rem;color:var(--t3)" class="mono" id="tc"></span></div>
+  <div style="overflow-x:auto"><table class="dtb"><thead><tr>
+    <th style="width:28px"><input type="checkbox" onchange="togAll(this.checked)"></th>
+    <th class="srt" onclick="srt('entryDate')">Datum</th><th class="srt" onclick="srt('underlying')">UL</th><th>Strat</th><th class="hm">Legs</th>
+    <th class="srt" style="text-align:right" onclick="srt('premium')">Prämie</th><th style="text-align:right" class="hm">Max Risk</th><th style="text-align:right" class="hm">% Konto</th>
+    <th class="srt" style="text-align:right" onclick="srt('pnl')">P&L</th><th class="srt hm" style="text-align:right" onclick="srt('dte')">DTE</th>
+    <th style="text-align:center">Status</th><th style="text-align:center">Aktionen</th>
+  </tr></thead><tbody>`;
+
+  let f=T;
+  const fs=fS,fst=fSt,fu=fU,fq=(fQ||'').toUpperCase(); // v4.2.20: aus persistenten Variablen statt DOM
+  if(fs)f=f.filter(t=>t.strategy===fs);if(fst)f=f.filter(t=>t.status===fst);if(fu)f=f.filter(t=>t.underlying===fu);
+  /* v4.2.21: Suche -- Guard gegen fehlendes Underlying + Gross/Klein-Normalisierung */
+  if(fq)f=f.filter(t=>(t.underlying||'').toUpperCase().includes(fq)||(t.notes||'').toUpperCase().includes(fq)||(t.tags||[]).some(g=>g.toUpperCase().includes(fq)));
+
+  f.sort((a,b)=>{let va,vb;
+    if(sortF==='premium'){va=a.premium*a.contracts;vb=b.premium*b.contracts;}
+    else if(sortF==='pnl'){va=a.pnl||0;vb=b.pnl||0;}
+    else if(sortF==='dte'){va=dte(a.expiry)??999;vb=dte(b.expiry)??999;}
+    else{va=a[sortF]||'';vb=b[sortF]||'';}
+    if(typeof va==='string')return sortD==='desc'?vb.localeCompare(va):va.localeCompare(vb);
+    return sortD==='desc'?vb-va:va-vb;
+  });
+
+  if(!f.length) h+='<tr><td colspan="12"><div class="empty"><h3>Keine Trades</h3><p>Ändere die Filter oder erfasse einen neuen Trade.</p><button class="btn btn-p" onclick="go(\'new\')">+ Neu</button></div></td></tr>';
+
+  f.forEach(t=>{
+    const m=ST[t.strategy]||{},d=t.strategy==='STOCK'?null:(t.status==='OPEN'?dte(t.expiry):null),tp=t.premium*t.contracts*MUL;
+    const r=calcRisk(t),rp=tradeRiskPct(t),ov=isOverTrade(t);
+    const ri=t.rolledFrom?'🔄':'',ai=(t.adjustments||[]).length?'⚡':'';
+    const ror=returnOnRisk(t);
+    const premCol=t.strategy==='STOCK'?`${t.contracts}×${f2(t.underlyingPrice||0)}`:f$(Math.round(tp));
+    h+=`<tr class="${m.c||''}" onclick="openDetail('${t.id}')">
+      <td onclick="event.stopPropagation()"><input type="checkbox" ${sel.has(t.id)?'checked':''} onchange="togSel('${t.id}',this.checked)"></td>
+      <td class="mono" style="font-size:.7rem;color:var(--t3)">${t.entryDate}</td>
+      <td style="font-weight:600">${escHtml(t.underlying)}<span style="font-size:.55rem"> ${ri}${ai}</span></td>
+      <td><span class="badge" style="${m.bg||''}">${t.strategy}</span></td>
+      <td class="mono hm" style="font-size:.68rem;color:var(--t3)">${strikesFmt(t.legs)}</td>
+      <td class="mono" style="text-align:right">${premCol}</td>
+      <td class="mono hm" style="text-align:right;${ov?'color:var(--red);font-weight:600':'color:var(--t2)'}">${r?f$(Math.round(r)):'–'}</td>
+      <td class="mono hm" style="text-align:right;${riskC(rp)}">${rp!==null?fp(rp):'–'}</td>
+      <td class="mono" style="text-align:right;${t.pnl!==null?pnlC(t.pnl):'color:var(--t3)'}">${t.pnl!==null?f$(Math.round(t.pnl))+(ror?` <span style="font-size:.55rem;opacity:.7">(${fp(ror)} ann.)</span>`:''):'–'}</td>
+      <td class="mono hm" style="text-align:right;${d!==null?dteS(d):'color:var(--t3)'}">${d!==null?d+'d':t.status!=='OPEN'&&t.entryDate&&t.closeDate?Math.ceil((new Date(t.closeDate)-new Date(t.entryDate))/864e5)+'d <span style="font-size:.5rem;opacity:.6">gehalten</span>':'–'}</td>
+      <td style="text-align:center"><span class="badge" style="${SB[t.status]||''}">${t.status}</span></td>
+      <td style="text-align:center" onclick="event.stopPropagation()"><div style="display:flex;justify-content:center;gap:2px">
+        ${t.status==='OPEN'?`<button class="btn btn-s" style="padding:2px 6px;background:rgba(32,178,170,.12);color:var(--acc)" onclick="openCl('${t.id}')" title="Schließen">✓</button><button class="btn btn-s" style="padding:2px 6px;background:rgba(139,92,246,.12);color:var(--vio)" onclick="openAdj('${t.id}')" title="Adj">⚡</button>`:''}
+        ${t.status!=='OPEN'?`<button class="btn btn-s btn-g" style="padding:2px 6px" onclick="reopenTrade('${t.id}')" title="Öffnen">↺</button>`:''}
+        <button class="btn btn-s btn-g" style="padding:2px 6px" onclick="event.stopPropagation();editTrade('${t.id}')" title="Bearbeiten">✎</button>
+        <button class="btn btn-s btn-g" style="padding:2px 6px" onclick="dupTrade('${t.id}')" title="Dup">⧉</button>
+        <button class="btn btn-s" style="padding:2px 6px;color:var(--red);background:rgba(244,63,94,.08)" onclick="delTrade('${t.id}')" title="Del">✕</button>
+      </div></td></tr>`;
+  });
+
+  h+='</tbody></table></div></div>';
+  setTimeout(()=>{const c=$('tc');if(c)c.textContent=f.length+'/'+T.length;},20);
+  return h;
+}
+
+function srt(f){if(sortF===f)sortD=sortD==='desc'?'asc':'desc';else{sortF=f;sortD='desc';}render();}
+function togSel(id,c){if(c)sel.add(id);else sel.delete(id);}
+function togAll(c){ld().forEach(t=>{if(c)sel.add(t.id);else sel.delete(t.id)});render();}
+// ═══ TRADE FORM ═══
+function rForm(pre=null){
+  const t=pre||{underlying:'',strategy:'',entryDate:today(),contracts:1,legs:[],premium:'',expiry:'',underlyingPrice:'',commission:0,delta:'',theta:'',iv:'',ivRank:'',maxRisk:'',tags:[],notes:''};
+  fLegs=t.legs?JSON.parse(JSON.stringify(t.legs)):[];
+  const isE=!!editId;
+  const isStock=t.strategy==='STOCK';
+  return`<div class="fu" style="max-width:760px;margin:0 auto">
+    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:16px">${isE?'Bearbeiten: '+escHtml(t.underlying)+' '+t.strategy:'Neuen Trade erfassen'}</h2>
+    <div style="margin-bottom:16px"><label class="lbl">Strategie-Template</label>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:6px">${Object.entries(ST).map(([k,v])=>`<button onclick="applyTpl('${k}')" style="padding:10px 6px;border-radius:var(--r);border:1px solid var(--brd);background:var(--elev);cursor:pointer;text-align:center;transition:all var(--tr)" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--brd)'"><div style="font-weight:700;font-size:.85rem;${v.bg.split(';')[1]}">${k}</div><div style="font-size:.55rem;color:var(--t3);margin-top:2px">${v.n}</div></button>`).join('')}</div></div>
+    <form onsubmit="saveTrade(event)" style="display:grid;gap:12px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px">
+      <div><label class="lbl">Underlying *</label><input type="text" id="tf-ul" required placeholder="AAPL" value="${escHtml(t.underlying)}" class="inp" style="text-transform:uppercase"></div>
+      <div><label class="lbl">Strategie *</label><select id="tf-st" required onchange="applyTpl(this.value)" class="inp"><option value="">Wählen…</option>${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${t.strategy===k?'selected':''}>${v.n}</option>`).join('')}</select></div>
+      <div><label class="lbl">${isStock?'Kaufdatum *':'Entry *'}</label><input type="date" id="tf-dt" required value="${t.entryDate}" class="inp"></div>
+      <div><label class="lbl">${isStock?'Stückzahl *':'Kontrakte *'}</label><input type="number" id="tf-q" required min="1" value="${t.contracts}" class="inp" oninput="calcLive()"></div>
+    </div>
+    ${isStock?`
+    <div style="padding:10px;background:var(--elev);border-radius:var(--rs);font-size:.76rem;color:var(--t2)">📦 Aktien-Altbestand: Trage den <strong>Kaufkurs pro Share</strong> im Feld "Kaufkurs" ein. Prämien kommen später durch CC/CSP dazu.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px">
+      <div><label class="lbl">Kaufkurs (/Share) *</label><input type="number" id="tf-up" required step="0.01" value="${t.underlyingPrice||''}" placeholder="165.50" class="inp"></div>
+      <div><label class="lbl">Währung</label><select id="tf-cy" class="inp"><option value="USD" ${(t.currency||'USD')==='USD'?'selected':''}>USD</option><option value="EUR" ${t.currency==='EUR'?'selected':''}>EUR</option></select></div>
+      <div><label class="lbl">Kommission</label><input type="number" id="tf-cm" step="0.01" value="${t.commission||0}" class="inp"></div>
+    </div>
+    <input type="hidden" id="tf-pm" value="0"><input type="hidden" id="tf-ex" value="${t.expiry||today()}">
+    `:`
+    <div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><label class="lbl" style="margin:0">Legs</label><button type="button" onclick="addLeg()" style="font-size:.7rem;color:var(--acc);background:none;border:none;cursor:pointer">+ Leg</button></div>
+    <div id="legs-c" style="display:flex;flex-direction:column;gap:5px">${fLegs.map((l,i)=>legR(l,i)).join('')}</div></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px">
+      <div><label class="lbl">Prämie ($/K) *</label><input type="number" id="tf-pm" required step="0.01" value="${t.premium||''}" placeholder="1.25" class="inp" oninput="calcLive()"></div>
+      <div><label class="lbl">Expiry *</label><input type="date" id="tf-ex" required value="${t.expiry}" class="inp" oninput="updDTE();calcLive()"></div>
+      <div><label class="lbl">DTE</label><div id="tf-dte" class="mono" style="padding:7px 11px;font-size:.78rem;background:var(--bg);border:1px solid var(--brd);border-radius:var(--rs);color:var(--t2)">–</div></div>
+      <div><label class="lbl">UL-Kurs</label><input type="number" id="tf-up" step="0.01" value="${t.underlyingPrice||''}" class="inp" oninput="calcLive()"></div>
+      <div><label class="lbl">Währung</label><select id="tf-cy" class="inp" onchange="calcLive()"><option value="USD" ${(t.currency||'USD')==='USD'?'selected':''}>USD</option><option value="EUR" ${t.currency==='EUR'?'selected':''}>EUR</option></select></div>
+      <div><label class="lbl">Kommission</label><input type="number" id="tf-cm" step="0.01" value="${t.commission||0}" class="inp" oninput="calcLive()"></div>
+    </div>
+    <!-- Live calculation box -->
+    <div id="tf-calc" style="display:none;padding:10px;background:var(--elev);border-radius:var(--rs);font-size:.72rem"></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">
+      <div><label class="lbl">Delta</label><input type="number" id="tf-de" step="0.01" value="${t.delta||''}" class="inp"></div>
+      <div><label class="lbl">Theta</label><input type="number" id="tf-th" step="0.01" value="${t.theta||''}" class="inp"></div>
+      <div><label class="lbl">IV %</label><input type="number" id="tf-iv" step="0.1" value="${t.iv||''}" class="inp"></div>
+      <div><label class="lbl">IVR %</label><input type="number" id="tf-ir" step="0.1" value="${t.ivRank||''}" class="inp"></div>
+      <div><label class="lbl">Max Risk ($)</label><input type="number" id="tf-ri" step="0.01" value="${t.maxRisk||''}" placeholder="auto" class="inp"></div>
+    </div>
+    `}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label class="lbl">Tags</label><input type="text" id="tf-tg" value="${(t.tags||[]).join(', ')}" placeholder="earnings, wheel" class="inp"></div>
+      <div><label class="lbl">Notizen</label><textarea id="tf-nt" rows="1" class="inp" style="resize:none">${escHtml(t.notes)}</textarea></div>
+    </div>
+    ${isE&&t.status&&t.status!=='OPEN'?`
+    <div style="padding:12px;background:var(--elev);border-radius:var(--r);border:1px solid var(--brd)">
+      <div style="font-size:.72rem;font-weight:600;color:var(--t2);margin-bottom:8px">Close-Daten korrigieren</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+        <div><label class="lbl">Close-Datum</label><input type="date" id="tf-cd" value="${t.closeDate||''}" class="inp"></div>
+        <div><label class="lbl">Close-Typ</label><select id="tf-ct" class="inp"><option value="BTC" ${t.closeType==='BTC'?'selected':''}>BTC</option><option value="EXPIRED" ${t.closeType==='EXPIRED'?'selected':''}>Expired</option><option value="ASSIGNED" ${t.closeType==='ASSIGNED'?'selected':''}>Assigned</option><option value="ROLLED" ${t.closeType==='ROLLED'?'selected':''}>Rolled</option></select></div>
+        <div><label class="lbl">Close-Preis ($/K)</label><input type="number" id="tf-cp" step="0.01" value="${t.closePrice||0}" class="inp"></div>
+        <div><label class="lbl">Close-Kommission</label><input type="number" id="tf-cc" step="0.01" value="${t.closeCommission||0}" class="inp"></div>
+      </div>
+      ${t.closeType==='ASSIGNED'?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div><label class="lbl">Assignment-Preis</label><input type="number" id="tf-ap" step="0.01" value="${t.assignmentPrice||''}" class="inp"></div>
+        <div><label class="lbl">Assignment-Shares</label><input type="number" id="tf-as" value="${t.assignmentShares||100}" class="inp"></div>
+      </div>`:''}
+      <div style="margin-top:8px"><label class="lbl">Close-Notiz</label><textarea id="tf-cn" rows="1" class="inp" style="resize:none">${escHtml(t.closeNotes)}</textarea></div>
+    </div>
+    `:''}
+    <div style="display:flex;gap:8px;align-items:center">
+      <button type="submit" class="btn btn-p">${isE?'Aktualisieren':'Speichern'}</button>
+      <button type="button" class="btn btn-g" onclick="editId=null;go('new')">Reset</button>
+      ${isE?`<button type="button" class="btn btn-d" onclick="delTrade('${editId}')" style="margin-left:auto">Löschen</button>`:''}
+    </div></form></div>`;
+}
+
+function legR(l,i){
+  return`<div style="display:grid;grid-template-columns:1fr 1fr 1.2fr 1.2fr auto;gap:5px;align-items:end;background:var(--elev);border-radius:var(--rs);padding:6px">
+    <div><label class="lbl">${l.label||'Leg '+(i+1)}</label><select onchange="fLegs[${i}].side=this.value" class="inp" style="padding:4px 7px;font-size:.7rem"><option value="SELL" ${l.side==='SELL'?'selected':''}>SELL</option><option value="BUY" ${l.side==='BUY'?'selected':''}>BUY</option></select></div>
+    <div><label class="lbl">Typ</label><select onchange="fLegs[${i}].type=this.value" class="inp" style="padding:4px 7px;font-size:.7rem"><option value="CALL" ${l.type==='CALL'?'selected':''}>CALL</option><option value="PUT" ${l.type==='PUT'?'selected':''}>PUT</option></select></div>
+    <div><label class="lbl">Strike</label><input type="number" step="0.5" value="${l.strike||''}" onchange="fLegs[${i}].strike=parseFloat(this.value);calcLive()" class="inp" style="padding:4px 7px;font-size:.7rem" placeholder="170"></div>
+    <div><label class="lbl">Leg $/K</label><input type="number" step="0.01" value="${l.legPremium||''}" onchange="fLegs[${i}].legPremium=parseFloat(this.value);autoNetPrem();calcLive()" class="inp" style="padding:4px 7px;font-size:.7rem" placeholder="opt."></div>
+    <button type="button" onclick="fLegs.splice(${i},1);$('legs-c').innerHTML=fLegs.map((l,i)=>legR(l,i)).join('')" style="color:var(--red);background:none;border:none;cursor:pointer;font-size:.82rem;padding:3px">✕</button></div>`;
+}
+function addLeg(){fLegs.push({type:'CALL',side:'SELL',strike:null,legPremium:null,label:''});const c=$('legs-c');if(c)c.innerHTML=fLegs.map((l,i)=>legR(l,i)).join('');}
+function autoNetPrem(){
+  const withPrem=fLegs.filter(l=>l.legPremium!==null&&l.legPremium!==undefined);
+  if(!withPrem.length)return;
+  // Net = sum of SELL premiums - sum of BUY premiums
+  let net=0;
+  withPrem.forEach(l=>{net+=l.side==='SELL'?(l.legPremium||0):-(l.legPremium||0);});
+  const el=$('tf-pm');if(el){el.value=Math.abs(net).toFixed(2);}
+}
+function updDTE(){const ex=$('tf-ex')?.value,dt=$('tf-dt')?.value,el=$('tf-dte');if(!el)return;if(!ex){el.textContent='–';el.style.color='var(--t3)';return;}const d=dte(ex);if(d===null){el.textContent='–';el.style.color='var(--t3)';return;}el.textContent=d+'d';el.style.cssText=`padding:7px 11px;font-size:.78rem;background:var(--bg);border:1px solid var(--brd);border-radius:var(--rs);font-weight:600;${dteS(d)}`;}
+function calcLive(){
+  const el=$('tf-calc');if(!el)return;
+  const pm=parseFloat($('tf-pm')?.value)||0,k=parseInt($('tf-q')?.value)||1,up=parseFloat($('tf-up')?.value)||0;
+  const ex=$('tf-ex')?.value,dt=$('tf-dt')?.value,ccy=$('tf-cy')?.value||'USD';
+  const strike=fLegs.length?fLegs.find(l=>l.side==='SELL')?.strike||0:0;
+  const fx=ls().eurusd||FX_NOTWERT;
+  if(!pm&&!up&&!strike){el.style.display='none';return;}
+  el.style.display='grid';el.style.gridTemplateColumns='repeat(auto-fit,minmax(160px,1fr))';el.style.gap='8px';
+  let h='';
+  // 1. Gesamteinnahme
+  const totalPrem=pm*k*(ccy==='EUR'?100:MUL);
+  const totalPremEUR=ccy==='USD'?totalPrem/fx:totalPrem;
+  h+=`<div><span style="color:var(--t3);font-size:.6rem">GESAMTEINNAHME</span><div class="mono" style="color:var(--grn);font-weight:700;font-size:.88rem">${fCcy(totalPrem,ccy,2)}</div>${ccy==='USD'?`<div class="mono" style="color:var(--t3);font-size:.65rem">≈ ${fE2(totalPremEUR)}</div>`:''}</div>`;
+  // 2. Abstand Strike → Kurs
+  if(strike&&up){const dist=Math.abs(up-strike);const distPct=(dist/up*100);
+    const distEUR=ccy==='USD'?dist/fx:dist;
+    h+=`<div><span style="color:var(--t3);font-size:.6rem">ABSTAND STRIKE↔KURS</span><div class="mono" style="font-size:.88rem">${fCcy(dist,ccy,2)} (${distPct.toFixed(1)}%)</div>${ccy==='USD'?`<div class="mono" style="color:var(--t3);font-size:.65rem">≈ ${fE2(distEUR)}</div>`:''}</div>`;}
+  // 3. Max Risk pro Trade
+  const capital=strike?(strike*k*(ccy==='EUR'?100:MUL)):(up?up*k*(ccy==='EUR'?100:MUL):0);
+  if(capital>0){const maxLoss=capital-totalPrem;
+    h+=`<div><span style="color:var(--t3);font-size:.6rem">MAX RISK (TRADE)</span><div class="mono" style="color:var(--red);font-weight:700;font-size:.88rem">${fCcy(maxLoss,ccy,0)}</div><div class="mono" style="color:var(--t3);font-size:.65rem">Cash: ${fCcy(capital,ccy,0)} − Prämie</div></div>`;}
+  // 4. Rendite auf Kapital
+  if(capital>0){const yieldPct=(totalPrem/capital*100);
+    h+=`<div><span style="color:var(--t3);font-size:.6rem">RENDITE AUF KAPITAL</span><div class="mono" style="color:var(--acc);font-weight:700;font-size:.88rem">${yieldPct.toFixed(2)}%</div><div class="mono" style="color:var(--t3);font-size:.65rem">auf ${fCcy(capital,ccy,0)}</div></div>`;}
+  // 5. Rendite p.a. bezogen auf DTE
+  if(capital>0&&ex&&dt){const days=Math.max(1,Math.ceil((new Date(ex)-new Date(dt))/864e5));const yieldPct=(totalPrem/capital*100);const pa=yieldPct*(365/days);
+    h+=`<div><span style="color:var(--t3);font-size:.6rem">RENDITE P.A. (${days}d)</span><div class="mono" style="color:var(--vio);font-weight:700;font-size:.88rem">${pa.toFixed(1)}% p.a.</div><div class="mono" style="color:var(--t3);font-size:.65rem">${yieldPct.toFixed(2)}% in ${days} Tagen</div></div>`;}
+  // 5. EUR/USD info
+  if(ccy==='USD'){h+=`<div><span style="color:var(--t3);font-size:.6rem">EUR/USD KURS</span><div class="mono" style="font-size:.88rem">${fx.toFixed(4)}</div><div style="font-size:.6rem;color:var(--t3)">Ändern in ⚙ Settings</div></div>`;}
+  el.innerHTML=h;
+}
+function applyTpl(s){if(!ST[s])return;const sel=$('tf-st');if(sel)sel.value=s;
+  if(s==='STOCK'){fLegs=[];const pre={underlying:$('tf-ul')?.value||'',strategy:'STOCK',entryDate:$('tf-dt')?.value||today(),contracts:parseInt($('tf-q')?.value)||100,legs:[],premium:0,expiry:$('tf-dt')?.value||today(),underlyingPrice:$('tf-up')?.value||'',commission:parseFloat($('tf-cm')?.value)||0,tags:($('tf-tg')?.value||'').split(',').map(s=>s.trim()).filter(Boolean),notes:$('tf-nt')?.value||''};$('main').innerHTML=rForm(pre);return;}
+  fLegs=ST[s].legs.map(l=>({...l,strike:null,legPremium:null}));const c=$('legs-c');if(c)c.innerHTML=fLegs.map((l,i)=>legR(l,i)).join('');}
+
+function syncLegs(){$('legs-c')?.querySelectorAll(':scope > div').forEach((d,i)=>{if(!fLegs[i])return;const se=d.querySelectorAll('select'),inp=d.querySelectorAll('input[type="number"]');fLegs[i].side=se[0]?.value||fLegs[i].side;fLegs[i].type=se[1]?.value||fLegs[i].type;fLegs[i].strike=parseFloat(inp[0]?.value)||null;fLegs[i].legPremium=parseFloat(inp[1]?.value)||null;});}
+
+function saveTrade(e){
+  e.preventDefault();syncLegs();
+  const ul=($('tf-ul')?.value||'').trim();const st=$('tf-st')?.value;const dt=$('tf-dt')?.value;const ex=$('tf-ex')?.value;const pm=$('tf-pm')?.value;
+  if(!ul){toast('Underlying fehlt!','t-err');return;}if(!st){toast('Strategie wählen!','t-err');return;}
+  if(!dt){toast('Entry-Datum fehlt!','t-err');return;}
+  if(st==='STOCK'){
+    const up=$('tf-up')?.value;
+    if(!up||parseFloat(up)<=0){toast('Kaufkurs pro Share eingeben!','t-err');return;}
+  } else {
+    if(!ex){toast('Expiry fehlt!','t-err');return;}
+    if(!pm&&pm!=='0'&&parseFloat(pm)<0){toast('Prämie ungültig!','t-err');return;}
+    if(new Date(ex)<new Date(dt)){toast('Expiry muss nach Entry liegen!','t-err');return;}
+    if(fLegs.length&&fLegs.some(l=>!l.strike)){toast('Bitte alle Strikes ausfüllen!','t-err');return;}
+  }
+
+  const T=ld();const id=editId||gid();
+  const tags=($('tf-tg')?.value||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const trade={id,underlying:($('tf-ul')?.value||'').toUpperCase(),strategy:$('tf-st')?.value,entryDate:$('tf-dt')?.value,contracts:parseInt($('tf-q')?.value)||1,
+    legs:JSON.parse(JSON.stringify(fLegs)),premium:parseFloat($('tf-pm')?.value)||0,expiry:$('tf-ex')?.value,underlyingPrice:parseFloat($('tf-up')?.value)||null,
+    commission:parseFloat($('tf-cm')?.value)||0,currency:$('tf-cy')?.value||'USD',delta:parseFloat($('tf-de')?.value)||null,theta:parseFloat($('tf-th')?.value)||null,
+    iv:parseFloat($('tf-iv')?.value)||null,ivRank:parseFloat($('tf-ir')?.value)||null,maxRisk:parseFloat($('tf-ri')?.value)||null,
+    tags,notes:$('tf-nt')?.value||'',rolledFrom:(editId?null:pendingRollFrom),adjustments:[],status:'OPEN',closeDate:null,closeType:null,closePrice:null,closeCommission:0,closeNotes:'',pnl:null,assignmentPrice:null,assignmentShares:null,fxClose:null};
+  const idx=T.findIndex(t=>t.id===id);
+  if(idx>=0){const o=T[idx];
+    // If closed trade is being edited, read close data from form (if fields exist)
+    if(o.status!=='OPEN'&&$('tf-cd')){
+      trade.status=o.status;
+      trade.closeDate=$('tf-cd')?.value||o.closeDate;
+      const _nct=$('tf-ct')?.value||o.closeType;
+      if(_nct==='ASSIGNED'&&isCashSettled(trade.underlying)){toast(trade.underlying+' ist barabgerechnet — ASSIGNED nicht möglich (Cash Settlement).','t-err');return;} // v4.3.1
+      trade.closeType=_nct;
+      trade.closePrice=parseFloat($('tf-cp')?.value)||0;
+      trade.closeCommission=parseFloat($('tf-cc')?.value)||0;
+      trade.closeNotes=$('tf-cn')?.value||'';
+      trade.assignmentPrice=$('tf-ap')?parseFloat($('tf-ap')?.value)||null:o.assignmentPrice;
+      trade.assignmentShares=$('tf-as')?parseInt($('tf-as')?.value)||100:o.assignmentShares;
+    } else {
+      trade.status=o.status;trade.closeDate=o.closeDate;trade.closeType=o.closeType;
+      trade.closePrice=o.closePrice;trade.closeCommission=o.closeCommission;trade.closeNotes=o.closeNotes;
+      trade.assignmentPrice=o.assignmentPrice;trade.assignmentShares=o.assignmentShares;
+    }
+    trade.fxClose=o.fxClose||null; // v4.2.22 (Opt④): Pro-Trade-FX bei Edit erhalten
+    trade.adjustments=o.adjustments||[];trade.rolledFrom=o.rolledFrom;
+    // Recalculate P&L if trade is closed
+    if(trade.status!=='OPEN'&&trade.closeDate){
+      const adj=(trade.adjustments||[]).reduce((s,a)=>s+(a.cost||0),0);
+      const tp2=trade.premium*trade.contracts*MUL,tc2=(trade.closePrice||0)*trade.contracts*MUL;
+      if(trade.closeType==='EXPIRED')trade.pnl=tp2-trade.commission+adj;
+      else trade.pnl=tp2-tc2-trade.commission-(trade.closeCommission||0)+adj;
+    } else {trade.pnl=null;}
+    T[idx]=trade;}else T.push(trade);
+  // v6.0: Vorwaertszeiger auf dem Vorgaenger setzen, damit die Kette in BEIDE
+  // Richtungen lesbar ist — und damit ein abgebrochener Roll erkennbar bleibt.
+  if(trade.rolledFrom){
+    const vor=T.find(x=>x.id===trade.rolledFrom);
+    if(vor) vor.rolledTo=trade.id;
+  }
+  pendingRollFrom=null;
+  sv(T);editId=null;toast('Trade gespeichert');
+  const rp=tradeRiskPct(trade);if(rp!==null&&isOverTrade(trade))toast(`⚠ Risk ${fp(rp)} > ${ls().maxTR||5}% Limit!`,'t-err');
+  go('trades');
+}
+
+function editTrade(id){const t=ld().find(x=>x.id===id);if(!t)return;editId=id;$('main').innerHTML=rForm(t);setTimeout(()=>{updDTE();calcLive();},30);}
+function dupTrade(id){const t=ld().find(x=>x.id===id);if(!t)return;editId=null;$('main').innerHTML=rForm({...t,id:null,entryDate:today(),status:'OPEN',pnl:null,closeDate:null,adjustments:[]});toast('Dupliziert','t-info');}
+function delTrade(id){const t=ld().find(x=>x.id===id);if(!t)return;if(!confirm(`Trade löschen?\n\n${t.underlying} ${t.strategy} · ${t.entryDate}\nPrämie: ${f$(Math.round(t.premium*t.contracts*MUL))}\n${t.pnl!==null?'P&L: '+f$(Math.round(t.pnl)):''}\n\nDiese Aktion kann nicht rückgängig gemacht werden.`))return;sv(ld().filter(t=>t.id!==id));editId=null;toast('Trade gelöscht');go('trades');}
+function reopenTrade(id){const T=ld();const t=T.find(x=>x.id===id);if(!t)return;t.status='OPEN';t.closeDate=null;t.closeType=null;t.closePrice=null;t.closeCommission=0;t.pnl=null;sv(T);toast('Wieder geöffnet','t-info');render();}
+
+// ═══ CLOSE TRADE ═══
+// v6.2 FIX: Das Feld "Shares" im Assignment stand fest auf 100 — bei 2 Kontrakten
+// mussten 200 von Hand eingetragen werden, sonst rechneten Wheel-Tab und Cockpit
+// mit der falschen Stückzahl. Jetzt: Kontrakte × Multiplikator vorbelegt.
+function openCl(id){const t=ld().find(x=>x.id===id);$('cl-id').value=id;$('cl-dt').value=today();$('cl-px').value='0';$('cl-cm').value='0';$('cl-tp').value='BTC';$('cl-nt').value='';$('cl-af').style.display='none';$('cl-fx').value=(ls().eurusd||'');if(t){$('cl-sh').value=String((+t.contracts||1)*MUL);$('cl-px').readOnly=false;}clPrev();om('M-cl');}
+function clTypeChg(){
+  const t=$('cl-tp').value;const af=$('cl-af');const px=$('cl-px');
+  if(t==='ASSIGNED'){af.style.display='grid';af.style.gridTemplateColumns='1fr 1fr';af.style.gap='8px';}else{af.style.display='none';}
+  // v6.0 FIX: Bei ASSIGNED wurde der Schlusskurs NICHT zurueckgesetzt — nur bei EXPIRED.
+  // Realer Ablauf: man tippt erst einen Rueckkaufkurs fuer "Buy to Close" und stellt dann
+  // fest, dass man eingebucht wurde. Beim Umschalten blieb der Kurs stehen und wurde als
+  // Rueckkauf abgezogen. Im Test: statt +248,80 EUR standen -501,20 EUR im Journal —
+  // 750 EUR Fehler bei EINEM Kontrakt, und die Praemie war faelschlich weg.
+  // Bei einem Assignment gibt es keinen Rueckkauf: die Praemie bleibt vollstaendig,
+  // das Ergebnis der Aktien steckt spaeter in deren Einstandskurs.
+  if(t==='EXPIRED'||t==='ASSIGNED'){ if(px){ px.value='0'; px.readOnly=true; px.title='Bei '+t+' gibt es keinen Rückkauf — die Prämie bleibt vollständig.'; } }
+  else { if(px){ px.readOnly=false; px.title=''; } }
+  clPrev();
+}
+function clPrev(){const t=ld().find(x=>x.id===$('cl-id').value);if(!t)return;const ct=$('cl-tp').value,cp=parseFloat($('cl-px').value)||0,cc=parseFloat($('cl-cm').value)||0;const adj=(t.adjustments||[]).reduce((s,a)=>s+(a.cost||0),0);const tp=t.premium*t.contracts*MUL,tc=cp*t.contracts*MUL;let pnl=ct==='EXPIRED'?tp-t.commission+adj:tp-tc-t.commission-cc+adj;const el=$('cl-pv');el.textContent=f$(Math.round(pnl));el.style.cssText=`font-size:1.3rem;font-weight:700;${pnl>=0?'color:var(--grn)':'color:var(--red)'}`;}
+function execClose(){
+  const id=$('cl-id').value,T=ld(),i=T.findIndex(t=>t.id===id);if(i<0)return;const t=T[i];
+  const ct=$('cl-tp').value,cp=parseFloat($('cl-px').value)||0,cc=parseFloat($('cl-cm').value)||0;
+  const adj=(t.adjustments||[]).reduce((s,a)=>s+(a.cost||0),0);
+  t.closeDate=$('cl-dt').value;t.closeType=ct;t.closePrice=cp;t.closeCommission=cc;t.closeNotes=$('cl-nt').value;t.fxClose=parseFloat($('cl-fx').value)||null;
+  const tp=t.premium*t.contracts*MUL,tc=cp*t.contracts*MUL;
+  if(ct==='EXPIRED'){t.status='EXPIRED';t.pnl=tp-t.commission+adj;}
+  else if(ct==='ASSIGNED'){
+    if(isCashSettled(t.underlying)){toast(t.underlying+' ist barabgerechnet (Cash Settlement) — kein Aktien-Assignment möglich. Bitte als \'Buy to Close\' mit dem Settlement-Wert buchen.','t-err');return;}
+    t.status='ASSIGNED';t.assignmentPrice=parseFloat($('cl-ap').value)||null;t.assignmentShares=parseInt($('cl-sh').value)||((+t.contracts||1)*MUL);t.pnl=tp-tc-t.commission-cc+adj;}
+  else if(ct==='ROLLED'){t.status='ROLLED';t.pnl=tp-tc-t.commission-cc+adj;}
+  else{t.status='CLOSED';t.pnl=tp-tc-t.commission-cc+adj;}
+  sv(T);cm('M-cl');toast('Geschlossen: '+f$(Math.round(t.pnl)));
+  if(ct==='ROLLED'){editId=null;pendingRollFrom=t.id;const r={underlying:t.underlying,strategy:t.strategy,contracts:t.contracts,legs:(t.legs||[]).map(l=>({...l,strike:null,legPremium:null})),rolledFrom:t.id,entryDate:today()};$('main').innerHTML=rForm(r);return;}
+  // CSP assigned → offer CC creation for Wheel
+  if(ct==='ASSIGNED'&&t.strategy==='CSP'){
+    if(confirm(`${t.underlying} eingebucht! Jetzt Covered Call schreiben für den Wheel-Zyklus?`)){
+      createWheelCC(t.underlying);return;
+    }
+  }
+  render();
+}
+
+// ═══ ADJUSTMENTS ═══
+function openAdj(id){$('adj-id').value=id;$('adj-dt').value=today();$('adj-co').value='0';$('adj-st').value='';$('adj-nt').value='';om('M-adj');}
+function saveAdj(){const id=$('adj-id').value,T=ld(),t=T.find(x=>x.id===id);if(!t)return;if(!t.adjustments)t.adjustments=[];t.adjustments.push({date:$('adj-dt').value,type:$('adj-tp').value,cost:parseFloat($('adj-co').value)||0,strike:parseFloat($('adj-st').value)||null,notes:$('adj-nt').value});sv(T);cm('M-adj');toast('Adjustment gespeichert','t-info');render();}
+
+// ═══ RISK DASHBOARD ═══
+function rRisk(){
+  const S=ls(),O=ld().filter(t=>t.status==='OPEN'),ac=S.accountSize||0,mT=S.maxTR||5,mA=S.maxAR||25;
+  const oR=totalRisk(),oD=totalDelta(),rP=ac?(oR/ac*100):0,avail=availBudget();
+  if(!ac)return`<div class="empty fu"><div style="font-size:2rem;opacity:.5;margin-bottom:10px">⚠</div><h3>Kontogröße erforderlich</h3><p>Hinterlege deine Kontogröße in den Settings.</p><button class="btn btn-p" onclick="openSettings()">⚙ Settings</button></div>`;
+  const byU={};O.forEach(t=>{if(!byU[t.underlying])byU[t.underlying]={r:0,p:0,d:0,n:0,c:0};byU[t.underlying].r+=calcRisk(t)||0;byU[t.underlying].p+=t.premium*t.contracts*MUL;byU[t.underlying].d+=(t.delta||0)*t.contracts*MUL;byU[t.underlying].n++;byU[t.underlying].c+=t.contracts;});
+
+  let h=`<div class="fu"><h2 style="font-size:1.05rem;font-weight:700;margin-bottom:14px">⚠ Risiko-Management</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:16px">
+    <div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:8px">Konto-Übersicht</div><div style="display:grid;gap:7px">
+      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Kontogröße</span><span class="mono" style="font-size:.8rem">${f$(ac)}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Offenes Risiko</span><span class="mono" style="font-size:.8rem;${rP>mA?'color:var(--red);font-weight:600':'color:var(--grn)'}">${f$(Math.round(oR))}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">% Konto</span><span class="mono" style="font-size:.85rem;font-weight:700;${rP>mA?'color:var(--red)':'color:var(--grn)'}">${fp(rP)}</span></div>
+      <div class="rg" style="margin:3px 0"><div class="rg-f" style="width:${Math.min(100,rP/mA*100)}%;background:${rP>mA?'var(--red)':rP>mA*.7?'var(--amb)':'var(--grn)'}"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:.57rem;color:var(--t3)"><span>0%</span><span style="color:var(--amb)">${mA}% Limit</span></div>
+      <div style="display:flex;justify-content:space-between;margin-top:3px"><span style="font-size:.8rem;color:var(--t2)">Verfügbar</span><span class="mono" style="font-size:.8rem;color:var(--grn)">${avail!==null?f$(Math.round(avail)):'–'}</span></div>
+    </div></div>
+    <div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:8px">Greeks Aggregiert</div><div style="display:grid;gap:7px">
+      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Gesamt-Delta</span><span class="mono" style="font-size:.8rem;${oD>0?'color:var(--grn)':oD<0?'color:var(--red)':''}">${oD>0?'+':''}${oD.toFixed(0)}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Positionen</span><span class="mono">${O.length}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Kontrakte</span><span class="mono">${O.reduce((s,t)=>s+t.contracts,0)}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Underlyings</span><span class="mono">${Object.keys(byU).length}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Ø DTE</span><span class="mono">${O.length?Math.round(O.reduce((s,t)=>s+(dte(t.expiry)||0),0)/O.length):0}d</span></div>
+    </div></div>
+    <div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:8px">Position-Sizing</div><div style="display:grid;gap:7px">
+      <div><label class="lbl">Spread-Breite ($)</label><input type="number" id="ps-w" value="5" step="0.5" class="inp" style="padding:4px 7px" oninput="calcPS()"></div>
+      <div><label class="lbl">Prämie/K ($)</label><input type="number" id="ps-p" value="1.00" step="0.05" class="inp" style="padding:4px 7px" oninput="calcPS()"></div>
+      <div id="ps-r" class="mono" style="font-size:.73rem;display:grid;gap:3px;padding:7px;background:var(--elev);border-radius:var(--rs)"></div>
+    </div></div>
+  </div>`;
+
+  // UL concentration table
+  h+=`<div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:10px">Risiko nach Underlying</div><table class="dtb"><thead><tr><th>UL</th><th style="text-align:right">#</th><th style="text-align:right">K</th><th style="text-align:right">Risk</th><th style="text-align:right">%</th><th style="text-align:right">Δ</th><th style="width:70px">Gauge</th></tr></thead><tbody>`;
+  Object.entries(byU).sort((a,b)=>b[1].r-a[1].r).forEach(([sym,d])=>{const p=d.r/ac*100,sl=mT*2;
+    h+=`<tr style="cursor:default"><td style="font-weight:600">${sym}</td><td class="mono" style="text-align:right">${d.n}</td><td class="mono" style="text-align:right">${d.c}</td><td class="mono" style="text-align:right;${p>sl?'color:var(--red);font-weight:600':''}">${f$(Math.round(d.r))}</td><td class="mono" style="text-align:right;${p>sl?'color:var(--red)':p>sl*.7?'color:var(--amb)':'color:var(--grn)'}">${fp(p)}</td><td class="mono" style="text-align:right;${d.d>0?'color:var(--grn)':d.d<0?'color:var(--red)':''}">${d.d>0?'+':''}${d.d.toFixed(0)}</td><td><div class="rg"><div class="rg-f" style="width:${Math.min(100,p/sl*100)}%;background:${p>sl?'var(--red)':'var(--grn)'}"></div></div></td></tr>`;
+  });
+  h+='</tbody></table></div></div>';
+  setTimeout(calcPS,50);return h;
+}
+
+function calcPS(){const w=parseFloat($('ps-w')?.value)||5,p=parseFloat($('ps-p')?.value)||1;const r=posSize(w,p);const el=$('ps-r');if(!el)return;el.innerHTML=`<div style="display:flex;justify-content:space-between"><span style="color:var(--t2)">Risk/K:</span><span>${f$(r.rpc)} <span style="color:var(--t3);font-size:.62rem">≈ ${fE(Math.round(r.rpcEur))}</span></span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--t2)">Max Kontrakte:</span><span style="color:var(--acc);font-weight:700;font-size:.85rem">${r.mc||'–'}</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--t2)">Prämie/Risk:</span><span>${r.pr.toFixed(1)}%</span></div>`;}
+
+// ═══ WHEEL ═══
+function calcWheelData(sym,tds){
+  const wt=tds.filter(t=>t.strategy==='CSP'||t.strategy==='CC'||t.strategy==='STOCK').sort((a,b)=>a.entryDate.localeCompare(b.entryDate));
+  if(!wt.length)return null;
+  const cspTrades=wt.filter(t=>t.strategy==='CSP');
+  const ccTrades=wt.filter(t=>t.strategy==='CC');
+  const stockTrades=wt.filter(t=>t.strategy==='STOCK');
+  const otherTrades=tds.filter(t=>t.strategy!=='CSP'&&t.strategy!=='CC'&&t.strategy!=='STOCK');
+  const tpnl=wt.reduce((s,t)=>s+(t.pnl||0),0);
+  const totalCSPprem=cspTrades.reduce((s,t)=>s+t.premium*t.contracts*MUL,0);
+  const totalCCprem=ccTrades.reduce((s,t)=>s+t.premium*t.contracts*MUL,0);
+  const totalComm=wt.reduce((s,t)=>s+(t.commission||0)+(t.closeCommission||0),0);
+  let shares=0,shareSource='none',origBuyPrice=null;
+  // 1. STOCK positions (Altbestand)
+  const activeStock=stockTrades.filter(t=>t.status==='OPEN');
+  if(activeStock.length){const s=activeStock[activeStock.length-1];shares=s.contracts;shareSource='stock';origBuyPrice=s.underlyingPrice||0;}
+  // 2. CSP assignments (overrides if later)
+  const asg=cspTrades.filter(t=>t.status==='ASSIGNED');
+  if(asg.length){const la=asg[asg.length-1];if(la.assignmentPrice){shares=la.assignmentShares||100;shareSource='assigned';origBuyPrice=la.assignmentPrice;}}
+  const hasShares=shares>0;
+  let bruttoPrice=null,effektivPrice=null,premReduction=0,commEffect=0;
+  if(hasShares&&origBuyPrice){
+    bruttoPrice=origBuyPrice;
+    // Realized gain per trade: closed → use actual P&L (includes BTC cost, commissions)
+    // open → use full entry premium (not yet closed)
+    // v6.1.1 FIX: Adjustments (Roll-Kosten, Nachjustierungen) blieben hier außen vor.
+    // Der Kommentar behauptete sogar, der P&L berücksichtige sie — das tut er,
+    // diese Funktion aber nicht. Folge: Die Prämien-Reduktion im Wheel wurde zu
+    // hoch und der effektive Einstandspreis damit zu optimistisch ausgewiesen.
+    // Beispiel: Prämie +100, Roll −20, Rückkauf −10 → tatsächlich 70 statt 90.
+    function realizedPrem(t){
+      const adj=(t.adjustments||[]).reduce((s,a)=>s+(+a.cost||0),0);
+      if(t.status==='OPEN') return t.premium*t.contracts*MUL + adj;
+      // For closed: P&L already accounts for close price, commissions, adjustments
+      // But we want just the premium effect, not commissions (those go in commEffect)
+      // So: entry premium minus close cost = net premium retained
+      const ep=t.premium*t.contracts*MUL;
+      const cp=(t.closePrice||0)*t.contracts*MUL;
+      return ep-cp+adj;   // v6.1.1: Adjustments einbezogen
+    }
+    const cspPremPS=cspTrades.reduce((s,t)=>s+realizedPrem(t),0)/(shares||100);
+    const shareDate=shareSource==='assigned'?(asg[asg.length-1].closeDate||asg[asg.length-1].entryDate):(activeStock.length?activeStock[activeStock.length-1].entryDate:'');
+    const ccAfterPS=ccTrades.filter(t=>t.entryDate>=shareDate).reduce((s,t)=>s+realizedPrem(t),0)/(shares||100);
+    premReduction=cspPremPS+ccAfterPS;
+    commEffect=totalComm/(shares||100);
+    effektivPrice=bruttoPrice-premReduction+commEffect;
+  }
+  const calledAway=ccTrades.some(t=>t.status==='ASSIGNED');
+  const stockSold=stockTrades.some(t=>t.status==='CLOSED');
+  const currentlyHolding=hasShares&&!calledAway&&!(shareSource==='stock'&&stockSold);
+  const openCC=ccTrades.find(t=>t.status==='OPEN');
+  const openCSP=cspTrades.find(t=>t.status==='OPEN');
+  return{wt,tpnl,totalCSPprem,totalCCprem,totalComm,bruttoPrice,effektivPrice,premReduction,commEffect,shares,shareSource,hasShares,currentlyHolding,openCC,openCSP,cspTrades,ccTrades,stockTrades,otherTrades};
+}
+
+function rWheel(){
+  const T=ld(),byU={};T.forEach(t=>{if(!byU[t.underlying])byU[t.underlying]=[];byU[t.underlying].push(t)});
+  let h=`<div class="fu"><h2 style="font-size:1.05rem;font-weight:700;margin-bottom:5px">Wheel Tracker</h2>
+    <p style="font-size:.8rem;color:var(--t3);margin-bottom:6px">Aktien + CSP + CC pro Underlying · Effektiver Einkaufspreis inkl. Gebühren</p>
+    <div style="margin-bottom:14px"><button class="btn btn-g btn-s" onclick="addStockPosition()">+ Aktien-Altbestand einpflegen</button></div>`;
+  let found=false;
+  Object.entries(byU).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([sym,tds])=>{
+    const wd=calcWheelData(sym,tds);if(!wd)return;found=true;
+    const {wt,tpnl,totalCSPprem,totalCCprem,totalComm,bruttoPrice,effektivPrice,premReduction,commEffect,shares,shareSource,hasShares,currentlyHolding,openCC,openCSP,cspTrades,ccTrades,stockTrades,otherTrades}=wd;
+    h+=`<div class="card" style="padding:14px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:1.1rem;font-weight:700">${escHtml(sym)}</span>
+          <span style="font-size:.68rem;color:var(--t3)">${wt.length} Trades</span>
+          ${currentlyHolding?`<span class="badge" style="background:rgba(245,158,11,.15);color:var(--amb)">${shares} SHARES · ${shareSource==='stock'?'ALTBESTAND':'ASSIGNED'}</span>`:''}
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div style="text-align:right"><div style="font-size:.5rem;color:var(--t3);text-transform:uppercase">CSP Prämien</div><div class="mono" style="font-size:.75rem;color:var(--acc)">${f$(Math.round(totalCSPprem))}</div></div>
+          <div style="text-align:right"><div style="font-size:.5rem;color:var(--t3);text-transform:uppercase">CC Prämien</div><div class="mono" style="font-size:.75rem;color:var(--grn)">${f$(Math.round(totalCCprem))}</div></div>
+          <div style="text-align:right"><div style="font-size:.5rem;color:var(--t3);text-transform:uppercase">Gebühren</div><div class="mono" style="font-size:.75rem;color:var(--red)">${f$(Math.round(totalComm))}</div></div>
+          <div style="text-align:right"><div style="font-size:.5rem;color:var(--t3);text-transform:uppercase">P&L</div><div class="mono" style="font-size:.75rem;${pnlC(tpnl)}">${f$(Math.round(tpnl))}</div></div>
+        </div>
+      </div>`;
+    if(hasShares){
+      const redPct=bruttoPrice>0?((premReduction/bruttoPrice)*100):0;
+      const ccy=wt[0]?.currency||'USD';
+      const totalValEUR=toEUR(shares*effektivPrice,ccy);
+      h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:10px;padding:12px;background:var(--elev);border-radius:var(--rs)">
+        <div><div style="font-size:.52rem;color:var(--t3);text-transform:uppercase">Einstieg (Brutto)</div><div class="mono" style="font-size:.92rem;color:var(--t1)">${f2(bruttoPrice)}<span style="font-size:.55rem;color:var(--t3)"> /Sh</span></div></div>
+        <div><div style="font-size:.52rem;color:var(--t3);text-transform:uppercase">Effektiv (Prämien−Geb.)</div><div class="mono" style="font-size:.92rem;font-weight:700;color:var(--acc)">${f2(effektivPrice)}<span style="font-size:.55rem;color:var(--t3)"> /Sh</span></div></div>
+        <div><div style="font-size:.52rem;color:var(--t3);text-transform:uppercase">Prämien ↓ (${redPct.toFixed(1)}%)</div><div class="mono" style="font-size:.92rem;color:var(--grn)">−${f2(premReduction)}<span style="font-size:.55rem;color:var(--t3)"> /Sh</span></div></div>
+        <div><div style="font-size:.52rem;color:var(--t3);text-transform:uppercase">Gebühren ↑</div><div class="mono" style="font-size:.92rem;color:var(--red)">+${f2(commEffect)}<span style="font-size:.55rem;color:var(--t3)"> /Sh</span></div></div>
+        <div><div style="font-size:.52rem;color:var(--t3);text-transform:uppercase">Gesamt</div><div class="mono" style="font-size:.92rem">${shares}× ${f2(effektivPrice)} = <span style="color:var(--acc)">${fCcy(Math.round(shares*effektivPrice),ccy,0)}</span></div>
+          ${ccy==='USD'?`<div class="mono" style="font-size:.6rem;color:var(--t3)">≈ ${fE(Math.round(totalValEUR))}</div>`:''}</div>
+      </div>`;
+    }
+    // RISK SECTION — CSP exposure, CC upside cap, total risk
+    const openCSPs=cspTrades.filter(t=>t.status==='OPEN');
+    const openCCs=ccTrades.filter(t=>t.status==='OPEN');
+    const ccy=wt[0]?.currency||'USD';
+    const mul2=ccy==='EUR'?100:MUL;
+    let riskRows=[];
+    // CSP Risk: Cash-secured amount per open CSP
+    openCSPs.forEach(csp=>{
+      const ss=csp.legs?.find(l=>l.side==='SELL')?.strike||0;
+      const cashNeeded=ss*csp.contracts*mul2;
+      const premReceived=csp.premium*csp.contracts*mul2;
+      riskRows.push({label:`CSP ${csp.expiry?.substring(5)||''} Strike ${ss}`,cash:cashNeeded,prem:premReceived,maxLoss:cashNeeded-premReceived,type:'csp'});
+    });
+    // CC Risk: Upside cap
+    if(currentlyHolding&&openCCs.length){
+      openCCs.forEach(cc=>{
+        const cs=cc.legs?.find(l=>l.side==='SELL')?.strike||0;
+        // v6.1.1 FIX: Der maximale Gewinn eines Covered Calls reicht nur so weit,
+        // wie der Call Aktien deckt — nicht über den gesamten Bestand.
+        // Bei 300 Stück und einem einzigen Call wurde der Gewinn verdreifacht,
+        // bei mehreren Calls addierte sich der Fehler je Call erneut.
+        const gedeckt=Math.min(shares,(+cc.contracts||0)*MUL);
+        const capGain=cs&&effektivPrice?(cs-effektivPrice)*gedeckt:0;
+        const premCC=cc.premium*cc.contracts*mul2;
+        riskRows.push({label:`CC ${cc.expiry?.substring(5)||''} Strike ${cs}`,capPrice:cs,capGain:capGain,prem:premCC,type:'cc'});
+      });
+    }
+    // Share exposure
+    if(currentlyHolding){
+      const exposure=shares*(effektivPrice||bruttoPrice||0);
+      riskRows.push({label:`Aktien ${shares}×${f2(effektivPrice||bruttoPrice||0)}`,exposure,type:'shares'});
+    }
+    if(riskRows.length){
+      const totalExposure=riskRows.reduce((s,r)=>s+(r.cash||r.exposure||0),0);
+      h+=`<div style="margin-bottom:10px;padding:10px;background:rgba(244,63,94,.04);border:1px solid rgba(244,63,94,.12);border-radius:var(--rs)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:.6rem;color:var(--t3);text-transform:uppercase;font-weight:600">⚠ Risiko · ${escHtml(sym)}</span>
+          <span class="mono" style="font-size:.72rem;color:var(--red);font-weight:600">Σ ${fCcy(totalExposure,ccy,0)} Exposure</span>
+        </div>`;
+      riskRows.forEach(r=>{
+        if(r.type==='csp'){
+          h+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.68rem;border-bottom:1px solid var(--brd)">
+            <span style="color:var(--t2)">${r.label}</span>
+            <div class="mono" style="display:flex;gap:12px">
+              <span style="color:var(--t3)">Cash: ${fCcy(r.cash,ccy,0)}</span>
+              <span style="color:var(--grn)">Prämie: ${fCcy(r.prem,ccy,0)}</span>
+              <span style="color:var(--red)">Max Loss: ${fCcy(r.maxLoss,ccy,0)}</span>
+            </div></div>`;
+        } else if(r.type==='cc'){
+          h+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.68rem;border-bottom:1px solid var(--brd)">
+            <span style="color:var(--t2)">${r.label}</span>
+            <div class="mono" style="display:flex;gap:12px">
+              <span style="color:var(--amb)">Upside gekappt bei ${fCcy(r.capPrice,ccy,2)}</span>
+              <span style="color:var(--acc)">Max Gewinn: ${fCcy(r.capGain,ccy,0)}</span>
+              <span style="color:var(--grn)">+Prämie: ${fCcy(r.prem,ccy,0)}</span>
+            </div></div>`;
+        } else if(r.type==='shares'){
+          h+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.68rem">
+            <span style="color:var(--t2)">${r.label}</span>
+            <span class="mono" style="color:var(--amb)">Kapitalbindung: ${fCcy(r.exposure,ccy,0)}</span></div>`;
+        }
+      });
+      h+=`</div>`;
+    }
+    h+='<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">';
+    if(currentlyHolding&&!openCC)h+=`<button class="btn btn-p btn-s" onclick="createWheelCC('${escHtml(sym)}')" style="background:var(--grn)">+ CC schreiben</button>`;
+    if(!openCSP)h+=`<button class="btn btn-p btn-s" onclick="createWheelCSP('${escHtml(sym)}')">+ CSP verkaufen</button>`;
+    if(!currentlyHolding)h+=`<button class="btn btn-g btn-s" onclick="addStockPosition('${escHtml(sym)}')">+ Aktien einbuchen</button>`;
+    h+='</div>';
+    const sections=[{t:'Aktien',tr:stockTrades},{t:'Cash-Secured Puts',tr:cspTrades},{t:'Covered Calls',tr:ccTrades},{t:'Andere',tr:otherTrades}];
+    sections.filter(s=>s.tr.length).forEach(sec=>{
+      h+=`<div style="margin-bottom:6px"><div style="font-size:.55rem;color:var(--t3);text-transform:uppercase;margin-bottom:3px">${sec.t} (${sec.tr.length})</div><div style="display:flex;flex-wrap:wrap;gap:4px">`;
+      sec.tr.forEach(t=>{const m=ST[t.strategy]||{},d=t.status==='OPEN'?dte(t.expiry):null;
+        const info=t.strategy==='STOCK'?`${t.contracts}Sh@${f2(t.underlyingPrice||0)}`:`${f$(Math.round(t.premium*t.contracts*MUL))}`;
+        const pnlBadge=t.pnl!==null&&t.status!=='OPEN'?`<span class="mono" style="font-size:.6rem;${pnlC(t.pnl)}">${f$(Math.round(t.pnl))}</span>`:'';
+        h+=`<div class="${m.c||''}" style="display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:var(--rs);background:var(--bg);font-size:.65rem;cursor:pointer" onclick="openDetail('${t.id}')">
+          <span class="badge" style="${m.bg}">${t.strategy}</span><span style="color:var(--t2)">${t.entryDate.substring(5)}</span>
+          <span class="mono">${info}</span>${pnlBadge}${t.commission?`<span style="font-size:.5rem;color:var(--red)">−${f2(t.commission)}</span>`:''}
+          <span class="badge" style="${SB[t.status]||''}">${t.status}${d!==null?' '+d+'d':''}</span></div>`;
+      });h+='</div></div>';
+    });
+    h+='</div>';
+  });
+  if(!found)h+='<div class="empty"><h3>Keine Wheel-Trades</h3><p>Erfasse CSP, CC oder pflege Aktien-Altbestand ein.</p></div>';
+  return h+'</div>';
+}
+
+function createWheelCC(sym){editId=null;fLegs=[{type:'CALL',side:'SELL',strike:null,legPremium:null,label:'Short Call'}];tab='new';
+  $('nav').innerHTML=TABS.map(x=>`<button class="nav-t ${x.id==='new'?'on':''}" onclick="go('${x.id}')">${x.l}</button>`).join('');
+  $('main').innerHTML=rForm({underlying:sym,strategy:'CC',entryDate:today(),contracts:1,legs:fLegs,premium:'',expiry:'',underlyingPrice:'',commission:0,delta:'',theta:'',iv:'',ivRank:'',maxRisk:'',tags:['wheel'],notes:'Wheel: CC'});toast('CC für '+sym,'t-info');}
+
+function createWheelCSP(sym){editId=null;fLegs=[{type:'PUT',side:'SELL',strike:null,legPremium:null,label:'Short Put'}];tab='new';
+  $('nav').innerHTML=TABS.map(x=>`<button class="nav-t ${x.id==='new'?'on':''}" onclick="go('${x.id}')">${x.l}</button>`).join('');
+  $('main').innerHTML=rForm({underlying:sym,strategy:'CSP',entryDate:today(),contracts:1,legs:fLegs,premium:'',expiry:'',underlyingPrice:'',commission:0,delta:'',theta:'',iv:'',ivRank:'',maxRisk:'',tags:['wheel'],notes:'Wheel: CSP auf '+sym});toast('CSP für '+sym,'t-info');}
+
+function addStockPosition(sym){editId=null;fLegs=[];tab='new';
+  $('nav').innerHTML=TABS.map(x=>`<button class="nav-t ${x.id==='new'?'on':''}" onclick="go('${x.id}')">${x.l}</button>`).join('');
+  $('main').innerHTML=rForm({underlying:sym||'',strategy:'STOCK',entryDate:today(),contracts:100,legs:[],premium:0,expiry:today(),underlyingPrice:'',commission:0,delta:'',theta:'',iv:'',ivRank:'',maxRisk:'',tags:['altbestand'],notes:'Aktien-Altbestand'});
+  toast('Kaufkurs im Feld "UL-Preis" eintragen','t-info');}
+
+// ═══ ANALYTICS ═══
+function rStats(){
+  const C=ld().filter(t=>t.status!=='OPEN');
+  if(!C.length)return'<div class="empty fu"><h3>Noch keine geschlossenen Trades</h3><p>Analytics nach dem ersten Close verfügbar.</p></div>';
+  return`<div class="fu"><h2 style="font-size:1.05rem;font-weight:700;margin-bottom:14px">Analytics</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-bottom:16px"><div class="card" style="padding:14px"><div style="font-size:.8rem;font-weight:600;margin-bottom:7px">P&L pro Monat</div><div style="position:relative;height:190px"><canvas id="ch-mp"></canvas></div></div><div class="card" style="padding:14px"><div style="font-size:.8rem;font-weight:600;margin-bottom:7px">IV vs P&L</div><div style="position:relative;height:190px"><canvas id="ch-iv"></canvas></div></div></div>
+  <div class="card" style="padding:14px"><div style="font-size:.8rem;font-weight:600;margin-bottom:10px">Strategie-Statistiken</div><div id="st-tbl"></div></div></div>`;
+}
+
+// ═══ KI COACH ═══
+function rAI(){return`<div class="fu" style="max-width:760px;margin:0 auto"><h2 style="font-size:1.05rem;font-weight:700;margin-bottom:5px">KI-Coach</h2><p style="font-size:.8rem;color:var(--t3);margin-bottom:14px">Stillhalter-Analyse mit Gemini AI</p>
+  <div style="margin-bottom:12px"><label class="lbl">Gemini API Key</label><input type="password" id="ai-k" placeholder="AIza…" value="${localStorage.getItem(GK)||''}" class="inp" oninput="localStorage.setItem('${GK}',this.value)"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:7px;margin-bottom:12px"><button class="btn btn-g" onclick="aiQ('summary')">📊 Performance</button><button class="btn btn-g" onclick="aiQ('risk')">⚠ Risiko</button><button class="btn btn-g" onclick="aiQ('optimize')">🎯 Optimierung</button><button class="btn btn-g" onclick="aiQ('wheel')">⟳ Wheel</button></div>
+  <div style="margin-bottom:12px"><textarea id="ai-q" rows="2" placeholder="Eigene Frage…" class="inp" style="resize:none"></textarea><button class="btn btn-p" style="margin-top:7px" onclick="aiQ('custom')">Fragen</button></div>
+  <div id="ai-r" class="card" style="padding:14px;min-height:180px;font-size:.76rem;line-height:1.6;white-space:pre-wrap"></div></div>`;}
+
+async function aiQ(mode){const key=localStorage.getItem(GK);if(!key){alert('API Key fehlt');return;}const el=$('ai-r');if(el)el.textContent='⏳ Analysiere…';
+  const T=ld(),S=ls();const ps={summary:'Performance mit Zahlen.',risk:'Risiko-Check: Konzentration, Delta, Sizing.',optimize:'Optimierung: Strategie-Mix, Timing.',wheel:'Wheel-Analyse.',custom:$('ai-q')?.value||''};
+  const p=`Erfahrener Options-Coach. IB/CapTrader, 100er Kontrakte.\n${S.accountSize?'Konto: $'+S.accountSize:''}\nMax Risk/Trade: ${S.maxTR||5}%, Konto: ${S.maxAR||25}%\n\nPORTFOLIO: ${JSON.stringify(T,null,1)}\n\n${ps[mode]}\nDeutsch, strukturiert, konkrete Zahlen.`;
+  try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ls().geminiModel||'gemini-2.5-flash'}:generateContent?key=${key}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:p}]}]})});const d=await r.json();if(el)el.textContent=d?.candidates?.[0]?.content?.parts?.[0]?.text||('Keine Antwort.'+(d?.error?.message?' ('+d.error.message+')':'')+(d?.promptFeedback?.blockReason?' [blockiert: '+d.promptFeedback.blockReason+']':''));}catch(e){if(el)el.textContent='❌ '+e.message;}}
+
+// ═══ CHARTS ═══
+function initCharts(){
+  const cf={family:"'IBM Plex Mono',monospace",size:9},gc='rgba(255,255,255,.04)',tc='#687990';
+  Object.values(charts).forEach(c=>{try{c?.destroy?.()}catch(e){}});
+  if(tab==='dash'){
+    const now=new Date();let periodStart=null;
+    if(dashPeriod==='week'){periodStart=new Date(now);periodStart.setDate(now.getDate()-7);}
+    else if(dashPeriod==='month'){periodStart=new Date(now.getFullYear(),now.getMonth(),1);}
+    else if(dashPeriod==='quarter'){periodStart=new Date(now.getFullYear(),Math.floor(now.getMonth()/3)*3,1);}
+    else if(dashPeriod==='year'){periodStart=new Date(now.getFullYear(),0,1);}
+    const inP=t=>!periodStart||new Date(t.closeDate||t.entryDate)>=periodStart;
+    const T=ld(),allC=T.filter(t=>t.status!=='OPEN'),C=allC.filter(inP),Tp=T.filter(inP);
+    const pe=$('ch-pr');if(pe){const mo={};[...T].sort((a,b)=>a.entryDate.localeCompare(b.entryDate)).forEach(t=>{const m=t.entryDate.substring(0,7);mo[m]=(mo[m]||0)+t.premium*t.contracts*MUL});const lb=Object.keys(mo);let cu=0;
+    charts.pr=new Chart(pe,{type:'bar',data:{labels:lb,datasets:[{type:'line',label:'Kum.',data:lb.map(m=>{cu+=mo[m];return cu}),borderColor:'#20b2aa',backgroundColor:'rgba(32,178,170,.06)',fill:true,tension:.3,yAxisID:'y1',pointRadius:3,pointBackgroundColor:'#20b2aa'},{type:'bar',label:'Monatl.',data:lb.map(m=>mo[m]),backgroundColor:'rgba(139,92,246,.45)',borderRadius:4,yAxisID:'y'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc,font:cf}}},scales:{x:{ticks:{color:tc,font:cf},grid:{color:gc}},y:{position:'left',ticks:{color:tc,font:cf,callback:v=>'$'+v},grid:{color:gc}},y1:{position:'right',ticks:{color:'#20b2aa',font:cf,callback:v=>'$'+v},grid:{display:false}}}}});}
+    const se=$('ch-st');if(se&&C.length){const by={};C.forEach(t=>{by[t.strategy]=(by[t.strategy]||0)+(t.pnl||0)});
+    charts.st=new Chart(se,{type:'bar',data:{labels:Object.keys(by).map(s=>ST[s]?.n||s),datasets:[{data:Object.values(by),backgroundColor:Object.values(by).map(v=>v>=0?'rgba(132,204,22,.6)':'rgba(244,63,94,.6)'),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:cf,callback:v=>'$'+v},grid:{color:gc}},y:{ticks:{color:'#8d9aad',font:{...cf,size:10}},grid:{display:false}}}}});}
+    // Waterfall chart — configurable count
+    const wfe=$('ch-wf');if(wfe&&C.length){const sorted=[...C].sort((a,b)=>(a.closeDate||a.entryDate).localeCompare(b.closeDate||b.entryDate));const wfData=dashWfCount>=9999?sorted:sorted.slice(-dashWfCount);let run=0;
+    charts.wf=new Chart(wfe,{type:'bar',data:{labels:wfData.map(t=>t.underlying),datasets:[{data:wfData.map(t=>{run+=(t.pnl||0);return run}),backgroundColor:wfData.map(t=>(t.pnl||0)>=0?'rgba(132,204,22,.5)':'rgba(244,63,94,.5)'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{...cf,size:7},maxRotation:45},grid:{display:false}},y:{ticks:{color:tc,font:cf,callback:v=>'$'+v},grid:{color:gc}}}}});}
+    // NEW: P&L per trade bar chart with zero line
+    const pnlEl=$('ch-pnl');if(pnlEl&&C.length){const sorted=[...C].sort((a,b)=>(a.closeDate||a.entryDate).localeCompare(b.closeDate||b.entryDate));
+    charts.pnl=new Chart(pnlEl,{type:'bar',data:{labels:sorted.map((t,i)=>`${t.underlying} ${t.entryDate.substring(5)}`),datasets:[{data:sorted.map(t=>t.pnl||0),backgroundColor:sorted.map(t=>(t.pnl||0)>=0?'rgba(132,204,22,.6)':'rgba(244,63,94,.6)'),borderColor:sorted.map(t=>(t.pnl||0)>=0?'rgba(132,204,22,.9)':'rgba(244,63,94,.9)'),borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},annotation:false},scales:{x:{ticks:{color:tc,font:{...cf,size:6},maxRotation:60},grid:{display:false}},y:{ticks:{color:tc,font:cf,callback:v=>'$'+v},grid:{color:'rgba(255,255,255,.06)',lineWidth:1},border:{display:false}}}},plugins:[{id:'zeroLine',afterDraw(chart){const yScale=chart.scales.y;if(!yScale)return;const y=yScale.getPixelForValue(0);if(y===undefined)return;const ctx=chart.ctx;ctx.save();ctx.beginPath();ctx.moveTo(chart.chartArea.left,y);ctx.lineTo(chart.chartArea.right,y);ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();}}]});}
+  }
+  if(tab==='stats'){
+    const C=ld().filter(t=>t.status!=='OPEN');
+    const me=$('ch-mp');if(me){const mo={};C.forEach(t=>{const m=(t.closeDate||t.entryDate).substring(0,7);mo[m]=(mo[m]||0)+(t.pnl||0)});const lb=Object.keys(mo).sort();
+    charts.mp=new Chart(me,{type:'bar',data:{labels:lb,datasets:[{data:lb.map(m=>mo[m]),backgroundColor:lb.map(m=>mo[m]>=0?'rgba(132,204,22,.5)':'rgba(244,63,94,.5)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:cf},grid:{display:false}},y:{ticks:{color:tc,font:cf,callback:v=>'$'+v},grid:{color:gc}}}}});}
+    const iv=$('ch-iv');if(iv){const dt=C.filter(t=>t.iv&&t.pnl!==null).map(t=>({x:t.iv,y:t.pnl}));
+    charts.iv=new Chart(iv,{type:'scatter',data:{datasets:[{data:dt,backgroundColor:dt.map(p=>p.y>=0?'rgba(132,204,22,.5)':'rgba(244,63,94,.5)'),pointRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'IV %',color:tc},ticks:{color:tc},grid:{color:gc}},y:{title:{display:true,text:'P&L',color:tc},ticks:{color:tc,callback:v=>'$'+v},grid:{color:gc}}}}});}
+    // Stats table
+    const stc=$('st-tbl');if(stc){const strats=[...new Set(C.map(t=>t.strategy))];let tb='<table class="dtb"><thead><tr><th>Strat</th><th style="text-align:right">#</th><th style="text-align:right">Win%</th><th style="text-align:right">Avg P&L</th><th style="text-align:right">Total</th><th style="text-align:right">PF</th><th style="text-align:right">Avg RoR%</th></tr></thead><tbody>';
+    strats.forEach(s=>{const st=C.filter(t=>t.strategy===s);const w=st.filter(t=>(t.pnl||0)>0),l=st.filter(t=>(t.pnl||0)<0);const wr=st.length?w.length/st.length*100:0;const avg=st.length?st.reduce((s,t)=>s+(t.pnl||0),0)/st.length:0;const tot=st.reduce((s,t)=>s+(t.pnl||0),0);const ws=w.reduce((s,t)=>s+t.pnl,0);const ls2=Math.abs(l.reduce((s,t)=>s+t.pnl,0));const pf=ls2>0?ws/ls2:0;
+    const rors=st.map(t=>returnOnRisk(t)).filter(Boolean);const avgRor=rors.length?rors.reduce((a,b)=>a+b,0)/rors.length:0;
+    const m=ST[s]||{};
+    tb+=`<tr><td><span class="badge" style="${m.bg||''}">${s}</span> ${m.n||''}</td><td class="mono" style="text-align:right">${st.length}</td><td class="mono" style="text-align:right;${wr>=60?'color:var(--grn)':'color:var(--red)'}">${wr.toFixed(0)}%</td><td class="mono" style="text-align:right;${avg>=0?'color:var(--grn)':'color:var(--red)'}">${f$(Math.round(avg))}</td><td class="mono" style="text-align:right;${tot>=0?'color:var(--grn)':'color:var(--red)'}">${f$(Math.round(tot))}</td><td class="mono" style="text-align:right;${pf>=1.5?'color:var(--grn)':pf>=1?'color:var(--amb)':'color:var(--red)'}">${pf.toFixed(2)}</td><td class="mono" style="text-align:right;color:var(--acc)">${avgRor?fp(avgRor):'–'}</td></tr>`;});
+    stc.innerHTML=tb+'</tbody></table>';}}
+}
+
+// ═══ SETTINGS ═══
+function openSettings(){const s=ls();$('s-ac').value=s.accountSize||'';$('s-tg').value=s.monthlyTarget||'';$('s-fx').value=s.eurusd||'';$('s-dw').value=s.dteWarn||7;$('s-mr').value=s.maxTR||5;$('s-ma').value=s.maxAR||25;$('s-gm').value=localStorage.getItem(GK)||'';if($('s-gmm'))$('s-gmm').value=s.geminiModel||'gemini-2.5-flash';$('s-cnt').textContent=ld().length+' Trades';om('M-set');}
+function saveSet(){localStorage.setItem(SK,JSON.stringify({accountSize:parseFloat($('s-ac').value)||null,monthlyTarget:parseFloat($('s-tg').value)||null,eurusd:parseFloat($('s-fx').value)||null,dteWarn:parseInt($('s-dw').value)||7,maxTR:parseFloat($('s-mr').value)||5,maxAR:parseFloat($('s-ma').value)||25,geminiModel:($('s-gmm')&&$('s-gmm').value)||'gemini-2.5-flash'}));localStorage.setItem(GK,$('s-gm').value);cm('M-set');toast('Gespeichert');render();}
+
+// ═══ EXPORT / IMPORT ═══
+// v4.3: Gegenstueck zum Auto-Backup in sv() — Server-Stand per Klick zuruecklesen.
+async function loadFromServer(){
+  if(!confirm('Daten vom Laufwerk (Server) laden? Aktuelle Browser-Daten werden überschrieben!'))return;
+  try{
+    const r=await fetch('http://localhost:8765/data/load?name=stillhalter_journal',{cache:'no-store'});
+    if(!r.ok){toast(r.status===404?'Noch keine Server-Daten (erst einmal speichern).':'Server-Fehler: HTTP '+r.status,'t-err');return;}
+    const d=await r.json();
+    if(!d||!Array.isArray(d.trades)){toast('Ungültige Server-Daten','t-err');return;}
+    localStorage.setItem(TK,JSON.stringify(d.trades));
+    if(d.settings)localStorage.setItem(SK,JSON.stringify(d.settings));
+    toast('Vom Laufwerk geladen ('+d.trades.length+' Trades)');
+    setTimeout(()=>location.reload(),600);
+  }catch(e){toast('Server nicht erreichbar — läuft die START-Batchdatei?','t-err');}
+}
+function exportJSON(){const d={version:'6.0',date:new Date().toISOString(),trades:ld(),settings:ls()};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=`stillhalter-v6-${today()}.json`;a.click();URL.revokeObjectURL(u);toast('Backup exportiert');}
+function importJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!d.trades?.length){alert('Ungültig');return;}if(!confirm(d.trades.length+' Trades importieren?'))return;d.trades.forEach(t=>{if(!t.adjustments)t.adjustments=[];if(!t.tags)t.tags=[];if(t.ivr!==undefined&&t.ivRank===undefined)t.ivRank=t.ivr;if(t.legs)t.legs.forEach(l=>{if(l.t&&!l.type){l.type=l.t;l.side=l.s;l.label=l.l;delete l.t;delete l.s;delete l.l}})});sv(d.trades);if(d.settings)localStorage.setItem(SK,JSON.stringify(d.settings));location.reload();}catch(err){alert('Fehler: '+err.message)}};r.readAsText(f);e.target.value='';}
+function exportCSV(){const T=ld();const esc=c=>{let s=String(c==null?'':c);if(/^[=+\-@\t]/.test(s)&&!/^-?\d/.test(s))s="'"+s;if(/[",\n\r]/.test(s))s='"'+s.replace(/"/g,'""')+'"';return s;};const h=['Datum','UL','Strat','K','Prämie/K','Total','Expiry','DTE','UL-Preis','Währung','Delta','IV','IVR','MaxRisk','%Kto','Status','Close','P&L','RoR%','EntryComm','CloseComm','TotalComm','Einstiegsnotiz','Schlussnotiz','Tags'];const rows=T.map(t=>{const r=calcRisk(t),rp=tradeRiskPct(t),ror=returnOnRisk(t);return[t.entryDate,t.underlying,t.strategy,t.contracts,t.premium,(t.premium*t.contracts*MUL).toFixed(0),t.expiry,Math.ceil((new Date(t.expiry)-new Date(t.entryDate))/864e5),t.underlyingPrice||'',t.currency||'USD',t.delta||'',t.iv||'',t.ivRank||'',r?Math.round(r):'',rp?rp.toFixed(1):'',t.status,t.closeDate||'',t.pnl||'',ror?ror.toFixed(1):'',t.commission||0,t.closeCommission||0,((t.commission||0)+(t.closeCommission||0)).toFixed(2),t.notes||'',t.closeNotes||'',(t.tags||[]).join(';')]});const csv=[h.map(esc).join(','),...rows.map(r=>r.map(esc).join(','))].join('\n');const b=new Blob(['\ufeff'+csv],{type:'text/csv'});const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=`trades-${today()}.csv`;a.click();URL.revokeObjectURL(u);toast('CSV exportiert');}
+
+// ═══ KEYBOARD ═══
+document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;const m={d:'dash',t:'trades',n:'new',r:'risk',u:'ul',w:'wheel',c:'cal',a:'stats'};if(m[e.key]){go(m[e.key]);e.preventDefault();}if(e.key==='s'){openSettings();e.preventDefault();}if(e.key==='Escape')document.querySelectorAll('.mo.on').forEach(m=>m.classList.remove('on'));});
+
+// ═══ BOOT ═══
+// v4.3: Boot-Haertung — ein Fehler beim ersten Render zeigte vorher nur eine leere Seite.
+try{
+  // v6.1: Erst anzeigen, dann das Laufwerk fragen. Ohne Server bleibt alles wie bisher.
+  go('dash');
+  syncFromDrive().then(neu=>{ if(neu) render(); }).catch(e=>console.error('Sync:',e));
+}
+catch(err){ console.error('Boot-Fehler:',err);
+  try{ document.body.insertAdjacentHTML('afterbegin','<div style="background:#e05252;color:#fff;padding:14px 18px;font-family:monospace">⚠ Start-Fehler: '+String(err&&err.message||err).replace(/</g,'&lt;')+' — F12/Konsole pruefen, Fehlermeldung an Claude geben.</div>'); }catch(e2){}
+}
+</script>
+</body>
+</html>
