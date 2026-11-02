@@ -251,3 +251,62 @@ Die Rohdaten selbst sind nicht eingecheckt, weil sie Abzüge Dritter sind. Sie l
 - [AAII Sentiment Survey](https://www.aaii.com/o/sentimentsurvey)
 - [thetrading.tools: Zweig Breadth Thrust](https://www.thetrading.tools/zweig-breadth-thrust)
 - [Nasdaq: Zweig Breadth Thrust](https://www.nasdaq.com/articles/rare-zweig-breadth-thrust-indicator-suggests-hefty-gains-ahead)
+
+---
+
+## 7. Test AM4 „VOREINSTIEG“ (nachgeprüft am 02.11.2026)
+
+Die Regel wurde **vor** der Auswertung festgelegt und unverändert eingecheckt (`am4_voreinstieg_test.py`). Danach habe ich nichts mehr angepasst.
+
+**Die Regel.** VOREINSTIEG gilt nur, wenn die Ampel STOP oder CAUTION zeigt **und** in den letzten 60 Handelstagen ein STOP-Tag lag, also nach einer Stressphase. Dann müssen alle vier Bedingungen erfüllt sein:
+
+1. mindestens 3 von 4 US-Indizes in **Phase 3** (Kurs über EMA50 über EMA200)
+2. kein Index in P6
+3. mindestens 6 von 11 Sektoren über ihrer **EMA200**
+4. VIX-Termstruktur in Contango (VIX/VIX3M unter 0,98)
+
+Feste VIX-Grenzen spielen keine Rolle. Investitionsgrad: 75 %.
+
+### Ergebnis
+
+Angegeben ist die Sharpe-Kennzahl 2007–2016 / 2017–2026 und die Rendite pro Jahr über den Gesamtzeitraum.
+
+- **Ampel heute:** 0,24 / 0,71 · 4,1 % pro Jahr · max. Verlust −19,3 %
+- **mit AM4 Voreinstieg:** **0,28 / 0,78** · 4,8 % pro Jahr · max. Verlust −19,3 %. **In beiden Zeiträumen besser.**
+- **AM1 (Breite EMA200) allein:** 0,39 / 0,75 · 5,2 % pro Jahr · −21,4 %
+- **AM1 und AM4 zusammen:** **0,44 / 0,83** · 5,9 % pro Jahr · −21,4 %. **Bestes Ergebnis aller Varianten, in beiden Zeiträumen.**
+
+### Was nach einem VOREINSTIEG geschah
+
+Es gab 478 Tage mit VOREINSTIEG, verteilt auf 121 Einstiege.
+
+- **Nach 20 Tagen:** im Schnitt +1,5 %, 75 % positiv. Über alle Tage sind es +0,8 % und 65 %.
+- **Nach 60 Tagen:** im Schnitt +4,7 %.
+- **Rückschläge:** Ein Rückschlag über 7 % folgte nur in 4 % der Fälle. Bei GO sind es deutlich mehr.
+
+### Früherer Wiedereinstieg nach Tiefpunkten
+
+- **2009:** VOREINSTIEG am 07.08.2009 statt GO am 22.12.2009. Bis dahin waren 49 % statt 64 % der Erholung gelaufen.
+- **2011:** 06.01.2012 statt 19.01.2012, 16 % statt 20 % verpasst.
+- **2020:** VOREINSTIEG am 15.07.2020 statt GO erst am 12.02.2021. Verpasst waren 44 % statt 76 % der Erholung.
+- **2022:** 17.02.2023 statt 11.04.2023, 14 % statt 15 % verpasst.
+- **2016, beide Fälle 2018 und 2025:** keine Änderung. Dort kam GO ohnehin, sobald die Bedingungen erfüllt waren.
+
+### Ehrliche Grenzen
+
+- **Sechs Fehlstarts mit über 7 % Rückschlag:** zweimal vor dem Flash-Crash 2010, zweimal im Mai/Juni 2010 und zweimal im Juli 2011 vor dem Einbruch im August.
+- **Herbst 2007:** VOREINSTIEG im Oktober und Dezember, kurz vor der großen Baisse. Die Folge waren −8 bis −14 % in 60 Tagen.
+- **Wechsel:** Die Ampel wechselt etwas häufiger als heute (43 statt 40 pro Jahr).
+- **Aussagekraft:** Die Verbesserung ist deutlich, beruht aber auf wenigen großen Erholungsphasen.
+
+### So würde es in der Morgenroutine aussehen (Vorschlag für die Umsetzung)
+
+Ein eigener Zustand **„VOREINSTIEG“** in hellem Grün, klar unterscheidbar von GO. Darunter steht eine Prüfliste mit den vier Bedingungen, jede mit Haken und dem aktuellen Wert, zum Beispiel:
+
+- ✓ 3/4 Indizes in P3 (SPY, QQQ, DIA)
+- ✓ kein P6
+- ✓ 7/11 Sektoren über EMA200
+- ✓ Termstruktur Contango (0,91)
+- Hinweis: STOP vor 23 Handelstagen
+
+Die Konsequenz-Zeile zeigt dazu „LONG · Voreinstieg, eine Stufe kleiner“. Du siehst also auf einen Blick, *warum* die Ampel einen frühen Einstieg erlaubt, und entscheidest selbst.
