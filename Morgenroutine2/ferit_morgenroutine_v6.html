@@ -2049,6 +2049,7 @@ async function loadPrices(){
   const cmtPromise = loadTreasuryCMT();
   const bandPromise = loadFedBand();   // v6.2.5: Zielband live holen, still scheitern erlaubt
   const kreditPromise = loadKredit();  // v6.19 (AM5)
+  const breitePromise = loadAktienBreite();   // v6.19 (T1)
 
   // Lokalen Proxy einmal prüfen (steuert Concurrency + Statusanzeige)
   if(localProxyAlive===null){ localProxyAlive = await probeLocalProxy(); }
@@ -2163,6 +2164,13 @@ async function loadPrices(){
   // kommt er nicht, bleibt schlicht der Code-Wert stehen.
   bandPromise.then(ok=>{ if(ok){ try{ renderTreasury(); }catch(e){} } }).catch(()=>{});
   kreditPromise.then(()=>{ try{ if(STATE.ampel) renderAmpelZusatz(STATE.ampel); }catch(e){} }).catch(()=>{});
+  // T1: Aktien-Breite vor dem Archiv-Eintrag abwarten (höchstens 25 s), dann Ampel-Zusatz neu zeichnen
+  try{ await Promise.race([breitePromise, sleep(25000)]); }catch(e){}
+  try{
+    const AB = STATE.aktienBreite && STATE.aktienBreite.US, tk = todayKey();
+    if(AB && KPIDAYS[tk]){ Object.assign(KPIDAYS[tk], {ak_p3:AB.p3, ak_nh:AB.nh, ak_nl:AB.nl}); localStorage.setItem(SK.kpidays, JSON.stringify(KPIDAYS)); }
+    if(STATE.ampel){ STATE.ampel.breitenWende = breitenWendePruefung(); renderAmpelZusatz(STATE.ampel); }
+  }catch(e){}
   STATE.treasury = TREASURY.map(m=>{
     const r=M[m.y];
     if(!r||r.err) return {...m, err:(r&&r.err)||'Fehler'};
@@ -2309,6 +2317,50 @@ async function loadKredit(){
   }catch(e){}
   try{ const alt=JSON.parse(localStorage.getItem('ferit_mr13_kredit')||'null'); if(alt&&isFinite(alt.wert)){ STATE.kredit={...alt, alt:true}; } }catch(e){}
   return false;
+}
+
+// ── v6.19 (T1): MARKTBREITE AUS EINZELAKTIEN ────────────────────────────────
+// Anteil der Aktien in P3 (Näherung mit 50/200-Tage-Durchschnitt), über SMA200,
+// neue 52-Wochen-Hochs/-Tiefs und steigend/fallend — für S&P 500 und DAX.
+// Quelle ist die Kursabfrage des Gap-Scanners (Server /breite), keine neue Datenquelle.
+// Jeder Lauf schreibt die Werte ins Archiv: So entsteht über die Jahre eine eigene
+// Breitenreihe OHNE Survivorship-Verzerrung (die Rückrechnung kannte nur heutige Mitglieder).
+async function loadAktienBreite(){
+  try{
+    const r = await fetchOnce('http://localhost:8765/breite', 30000);
+    const j = r.ok ? await r.json() : null;
+    if(!j || !j.ok || !j.maerkte) return false;
+    STATE.aktienBreite = { US:j.maerkte.US, DE:j.maerkte.DE, ts:j.ts };
+    // N3: Quartalszahlen-Termine je Symbol (Sekunden seit 1970)
+    STATE.earnings = {};
+    (j.maerkte.US_earnings||[]).concat(j.maerkte.DE_earnings||[]).forEach(x=>{ if(x&&x.s&&x.t) STATE.earnings[x.s]=x.t; });
+    return true;
+  }catch(e){ return false; }
+}
+
+// ── B4 „Breiten-Wende“ — Hinweis, KEIN Ampelzustand (Test knapp nicht bestanden) ──
+// Regel unverändert wie in auswertung/breite_wende_test.py. Braucht die Breite der
+// letzten 10 Handelstage aus den gespeicherten Tagesständen (KPIDAYS).
+function breitenWendePruefung(){
+  const B = STATE.aktienBreite && STATE.aktienBreite.US;
+  if(!B || B.p3==null) return null;
+  const heute = todayKey();
+  const frueher = Object.keys(KPIDAYS).filter(d=>d<heute && KPIDAYS[d] && KPIDAYS[d].ak_p3!=null).sort().slice(-9)
+    .map(d=>({p3:KPIDAYS[d].ak_p3, nh:KPIDAYS[d].ak_nh, nl:KPIDAYS[d].ak_nl}));
+  const reihe = frueher.concat([{p3:B.p3, nh:B.nh, nl:B.nl}]);           // bis zu 10 Tage inkl. heute
+  const nhnl = reihe.map(x=>(x.nh!=null&&x.nl!=null)?x.nh-x.nl:null).filter(x=>x!=null);
+  const nhnl10 = nhnl.length ? nhnl.reduce((a,b)=>a+b,0)/nhnl.length : null;
+  const k1 = reihe.some(x=>x.p3!=null && x.p3<20) || (nhnl10!=null && nhnl10<-5);
+  const maxNL = Math.max(...reihe.map(x=>x.nl!=null?x.nl:-Infinity));
+  const k2 = isFinite(maxNL) && maxNL>0 && B.nl <= 0.5*maxNL;
+  const vor3 = reihe.length>=4 ? reihe[reihe.length-4].p3 : null;
+  const k3 = vor3!=null && B.p3 > vor3;
+  const f = x=>x==null?'–':String(x).replace('.',',');
+  return { aktiv:k1&&k2&&k3, tage:reihe.length, nhnl10, liste:[
+    {ok:k1, txt:`Kapitulation in den letzten 10 Tagen: Anteil in P3 unter 20 % oder Netto-Hochs (10-Tage-Schnitt) unter −5 — heute P3 ${f(B.p3)} %, Netto-Hochs ${nhnl10!=null?f(nhnl10.toFixed(1)):'–'}`},
+    {ok:k2, txt:`Neue Tiefs mindestens halbiert: heute ${f(B.nl)} % gegen Höchststand ${isFinite(maxNL)?f(maxNL):'–'} %`},
+    {ok:k3, txt:`Breite dreht: P3-Anteil ${f(B.p3)} % über dem Wert vor 3 Tagen (${f(vor3)} %)`},
+  ]};
 }
 
 async function loadFedBand(){
@@ -3521,7 +3573,9 @@ function computeAmpel(){
 
   // heutige KPI-Werte speichern (für morgen). v6.19: mit Ampel-Zustand und Panik-Score,
   // 100 Tage statt 12 — die Rückschau des Voreinstiegs braucht 60 Handelstage.
-  KPIDAYS[today]={vix,fg,part,p3,p6,rsBeat,phases:curPhases,label,basis:R.label,panik,pwSignal:PW.aktiv||undefined};
+  const AB = STATE.aktienBreite && STATE.aktienBreite.US;
+  KPIDAYS[today]={vix,fg,part,p3,p6,rsBeat,phases:curPhases,label,basis:R.label,panik,pwSignal:PW.aktiv||undefined,
+                  ak_p3:AB?AB.p3:undefined, ak_nh:AB?AB.nh:undefined, ak_nl:AB?AB.nl:undefined};
   { const keep=Object.keys(KPIDAYS).sort().slice(-100); const pr={}; keep.forEach(k=>pr[k]=KPIDAYS[k]); KPIDAYS=pr; }
   try{ localStorage.setItem(SK.kpidays, JSON.stringify(KPIDAYS)); }catch(e){}
 
@@ -3813,6 +3867,11 @@ const INFO_TEXTE = {
     warum:'Die Morgenroutine schreibt bei jedem Lauf den Tag in daten/archiv_JJJJ.json: Zustand, Regelversion, Gründe, Konsequenz, alle Index- und Sektorwerte, Sentiment-Rohwerte. Später werden automatisch die Folgerenditen des S&P 500 nachgetragen, genau wie in der Rückrechnung gerechnet. Mit den Rohwerten lassen sich auch künftige Regeln rückwirkend auf dieselben Tage rechnen.',
     lesen:'Datum wählen → „anzeigen“ zeigt den Tag und was danach geschah; ◀ ▶ blättern. „Bericht erstellen“ fasst alle Tage je Ampelzustand zusammen und listet die Lücken (grün vor Einbruch, rot vor Erholung); dazu entstehen archiv_ki_paket.csv und archiv_ki_frage.txt für eine KI. „Rückrechnung einspielen“ trägt einmalig die Jahre 2007–2026 als „nachgerechnet“ ein, Live-Tage bleiben unberührt.',
     bsp:'Aus der Rückrechnung: Am 20.02.2020 stand die Ampel auf GO — VIX 15,6, 9 Sektoren über EMA200, Contango. In den 20 Tagen danach fiel der S&P 500 um 31 %. Solche Tage zeigt der Bericht als „Lücke 1“: Mit diesen Eingangswerten war der Einbruch nicht zu sehen.'},
+  aktienbreite: {t:'Aktien-Breite und Breiten-Wende (T1, B4)',
+    ziel:'Wie viele Einzelaktien tragen den Markt? Die Sektor-Breite zählt 11 ETFs, hier zählen rund 500 S&P-500-Aktien und die DAX-Werte.',
+    warum:'In der Rückrechnung (S&P 500, 2017–2026) wirkte extreme Breitenschwäche konträr: Netto-Hochs im 10-Tage-Schnitt unter −5 → danach im Schnitt +5,6 % in 20 Tagen (83 % positiv); unter 20 % der Aktien in P3 → +4,6 % (78 % positiv). Als Ampel-Regel hat keine Breitenregel bestanden (B1–B3), deshalb ändert sie die Ampel nicht. Die Breiten-Wende (B4: erst Kapitulation, dann halbierte neue Tiefs und drehende Breite) war knapp nicht bestanden und ist ein Hinweis.',
+    lesen:'P3 = Anteil der Aktien mit Kurs über 50-Tage- über 200-Tage-Durchschnitt (Näherung an die EMA-Phasen). Hochs/Tiefs = Anteil mit neuem 52-Wochen-Hoch bzw. -Tief heute. Violett unter 20 %: Kapitulationszone, dann erscheint die Prüfliste der Breiten-Wende. Jeder Lauf schreibt die Werte ins Archiv — so entsteht eine eigene Reihe ohne Survivorship-Verzerrung.',
+    bsp:'Rückrechnung: Breiten-Wende am 19.03.2020, vier Tage vor dem Tief vom 23.03., danach +23 % in 20 Tagen. Fehlsignal: 03.03.2020, danach −29 %. Stand 30.10.2026: 44 % der Aktien in P3, 9,2 % neue Hochs gegen 0,8 % neue Tiefs.'},
   kredit: {t:'Kreditspread High Yield (AM5) — nur Anzeige',
     ziel:'Zeigt, ob Kreditgeber für riskante Firmenanleihen mehr Aufschlag verlangen — ein Stressmaß außerhalb des Aktienmarkts.',
     warum:'Der Kreditmarkt fehlte bisher völlig. In der Rückrechnung half eine Spread-Warnung 2007–2016, schadete aber 2017–2026 (0,43/0,68). Deshalb fließt er nicht in die Ampel, sondern wird beobachtet und archiviert.',
@@ -3853,6 +3912,15 @@ function renderAmpelZusatz(v){
     const kf = d==null?'var(--steel)': d>1.0?'var(--red)': d>0.5?'var(--amber)':'var(--steel)';
     h += `<span class="az-chip" style="color:${kf}" title="ICE BofA US High Yield OAS (FRED), Stand ${esc(k.datum||'')}${k.alt?' — letzter gespeicherter Wert, Abruf gescheitert':''}">Kredit HY ${k.wert.toFixed(2).replace('.',',')} %${d!=null?` (${d>=0?'+':''}${d.toFixed(2).replace('.',',')} in 3M)`:''}</span><span class="info-i" onclick="infoPop('kredit')" title="Kreditspread">i</span>`;
   }
+  // v6.19 (T1): Aktien-Breite S&P 500 und DAX
+  const AB = STATE.aktienBreite;
+  const fz = x=>x==null?'–':String(Math.round(x));
+  if(AB && AB.US && AB.US.n){
+    const u=AB.US; const fu = u.p3<20?'var(--violet)': u.p3<40?'var(--amber)':'var(--green)';
+    h += `<span class="az-chip" style="color:${fu}" title="${u.n} S&P-500-Aktien · über SMA50 ${fz(u.ueber50)} % · steigend ${u.steigend} / fallend ${u.fallend}">S&amp;P-Aktien: P3 ${fz(u.p3)} % · über 200 ${fz(u.ueber200)} % · Hochs ${String(u.nh).replace('.',',')} / Tiefs ${String(u.nl).replace('.',',')} %</span>`;
+    if(AB.DE && AB.DE.n){ const d=AB.DE; h += `<span class="az-chip" title="${d.n} DAX-Werte">DAX-Aktien: P3 ${fz(d.p3)} % · über 200 ${fz(d.ueber200)} %</span>`; }
+    h += `<span class="info-i" onclick="infoPop('aktienbreite')" title="Aktien-Breite">i</span>`;
+  }
   const hp = STATE.handelsplan;
   const hpTxt = !hp ? '' : hp.fehler ? ` · <span title="${esc(hp.fehler)}">Handelsplan: –</span>`
     : ` · Handelsplan ${esc(hp.version)}${hp.abweichungen&&hp.abweichungen.length?` <b style="color:var(--red)" title="Diese Werte in handelsplan.json weichen von den getesteten ab und werden NICHT verwendet: ${esc(hp.abweichungen.join(', '))}. Erst über auswertung/ prüfen.">⚠ ungetestete Ampel-Werte in der Datei</b>`:''}`;
@@ -3868,6 +3936,15 @@ function renderAmpelZusatz(v){
        + `<div class="bilanz">Letzter STOP: ${datumDE(r.datum)}${r.tageSeit!=null?` (vor ca. ${r.tageSeit} Handelstagen, Quelle: ${esc(r.quelle||'')})`:''} · Fenster 60 Handelstage · getestet und in beiden Zeiträumen bestanden · Größe eine Stufe kleiner</div></div>`;
   }
 
+  // v6.19 (B4): Breiten-Wende — ebenfalls nur Hinweis
+  const BW=v.breitenWende;
+  if(BW && (BW.aktiv || BW.liste[0].ok)){
+    const beide = BW.aktiv && v.panikWende && v.panikWende.aktiv;
+    h += `<div class="az-box" style="border-left-color:${BW.aktiv?'var(--violet)':'var(--rule)'}">`
+       + `<h4>${BW.aktiv?(beide?'⚡⚡ Breiten-Wende UND Panik-Wende — stärkere Lage':'⚡ Breiten-Wende möglich'):'Breite in Kapitulation — Stabilisierung fehlt noch'} <span class="info-i" onclick="infoPop('aktienbreite')" title="Breiten-Wende">i</span></h4>`
+       + BW.liste.map(x=>`<div class="${x.ok?'ok':'nein'}">${x.ok?'✓':'○'} ${esc(x.txt)}</div>`).join('')
+       + `<div class="bilanz">Nur Hinweis: Test knapp nicht bestanden (2017–2021 besser, 2022–2026 leicht schlechter). Rückrechnung: 29 Signale, nach 20 Tagen +2,9 %, 66 % positiv, in 14 % vorher über 7 % Rückschlag — treffsicherer als die Panik-Wende.${BW.tage<10?` Datenbasis erst ${BW.tage}/10 Tage (wächst mit jedem Lauf).`:''} P3-Anteil hier mit 50/200-Tage-Durchschnitt statt EMA — eine Näherung.</div></div>`;
+  }
   const PW=v.panikWende;
   if(PW && (PW.aktiv || PW.liste[0].ok)){
     h += `<div class="az-box" style="border-left-color:${PW.aktiv?'var(--violet)':'var(--rule)'}">`
@@ -4552,6 +4629,13 @@ function archivEintrag(){
       pcr:MANUAL.pcr??null, aaiiBear:MANUAL.bear??null, naaim:MANUAL.naaim??null,
       panikTeile: (P && P.C) ? P.C.map(c=>({k:c.k, pkt:c.pts})) : null, panikAbdeckung: P?P.covered:null },
     termineHeute: termine,
+    // T1: Aktien-Breite (gleiche Feldnamen wie die Rückrechnung, damit beides vergleichbar ist)
+    aktien_p3_anteil: STATE.aktienBreite&&STATE.aktienBreite.US ? STATE.aktienBreite.US.p3 : null,
+    aktien_nh: STATE.aktienBreite&&STATE.aktienBreite.US ? STATE.aktienBreite.US.nh : null,
+    aktien_nl: STATE.aktienBreite&&STATE.aktienBreite.US ? STATE.aktienBreite.US.nl : null,
+    aktien_ueber200: STATE.aktienBreite&&STATE.aktienBreite.US ? STATE.aktienBreite.US.ueber200 : null,
+    aktien_de: STATE.aktienBreite ? STATE.aktienBreite.DE || null : null,
+    breitenWende: v.breitenWende ? v.breitenWende.aktiv : null,
     spySchluss: (()=>{ const s=(STATE.indices||[]).find(i=>i.key==='SPY'&&i.closes); return s? r2(s.closes[s.closes.length-1]) : null; })(),
   });
 }

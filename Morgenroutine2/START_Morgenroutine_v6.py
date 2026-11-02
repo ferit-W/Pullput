@@ -214,6 +214,38 @@ def _get_crumb(force=False):
         return None
 
 
+def breite_aus_quotes(quotes):
+    """v6.19 (T1): Breitenkennzahlen aus v7/quote-Datensaetzen. Rein rechnend (testbar).
+    Liefert (kennzahlen, earnings-termine)."""
+    n = ueber50 = ueber200 = p3 = nh = nl = auf = ab = 0
+    termine = []
+    for q in quotes:
+        px = q.get("regularMarketPrice")
+        s50, s200 = q.get("fiftyDayAverage"), q.get("twoHundredDayAverage")
+        if not (px and s50 and s200):
+            continue
+        n += 1
+        ueber50 += px > s50
+        ueber200 += px > s200
+        p3 += (px > s50 > s200)
+        hi, lo = q.get("fiftyTwoWeekHigh"), q.get("fiftyTwoWeekLow")
+        dh, dl = q.get("regularMarketDayHigh") or px, q.get("regularMarketDayLow") or px
+        nh += bool(hi and dh >= hi)
+        nl += bool(lo and dl <= lo)
+        chg = q.get("regularMarketChangePercent") or 0
+        auf += chg > 0
+        ab += chg < 0
+        et = q.get("earningsTimestamp") or q.get("earningsTimestampStart")
+        if et:
+            termine.append({"s": q.get("symbol"), "t": et})
+    pct = lambda x: round(x / n * 100, 1) if n else None
+    return ({"n": n, "ueber50": pct(ueber50), "ueber200": pct(ueber200), "p3": pct(p3),
+             "nh": pct(nh), "nl": pct(nl), "steigend": auf, "fallend": ab}, termine)
+
+
+_BREITE_CACHE = {"ts": 0, "daten": None}
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
 
     def __init__(self, *args, **kwargs):
@@ -303,6 +335,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._proxy()
         if self.path.startswith("/gapscan"):
             return self._gapscan()
+        if self.path.startswith("/breite"):
+            return self._breite()
         if self.path.startswith("/gapdetail"):
             return self._gapdetail()
         # v15.15: lokale .html-Dateien (Journale, Cockpit, Hub) SAME-ORIGIN ausliefern.
@@ -776,6 +810,45 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             except Exception:
                 return []
         return []
+
+
+    def _breite(self):
+        """v6.19 (T1): Marktbreite aus Einzelaktien - S&P 500 und DAX.
+
+        Nutzt dieselbe Kursabfrage wie der Gap-Scanner (v7/quote, 50er-Pakete), also
+        keine zusaetzliche Datenquelle. Yahoo liefert 50- und 200-Tage-DURCHSCHNITTE
+        (einfach, nicht exponentiell); der Anteil "in P3" ist deshalb eine Naeherung an
+        die EMA-Definition der Rueckrechnung. Ergebnis 10 Minuten zwischengespeichert.
+        """
+        try:
+            jetzt = _time.time()
+            if _BREITE_CACHE["daten"] and jetzt - _BREITE_CACHE["ts"] < 600:
+                return self._send_json(_BREITE_CACHE["daten"])
+            jobs = []
+            for markt, syms in (("US", SP500_SYMS), ("DE", DAX_SYMS)):
+                for i in range(0, len(syms), 50):
+                    jobs.append((markt, syms[i:i + 50]))
+
+            def _run(job):
+                mk, batch = job
+                try:
+                    return mk, self._batch_quote(batch)
+                except Exception:
+                    return mk, []
+            with ThreadPoolExecutor(max_workers=4) as ex:
+                res = list(ex.map(_run, jobs))
+            out = {}
+            for markt in ("US", "DE"):
+                quotes = [q for mk, qs in res if mk == markt for q in qs]
+                out[markt], out[markt + "_earnings"] = breite_aus_quotes(quotes)
+            daten = {"ok": True, "ts": int(jetzt * 1000), "maerkte": out}
+            _BREITE_CACHE.update(ts=jetzt, daten=daten)
+            return self._send_json(daten)
+        except Exception as e:
+            try:
+                self._send_json({"ok": False, "fehler": "breite: %s" % e}, 500)
+            except Exception:
+                pass
 
     def _gapscan(self):
         """Scannt SP500_SYMS + DAX_SYMS auf Open-vs-PrevClose-Gaps >= threshold (Default 5%)."""

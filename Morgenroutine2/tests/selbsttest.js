@@ -62,8 +62,8 @@ ctx.window = ctx; ctx.self = ctx; ctx.globalThis = ctx;
 vm.createContext(ctx);
 // Top-Level-const/let sind im vm nicht als Eigenschaften sichtbar — deshalb am Ende exportieren.
 const exporte = ['luedePhase','computeAmpel','ampelRegel','voreinstiegPruefung','trendUndRisiko','usBoersenStatus','xetraStatus','etNachBerlin','makroStufe','makroRegion',
-  'korrigiereZeit','wochenTermine','kreditAusCsv','folgeRenditen','datumAus','isoLokal','mrSyncWert','STATE','SK'];
-vm.runInContext(code + '\n;globalThis.__T={' + exporte.map(n => `${n}:(typeof ${n}!=='undefined'?${n}:undefined)`).join(',') + '};',
+  'korrigiereZeit','wochenTermine','kreditAusCsv','folgeRenditen','datumAus','breitenWendePruefung','isoLokal','mrSyncWert','STATE','SK'];
+vm.runInContext(code + '\n;globalThis.__T={' + exporte.map(n => `${n}:(typeof ${n}!=='undefined'?${n}:undefined)`).join(',') + ',kpi:()=>KPIDAYS};',
   ctx, { filename: 'ferit_morgenroutine_v6.html' });
 const T = ctx.__T;
 
@@ -224,6 +224,23 @@ abschnitt('Archiv-Folgerenditen');
   pruefe('vorhandene Werte bleiben unangetastet', Object.keys(T.folgeRenditen({ [tag]: { spy_fwd5: 1, spy_fwd20: 1, spy_fwd60: 1, spy_maxdd20: 1 } }, closes, times)).length, 0);
   const letzter = T.datumAus(times[98]);
   pruefe('zu junger Tag bekommt noch nichts', T.folgeRenditen({ [letzter]: {} }, closes, times)[letzter], undefined);
+}
+
+// ── Breiten-Wende (B4) wie in breite_wende_test.py ───────────────────────────
+abschnitt('Breiten-Wende');
+{
+  const K = T.kpi(); Object.keys(K).forEach(k => delete K[k]);
+  for (let i = 9; i >= 1; i--) { const d = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10);
+    K[d] = { ak_p3: 15, ak_nh: 0.5, ak_nl: i === 5 ? 12 : 8 }; }
+  T.STATE.aktienBreite = { US: { p3: 25, nh: 1, nl: 5 } };
+  const a = T.breitenWendePruefung();
+  pruefe('Kapitulation, Tiefs halbiert (5 ≤ 6), Breite dreht → Signal', [a.aktiv, a.liste.map(x => x.ok)], [true, [true, true, true]]);
+  T.STATE.aktienBreite = { US: { p3: 25, nh: 1, nl: 7 } };
+  pruefe('Tiefs nicht halbiert (7 > 6) → kein Signal', T.breitenWendePruefung().aktiv, false);
+  Object.keys(K).forEach(k => { K[k].ak_p3 = 50; K[k].ak_nl = 0.5; K[k].ak_nh = 3; });
+  T.STATE.aktienBreite = { US: { p3: 55, nh: 3, nl: 0.5 } };
+  pruefe('ohne Kapitulation → kein Signal', T.breitenWendePruefung().liste[0].ok, false);
+  Object.keys(K).forEach(k => delete K[k]);
 }
 
 // ── Ergebnis ─────────────────────────────────────────────────────────────────
