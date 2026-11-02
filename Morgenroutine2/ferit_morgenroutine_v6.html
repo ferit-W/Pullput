@@ -838,6 +838,14 @@ footer strong{color:var(--ink2)}
   <section class="card" id="c-sekt" style="margin-top:12px">
     <div id="sekt-body"><div class="init">11 S&amp;P-Sektoren — Heatmap nach EMA-Trendstärke; Drilldown 10 stärkste/schwächste je Sektor.</div></div>
   </section>
+  <!-- v6.19 (T3): Setup-Scanner mit der im Systemtest geprüften Regel -->
+  <section class="subpanel collapsed" id="sp-scan">
+    <div class="sp-head" onclick="toggleSub('sp-scan',event)">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="sp-t">🎯 Setup-Scanner · Rücksetzer im Trend</span><span class="sp-meta">S&amp;P 500 + DAX · Regel aus dem Systemtest</span><span class="info-i" onclick="event.stopPropagation();infoPop('scanner')" title="Wie der Scanner sucht">i</span></div>
+      <div class="sp-right"><button class="sp-btn" onclick="event.stopPropagation();setupScan(false)">▶ Scannen</button><button class="sp-btn" onclick="event.stopPropagation();setupScan(true)" title="neu rechnen, Zwischenspeicher übergehen">↻</button></div>
+    </div>
+    <div class="sp-body" id="scan-body"><div class="init">Sucht Aktien in Phase 3 nach einem Rücksetzer an die EMA20, die wieder darüber schließen — mit genug Platz bis zum Widerstand. Dauert 1–3 Minuten (rund 550 Kursverläufe).</div></div>
+  </section>
   <section class="subpanel" id="sp-gap">
     <div class="sp-head" onclick="toggleSub('sp-gap',event)">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="sp-t">⚡ Gap-Scanner · S&amp;P 500 + NASDAQ-100 + DAX</span><span class="sp-meta">US: Pre-Market/Eröffnung · DAX: Eröffnung</span><span class="sp-meta" id="gap-meta" style="color:var(--gold)"></span></div>
@@ -3869,6 +3877,11 @@ const INFO_TEXTE = {
     warum:'Die Morgenroutine schreibt bei jedem Lauf den Tag in daten/archiv_JJJJ.json: Zustand, Regelversion, Gründe, Konsequenz, alle Index- und Sektorwerte, Sentiment-Rohwerte. Später werden automatisch die Folgerenditen des S&P 500 nachgetragen, genau wie in der Rückrechnung gerechnet. Mit den Rohwerten lassen sich auch künftige Regeln rückwirkend auf dieselben Tage rechnen.',
     lesen:'Datum wählen → „anzeigen“ zeigt den Tag und was danach geschah; ◀ ▶ blättern. „Bericht erstellen“ fasst alle Tage je Ampelzustand zusammen und listet die Lücken (grün vor Einbruch, rot vor Erholung); dazu entstehen archiv_ki_paket.csv und archiv_ki_frage.txt für eine KI. „Rückrechnung einspielen“ trägt einmalig die Jahre 2007–2026 als „nachgerechnet“ ein, Live-Tage bleiben unberührt.',
     bsp:'Aus der Rückrechnung: Am 20.02.2020 stand die Ampel auf GO — VIX 15,6, 9 Sektoren über EMA200, Contango. In den 20 Tagen danach fiel der S&P 500 um 31 %. Solche Tage zeigt der Bericht als „Lücke 1“: Mit diesen Eingangswerten war der Einbruch nicht zu sehen.'},
+  scanner: {t:'Setup-Scanner „Rücksetzer im Trend“ (T3)',
+    ziel:'Die tägliche Vorauswahl: Welche Aktien zeigen heute genau den Einstieg, der im Systemtest einen Vorteil hatte?',
+    warum:'Regel wie im Systemtest (Phase 2b): Phase 3, an einem der 5 Vortage Schluss unter der EMA20, heute wieder darüber; Stopp am 10-Tage-Tief, Stoppabstand 1–15 %. Gefiltert wird nur mit „Platz bis zum Widerstand größer als der Stoppabstand“ — das einzige deiner Kriterien, das im Test in beiden Zeiträumen geholfen hat. RS gegen den Sektor war gemischt und dient deshalb nur zur Sortierung. Nähe zum 52-Wochen-Hoch hat im Test geschadet und filtert nicht. Die Rechnung ist gegen den Testcode geprüft (353 Vergleiche, identisch).',
+    lesen:'Platz = Abstand bis zum 52-Wochen-Hoch geteilt durch den Stoppabstand („am Hoch“ = kein Widerstand). RS Sektor = 3-Monats-Performance minus die des Sektor-ETFs (DAX-Werte gegen den DAX, * = kein Sektor hinterlegt, gegen SPY). 📅 = Quartalszahlen in den nächsten 10 Tagen. Liquidität und Höchstzahl stellst du in handelsplan.json ein; weitere deutsche Werte (MDAX, SDAX) unter „de_zusatz“. Angezeigt wird, wie viele Signale an der Liquidität oder am fehlenden Platz scheiterten.',
+    bsp:'Systemtest-Bilanz dieser Regel mit Ampel: +0,23 R je Trade (2017–2021) und +0,06 R (2022–2026), Trefferquote rund 32–39 %. Der Vorteil kommt aus wenigen großen Gewinnern — 20 bis 30 Verlierer in Folge kamen vor. Absolute Werte sind wegen Survivorship eher zu gut.'},
   positionen: {t:'Positions-Monitor (T2)',
     ziel:'Jeden Morgen auf einen Blick: Wie stehen deine offenen Trades, und wo ist etwas zu tun?',
     warum:'Die offenen Trades kommen aus dem Journal (Laufwerk, sonst Browser). Je Position: Kurs, Ergebnis in R, Abstand zum Stopp in R und in ATR, Phase des Titels heute. Der Vorschlag zum Nachziehen folgt den beiden Ausstiegen, die im Systemtest vorn lagen: 10-Tage-Tief (E4) und höchster Schluss seit Einstieg minus 3 × ATR (E5). Feste Ziele bei CRV 2 oder 3 waren 2022–2026 negativ, EMA20-Ausstieg ebenso.',
@@ -4841,6 +4854,45 @@ async function positionsMonitor(){
   }).join('');
   el.innerHTML = `<b>Positionen</b> (${offen.length} offen${warn?`, <span style="color:var(--amber)">${warn} mit Hinweis</span>`:''}) <span class="info-i" onclick="infoPop('positionen')" title="Positions-Monitor">i</span>`
     + (offen.length>25?' <span style="color:var(--steel)">— die ersten 25</span>':'') + `<div style="margin-top:4px">${html}</div>`;
+}
+
+// ═══ v6.19 (T3): SETUP-SCANNER ═══════════════════════════════════════════════
+async function setupScan(neu){
+  const body=$('scan-body'); if(!body) return;
+  const p=$('sp-scan'); if(p) p.classList.remove('collapsed');
+  body.innerHTML='<div class="loading"><div class="spinner"></div>Scanne S&amp;P 500 und DAX … (1–3 Minuten)</div>';
+  let j;
+  try{ const r=await fetchOnce('http://localhost:8765/scan'+(neu?'?neu=1':''), 300000); j=await r.json(); }
+  catch(e){ body.innerHTML='<div class="init" style="color:var(--red)">Scan nicht möglich — läuft der lokale Server?</div>'; return; }
+  if(!j || !j.ok){ body.innerHTML='<div class="init" style="color:var(--gold)">'+esc((j&&j.fehler)||'Fehler')+'</div>'; return; }
+  STATE.setupScan=j;
+  const f=(x,n=2)=>x==null?'–':(+x).toFixed(n).replace('.',',');
+  const mio=x=>x==null?'–':(x/1e6).toFixed(1).replace('.',',')+' Mio';
+  const amp=STATE.ampel?STATE.ampel.label:null;
+  let h=`<div style="font-size:.7rem;color:var(--steel);margin-bottom:6px">Stand ${new Date(j.ts).toLocaleString('de-DE')} · ${j.gescannt} Titel geprüft${j.ohne_daten?`, ${j.ohne_daten} ohne Daten`:''} · Liquidität mindestens ${mio(j.min_umsatz)} Umsatz/Tag (Handelsplan) · höchstens ${j.max_vorschlaege} je Markt${amp?` · Ampel heute: <b>${esc(amp)}</b>`:''}</div>`;
+  ['US','DE'].forEach(m=>{
+    const M=j.maerkte[m]; if(!M) return;
+    h+=`<div style="margin-top:6px"><b>${m==='US'?'🇺🇸 S&amp;P 500':'🇩🇪 DAX'+(j.maerkte.DE&&j.maerkte.DE.vorschlaege.some(x=>x.vergleich!=='^GDAXI')?'':'')}</b> — ${M.signale} Rücksetzer-Signale, ${M.an_liquiditaet_gescheitert} an der Liquidität gescheitert, ${M.ohne_platz} ohne Platz bis zum Widerstand → <b>${M.vorschlaege.length} Vorschläge</b>${M.weitere?` (+${M.weitere} weitere)`:''}</div>`;
+    if(!M.vorschlaege.length){ h+='<div style="color:var(--steel);font-size:.72rem">keine</div>'; return; }
+    h+='<table class="tbl" style="width:100%;font-size:.7rem;margin-top:3px"><tr style="color:var(--steel)"><th style="text-align:left">Titel</th><th>Kurs</th><th>Stopp</th><th>Abstand</th><th>Platz</th><th>RS Sektor</th><th>zum Hoch</th><th>Umsatz</th><th></th></tr>';
+    M.vorschlaege.forEach(t=>{
+      const sym=esc(t.symbol);
+      h+=`<tr><td><b>${sym}</b></td><td>${f(t.kurs)}</td><td>${f(t.stopp)}</td><td>${f(t.stopp_pct,1)} %</td>`
+        + `<td title="Platz bis zum 52-Wochen-Hoch im Verhältnis zum Stoppabstand">${t.am_hoch?'am Hoch':f(t.platz_x,1)+' ×'}</td>`
+        + `<td title="63 Tage gegen ${esc(t.vergleich)}" style="color:${t.rs63_pct>0?'var(--green)':'var(--red)'}">${t.rs63_pct==null?'–':(t.rs63_pct>0?'+':'')+f(t.rs63_pct,1)+' %'}${t.vergleich==='SPY'?' <span title="kein Sektor hinterlegt — gegen SPY">*</span>':''}</td>`
+        + `<td>${f(t.abstand_hoch_pct,1)} %</td><td>${mio(t.umsatz20)}</td>`
+        + `<td>${t.earnings_bald?`<b style="color:var(--amber)" title="Quartalszahlen innerhalb von 10 Tagen">📅 ${new Date(t.earnings*1000).toLocaleDateString('de-DE')}</b>`:''} <button class="cp-btn" style="padding:0 5px" onclick="addWatchSym('${sym}')" title="in die Watchlist">+</button></td></tr>`;
+    });
+    h+='</table>';
+  });
+  h+='<div style="font-size:.66rem;color:var(--steel);margin-top:6px">Vorauswahl nach festen Regeln, sortiert nach relativer Stärke gegen den Sektor. Chartbild, Allzeithoch und Entscheidung prüfst du in TradingView. Nur Long-Seite (getestet).</div>';
+  body.innerHTML=h;
+}
+function addWatchSym(sym){
+  if(!SYM_RE.test(sym)) return;
+  if(STATE.watch.find(w=>w.ticker===sym)){ toast(sym+' ist schon in der Watchlist','ok'); return; }
+  STATE.watch.push({ticker:sym,price:null,pct:null}); saveLS(SK.watch,STATE.watch); renderWatch(); refreshWatch(true);
+  toast(sym+' in die Watchlist','ok');
 }
 
 function saveSnapshot(auto){

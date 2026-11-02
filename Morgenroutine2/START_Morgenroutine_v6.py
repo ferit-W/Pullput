@@ -244,6 +244,8 @@ def breite_aus_quotes(quotes):
 
 
 _BREITE_CACHE = {"ts": 0, "daten": None}
+_SCAN_CACHE = {"ts": 0, "daten": None}
+_SCAN_LOCK = threading.Lock()
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -337,6 +339,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._gapscan()
         if self.path.startswith("/breite"):
             return self._breite()
+        if self.path.startswith("/scan"):
+            return self._scan()
         if self.path.startswith("/gapdetail"):
             return self._gapdetail()
         # v15.15: lokale .html-Dateien (Journale, Cockpit, Hub) SAME-ORIGIN ausliefern.
@@ -847,6 +851,45 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             try:
                 self._send_json({"ok": False, "fehler": "breite: %s" % e}, 500)
+            except Exception:
+                pass
+
+    def _scan(self):
+        """v6.19 (T3): Setup-Scanner. Rechenlogik in setup_scanner.py (identisch zum
+        Systemtest). Dauert je nach Verbindung 1-3 Minuten; Ergebnis 30 Minuten im
+        Speicher und als daten/scan_letzter.json. ?neu=1 erzwingt einen neuen Lauf."""
+        try:
+            import importlib.util
+            neu = "neu=1" in self.path
+            jetzt = _time.time()
+            if not neu and _SCAN_CACHE["daten"] and jetzt - _SCAN_CACHE["ts"] < 1800:
+                return self._send_json(_SCAN_CACHE["daten"])
+            if not _SCAN_LOCK.acquire(blocking=False):
+                return self._send_json({"ok": False, "fehler": "Scan laeuft bereits - bitte gleich noch einmal"}, 429)
+            try:
+                spec = importlib.util.spec_from_file_location("setup_scanner_mod", os.path.join(DIRECTORY, "setup_scanner.py"))
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                try:
+                    with open(os.path.join(DIRECTORY, "handelsplan.json"), encoding="utf-8") as f:
+                        plan = json.load(f)
+                except Exception:
+                    plan = {}
+                zusatz = [s for s in ((plan.get("universum") or {}).get("de_zusatz") or []) if isinstance(s, str) and _SYM_RE.match(s)]
+                erg = mod.scanne(_yget, self._batch_quote, SP500_SYMS, list(dict.fromkeys(DAX_SYMS + zusatz)), plan)
+                _SCAN_CACHE.update(ts=jetzt, daten=erg)
+                try:
+                    os.makedirs(DATA_DIR, exist_ok=True)
+                    with open(os.path.join(DATA_DIR, "scan_letzter.json"), "w", encoding="utf-8") as f:
+                        json.dump(erg, f, ensure_ascii=False)
+                except Exception:
+                    pass
+                return self._send_json(erg)
+            finally:
+                _SCAN_LOCK.release()
+        except Exception as e:
+            try:
+                self._send_json({"ok": False, "fehler": "scan: %s" % e}, 500)
             except Exception:
                 pass
 

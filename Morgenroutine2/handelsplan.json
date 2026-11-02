@@ -1,6 +1,6 @@
 {
   "_hinweis": "Handelsplan als Datei (W1). Alle Werkzeuge lesen hieraus: REGELCHECK, Trading Journal, Morgenroutine. Nach jeder Aenderung 'version' erhoehen. Werte im Block 'ampel' sind getestet und stehen fest im Code; weicht hier etwas ab, zeigt die Morgenroutine eine Warnung statt still mit ungetesteten Werten zu rechnen. Neue Ampel-Regeln erst ueber auswertung/ pruefen (AM8).",
-  "version": "2026.11.1",
+  "version": "2026.11.2",
   "stand": "2026-11-02",
 
   "risiko": {
@@ -18,7 +18,9 @@
   "universum": {
     "mindestkurs": 10.0,
     "liquiditaet_mio_eur": 1.0,
-    "max_vorschlaege": 20
+    "max_vorschlaege": 20,
+    "_de_zusatz_hinweis": "Weitere deutsche Werte fuer den Setup-Scanner (MDAX, SDAX), Yahoo-Symbole mit .DE, z. B. \"HAG.DE\". Der DAX ist eingebaut. Liste bitte selbst pflegen - Indexmitglieder aendern sich.",
+    "de_zusatz": []
   },
   "ampel": {
     "regelwerk": "2026.11 · AM1+AM3+AM4",
