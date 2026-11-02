@@ -76,13 +76,13 @@ Alle vier gelten mit dem Vorbehalt der Survivorship-Verzerrung (nur heutige Mitg
 - **N2 Platz-Check bis zum Widerstand** (als Vorprüfung, die Entscheidung fällt in TradingView): Die Routine sucht über dem Kurs das nächste markante Hoch der letzten 12 Monate. Am Allzeithoch gibt es keins. Sie zeigt dann zum Beispiel „Platz bis 182,40 = 1,8 × Stopp-Abstand“. Es ist nur ein Vorsortierer, damit man nicht jeden Chart öffnen muss. Bringt er im Test (S1) nichts, fliegt er raus.
 - **N3 Quartalszahlen für Positionen und Kandidaten** (gewünscht). Kommende Termine kommen wie bisher kostenlos aus Yahoo, je Titel. Für historische Termine (Backtest) gibt es laut Recherche keine verlässlich freie Quelle. Ein Anbieter wirbt mit einem Gratis-Kontingent, das muss vor einer Nutzung geprüft werden. Termin je Titel aus Yahoo. Warnung, wenn Zahlen innerhalb der Haltedauer oder vor dem nächsten Handelstag liegen.
 - **N4 Zweite Datenquelle:** Die Yahoo-Schnittstelle ist inoffiziell und kann jederzeit ausfallen oder sich ändern. Recherche und Einbau eines Ersatzes, mindestens für Indizes und VIX.
-- **N5 Deutscher Markt gleichwertig** (gewünscht), mit Liquiditätsfilter, weil viele MDAX- und SDAX-Werte dünn gehandelt sind. Vorschlag: mindestens 1 Mio. € Tagesumsatz im Schnitt der letzten 20 Tage, die Schwelle legst du fest. Breite, neue Hochs und Tiefs sowie Phasen auch für DAX, MDAX und SDAX, nicht nur für die USA.
+- **N5 Deutscher Markt gleichwertig** (gewünscht), mit Liquiditätsfilter, weil viele MDAX- und SDAX-Werte dünn gehandelt sind. Entschieden: Die Schwelle ist in den Einstellungen anpassbar, Startwert 1 Mio. € Tagesumsatz im Schnitt der letzten 20 Tage. Höchstens 20 Vorschläge, sortiert nach Qualität. Angezeigt wird auch, wie viele Werte am Liquiditätsfilter gescheitert sind, damit man sieht, ob die Schwelle zu streng ist. Breite, neue Hochs und Tiefs sowie Phasen auch für DAX, MDAX und SDAX, nicht nur für die USA.
 - **N6 Handy-App** (entschieden: beides, also App und Push): Die Morgenroutine wird als App auf dem Samsung installierbar, über „Zum Startbildschirm hinzufügen“ in Chrome (PWA), mit eigener, schlanker Handy-Ansicht. Dazu optional eine tägliche Push-Nachricht mit Ampel, Neigung des Trading-Partners, Terminen und Positionen mit Handlungsbedarf. Die funktioniert auch unterwegs, ohne den Server ins Internet zu öffnen. Die Variante wählst du.
 - **N7 Recherche-Punkte:** gute, freie Quellen für historische Earnings-Termine (damit N3 auch im Backtest nutzbar wird) und für eine Datenquelle ohne Survivorship-Verzerrung.
 - **N1 Ergänzung Bestände außerhalb der Journale:** Gold- und Silber-ETFs und Ähnliches, die nur bei CapTrader liegen, kommen bis zum Broker-Abgleich in eine kleine Liste „Sonstige Bestände“ (Symbol, Stückzahl, Art, etwa Rohstoff). Sie zählen bei Konzentration und Kapitalbindung mit, aber nicht ins Trading-Risiko.
 - **N6 Technik nach Recherche:**
   - Eine echte installierbare Web-App braucht HTTPS. Im Heim-WLAN mit einfachem `http://192.168…` installiert Chrome sie nicht vollwertig. Möglich ist dann ein eigenes Zertifikat, das auf dem Handy als vertrauenswürdig eingetragen werden muss, oder ein kleines Android-Programm (APK), das die Seite anzeigt und per Datei installiert wird. Das APK ist der bequemere Weg und wird vor dem Bau geprüft.
-  - Push über ntfy (kostenlos, eigene Android-App). Auf dem öffentlichen Dienst sind Themen-Namen öffentlich, deshalb sind dort nur ein langer Zufallsname und knappe Inhalte sinnvoll, oder ein eigener ntfy-Dienst. Alternative: Telegram-Bot.
+  - Push über ntfy (kostenlos, eigene Android-App). Auf dem öffentlichen Dienst sind Themen-Namen öffentlich, deshalb sind dort nur ein langer Zufallsname und knappe Inhalte sinnvoll, oder ein eigener ntfy-Dienst. **Entschieden: Telegram-Bot**, den du einmal mit deinem Konto verbindest. Bot-Schlüssel und Chat-Kennung liegen nur auf dem PC in der Server-Konfiguration, nicht im Browser.
 
 ## Phase 3 · Archiv als Grundlage für die spätere Auswertung
 
@@ -142,7 +142,7 @@ Alle vier gelten mit dem Vorbehalt der Survivorship-Verzerrung (nur heutige Mitg
 Diese Punkte setze ich erst um, wenn du dich entschieden hast:
 
 1. ~~KI-Anbieter~~ **entschieden:** Gemini und Claude wählbar, Gemini als Standard.
-2. ~~N6 Handy-App~~ **entschieden:** beides, also App im Heim-WLAN und tägliche Push-Nachricht. Offen ist nur noch der Push-Weg (ntfy oder Telegram).
+2. ~~N6 Handy-App~~ **entschieden:** beides, also App im Heim-WLAN und tägliche Push-Nachricht. Push über **Telegram-Bot** (entschieden).
 3. **W4 Broker-Abgleich:** entschieden: **später**. Dann mit eigener Liste „Altbestand, nicht abgleichen“.
 4. ~~Stillhalter-Journal~~ **erledigt:** Die Datei liegt im Repository und ist geprüft (`PRUEFBERICHT_Stillhalter_v6.2.md`).
 5. ~~DAX-Optionen~~ **geklärt:** derzeit keine. Der Multiplikator 100 passt, im Formular kommt nur ein Hinweis.

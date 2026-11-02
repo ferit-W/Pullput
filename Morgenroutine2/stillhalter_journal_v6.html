@@ -148,7 +148,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
   </div>
   <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-p" onclick="saveSet()">Speichern</button><button class="btn btn-g" onclick="cm('M-set')">Abbrechen</button></div>
   <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--brd);display:flex;justify-content:space-between">
-    <button class="btn btn-d btn-s" onclick="if(confirm('ALLE Daten löschen?')){localStorage.clear();location.reload()}">⚠ Reset</button>
+    <button class="btn btn-d btn-s" onclick="resetStillhalter()" title="Löscht nur die Browserdaten des Stillhalter-Journals — nicht die der anderen Werkzeuge und nicht die Datei auf dem Laufwerk">⚠ Reset</button>
     <span class="mono" style="font-size:.55rem;color:var(--t3)" id="s-cnt"></span>
   </div>
 </div></div>
@@ -992,6 +992,8 @@ function saveTrade(e){
       const _nct=$('tf-ct')?.value||o.closeType;
       if(_nct==='ASSIGNED'&&isCashSettled(trade.underlying)){toast(trade.underlying+' ist barabgerechnet — ASSIGNED nicht möglich (Cash Settlement).','t-err');return;} // v4.3.1
       trade.closeType=_nct;
+      // v6.3 FIX (SH2): Status folgt dem korrigierten Close-Typ — vorher blieb der alte Status stehen.
+      trade.status={BTC:'CLOSED',EXPIRED:'EXPIRED',ASSIGNED:'ASSIGNED',ROLLED:'ROLLED'}[_nct]||o.status;
       trade.closePrice=parseFloat($('tf-cp')?.value)||0;
       trade.closeCommission=parseFloat($('tf-cc')?.value)||0;
       trade.closeNotes=$('tf-cn')?.value||'';
@@ -1003,7 +1005,7 @@ function saveTrade(e){
       trade.assignmentPrice=o.assignmentPrice;trade.assignmentShares=o.assignmentShares;
     }
     trade.fxClose=o.fxClose||null; // v4.2.22 (Opt④): Pro-Trade-FX bei Edit erhalten
-    trade.adjustments=o.adjustments||[];trade.rolledFrom=o.rolledFrom;
+    trade.adjustments=o.adjustments||[];trade.rolledFrom=o.rolledFrom;trade.rolledTo=o.rolledTo||null; // v6.3 FIX (SH3): Vorwärtszeiger beim Bearbeiten erhalten
     // Recalculate P&L if trade is closed
     if(trade.status!=='OPEN'&&trade.closeDate){
       const adj=(trade.adjustments||[]).reduce((s,a)=>s+(a.cost||0),0);
@@ -1081,17 +1083,17 @@ function rRisk(){
   const S=ls(),O=ld().filter(t=>t.status==='OPEN'),ac=S.accountSize||0,mT=S.maxTR||5,mA=S.maxAR||25;
   const oR=totalRisk(),oD=totalDelta(),rP=ac?(oR/ac*100):0,avail=availBudget();
   if(!ac)return`<div class="empty fu"><div style="font-size:2rem;opacity:.5;margin-bottom:10px">⚠</div><h3>Kontogröße erforderlich</h3><p>Hinterlege deine Kontogröße in den Settings.</p><button class="btn btn-p" onclick="openSettings()">⚙ Settings</button></div>`;
-  const byU={};O.forEach(t=>{if(!byU[t.underlying])byU[t.underlying]={r:0,p:0,d:0,n:0,c:0};byU[t.underlying].r+=calcRisk(t)||0;byU[t.underlying].p+=t.premium*t.contracts*MUL;byU[t.underlying].d+=(t.delta||0)*t.contracts*MUL;byU[t.underlying].n++;byU[t.underlying].c+=t.contracts;});
+  const byU={};O.forEach(t=>{if(!byU[t.underlying])byU[t.underlying]={r:0,p:0,d:0,n:0,c:0};byU[t.underlying].r+=calcRiskEUR(t)||0; /* v6.3 FIX (SH4): EUR wie die Kontogröße */byU[t.underlying].p+=t.premium*t.contracts*MUL;byU[t.underlying].d+=(t.delta||0)*t.contracts*MUL;byU[t.underlying].n++;byU[t.underlying].c+=t.contracts;});
 
   let h=`<div class="fu"><h2 style="font-size:1.05rem;font-weight:700;margin-bottom:14px">⚠ Risiko-Management</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:16px">
     <div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:8px">Konto-Übersicht</div><div style="display:grid;gap:7px">
-      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Kontogröße</span><span class="mono" style="font-size:.8rem">${f$(ac)}</span></div>
-      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Offenes Risiko</span><span class="mono" style="font-size:.8rem;${rP>mA?'color:var(--red);font-weight:600':'color:var(--grn)'}">${f$(Math.round(oR))}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Kontogröße</span><span class="mono" style="font-size:.8rem">${fE(ac)}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Offenes Risiko</span><span class="mono" style="font-size:.8rem;${rP>mA?'color:var(--red);font-weight:600':'color:var(--grn)'}">${fE(Math.round(oR))}</span></div>
       <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">% Konto</span><span class="mono" style="font-size:.85rem;font-weight:700;${rP>mA?'color:var(--red)':'color:var(--grn)'}">${fp(rP)}</span></div>
       <div class="rg" style="margin:3px 0"><div class="rg-f" style="width:${Math.min(100,rP/mA*100)}%;background:${rP>mA?'var(--red)':rP>mA*.7?'var(--amb)':'var(--grn)'}"></div></div>
       <div style="display:flex;justify-content:space-between;font-size:.57rem;color:var(--t3)"><span>0%</span><span style="color:var(--amb)">${mA}% Limit</span></div>
-      <div style="display:flex;justify-content:space-between;margin-top:3px"><span style="font-size:.8rem;color:var(--t2)">Verfügbar</span><span class="mono" style="font-size:.8rem;color:var(--grn)">${avail!==null?f$(Math.round(avail)):'–'}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-top:3px"><span style="font-size:.8rem;color:var(--t2)">Verfügbar</span><span class="mono" style="font-size:.8rem;color:var(--grn)">${avail!==null?fE(Math.round(avail)):'–'}</span></div>
     </div></div>
     <div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:8px">Greeks Aggregiert</div><div style="display:grid;gap:7px">
       <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">Gesamt-Delta</span><span class="mono" style="font-size:.8rem;${oD>0?'color:var(--grn)':oD<0?'color:var(--red)':''}">${oD>0?'+':''}${oD.toFixed(0)}</span></div>
@@ -1110,7 +1112,7 @@ function rRisk(){
   // UL concentration table
   h+=`<div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:10px">Risiko nach Underlying</div><table class="dtb"><thead><tr><th>UL</th><th style="text-align:right">#</th><th style="text-align:right">K</th><th style="text-align:right">Risk</th><th style="text-align:right">%</th><th style="text-align:right">Δ</th><th style="width:70px">Gauge</th></tr></thead><tbody>`;
   Object.entries(byU).sort((a,b)=>b[1].r-a[1].r).forEach(([sym,d])=>{const p=d.r/ac*100,sl=mT*2;
-    h+=`<tr style="cursor:default"><td style="font-weight:600">${sym}</td><td class="mono" style="text-align:right">${d.n}</td><td class="mono" style="text-align:right">${d.c}</td><td class="mono" style="text-align:right;${p>sl?'color:var(--red);font-weight:600':''}">${f$(Math.round(d.r))}</td><td class="mono" style="text-align:right;${p>sl?'color:var(--red)':p>sl*.7?'color:var(--amb)':'color:var(--grn)'}">${fp(p)}</td><td class="mono" style="text-align:right;${d.d>0?'color:var(--grn)':d.d<0?'color:var(--red)':''}">${d.d>0?'+':''}${d.d.toFixed(0)}</td><td><div class="rg"><div class="rg-f" style="width:${Math.min(100,p/sl*100)}%;background:${p>sl?'var(--red)':'var(--grn)'}"></div></div></td></tr>`;
+    h+=`<tr style="cursor:default"><td style="font-weight:600">${sym}</td><td class="mono" style="text-align:right">${d.n}</td><td class="mono" style="text-align:right">${d.c}</td><td class="mono" style="text-align:right;${p>sl?'color:var(--red);font-weight:600':''}">${fE(Math.round(d.r))}</td><td class="mono" style="text-align:right;${p>sl?'color:var(--red)':p>sl*.7?'color:var(--amb)':'color:var(--grn)'}">${fp(p)}</td><td class="mono" style="text-align:right;${d.d>0?'color:var(--grn)':d.d<0?'color:var(--red)':''}">${d.d>0?'+':''}${d.d.toFixed(0)}</td><td><div class="rg"><div class="rg-f" style="width:${Math.min(100,p/sl*100)}%;background:${p>sl?'var(--red)':'var(--grn)'}"></div></div></td></tr>`;
   });
   h+='</tbody></table></div></div>';
   setTimeout(calcPS,50);return h;
@@ -1371,6 +1373,20 @@ function initCharts(){
 // ═══ SETTINGS ═══
 function openSettings(){const s=ls();$('s-ac').value=s.accountSize||'';$('s-tg').value=s.monthlyTarget||'';$('s-fx').value=s.eurusd||'';$('s-dw').value=s.dteWarn||7;$('s-mr').value=s.maxTR||5;$('s-ma').value=s.maxAR||25;$('s-gm').value=localStorage.getItem(GK)||'';if($('s-gmm'))$('s-gmm').value=s.geminiModel||'gemini-2.5-flash';$('s-cnt').textContent=ld().length+' Trades';om('M-set');}
 function saveSet(){localStorage.setItem(SK,JSON.stringify({accountSize:parseFloat($('s-ac').value)||null,monthlyTarget:parseFloat($('s-tg').value)||null,eurusd:parseFloat($('s-fx').value)||null,dteWarn:parseInt($('s-dw').value)||7,maxTR:parseFloat($('s-mr').value)||5,maxAR:parseFloat($('s-ma').value)||25,geminiModel:($('s-gmm')&&$('s-gmm').value)||'gemini-2.5-flash'}));localStorage.setItem(GK,$('s-gm').value);cm('M-set');toast('Gespeichert');render();}
+
+// ── v6.3 FIX (SH1): Reset löschte per localStorage.clear() den GESAMTEN Browserspeicher
+// von localhost:8765 — den teilen sich Morgenroutine, Trading Journal, Cockpit und dieses
+// Journal. Jetzt werden nur die eigenen Schlüssel (soj4_…) entfernt.
+function resetStillhalter(){
+  const eigene=[];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('soj4_')===0)eigene.push(k);}
+  if(!confirm('Stillhalter-Journal im Browser zurücksetzen?\n\n'
+    +'Gelöscht werden nur die '+eigene.length+' Einträge dieses Journals im Browser (Trades, Einstellungen, KI-Schlüssel).\n'
+    +'Nicht betroffen: Morgenroutine, Trading Journal, Depot-Cockpit und die Datei auf dem Laufwerk.\n\n'
+    +'Beim nächsten Start wird der Stand vom Laufwerk wieder geladen, falls der Server läuft.'))return;
+  eigene.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+  location.reload();
+}
 
 // ═══ EXPORT / IMPORT ═══
 // v4.3: Gegenstueck zum Auto-Backup in sv() — Server-Stand per Klick zuruecklesen.

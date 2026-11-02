@@ -313,7 +313,10 @@ def pruefe_optionen(daten, b):
     ids = {t.get("id") for t in trades if isinstance(t, dict)}
     for t in gerollt:
         nachfolger = t.get("rolledTo")
-        if not nachfolger or nachfolger not in ids:
+        # v1.3 FIX (SH3): Nachfolger auch rückwärts über rolledFrom erkennen — ältere
+        # Rolls (vor Journal v6.0) und bearbeitete Positionen haben kein rolledTo.
+        rueckwaerts = any(isinstance(x, dict) and x.get("rolledFrom") == t.get("id") for x in trades)
+        if (not nachfolger or nachfolger not in ids) and not rueckwaerts:
             b.warnung("Roll", "%s %s: als gerollt gebucht, aber ohne Nachfolger."
                       % (t.get("underlying") or "?", t.get("expiry") or ""),
                       "Verzerrt das aggregierte Risiko.")
