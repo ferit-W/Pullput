@@ -168,7 +168,17 @@ Wird nach jeder Phase hier fortgeschrieben.
     - Gap-Scanner vor 10:00 Uhr: Erscheint bei Pre-Market-Kursen „⚠ gestern“?
     - Alte Import-Fehler meldet die Selbstkontrolle als „Fehlerhafter IB-Import aus älterer Version“
   - Bewusst nicht geändert: Tailwind-Play-CDN im Journal (F19, zweiter Teil). Ein Umbau bräuchte einen Build-Schritt; das passt zum UI-Umbau in Phase 6.
-- [ ] Phase 2
+- [x] Phase 2 — erledigt und in der Prüfumgebung getestet (02.11.2026), Morgenroutine v6.19:
+  - **AM1** Breite über EMA200, **AM3** Panik-Score aus der Regel (an 4.827 Tagen kein Unterschied), **AM4** Zustand VOREINSTIEG mit Prüfliste und 60-Tage-Rückschau aus den Kursreihen
+  - **AM8** Prüfstand: Der Selbsttest vergleicht die Ampel der Seite an allen 4.827 Handelstagen 2007–2026 mit der Python-Rückrechnung (`auswertung/referenz_ampel_v2.py`). Ergebnis: identisch, davon 376 Tage VOREINSTIEG
+  - **AM2** Trend und Risiko getrennt angezeigt · **AM6** „🆕 Wechsel“ wird gekennzeichnet, die Ampel selbst wartet nicht (die 2-Tage-Bestätigung hatte im Test Rendite gekostet)
+  - **AM9** Hinweis „⚡ Panik-Wende möglich“ mit Prüfliste und ehrlicher Bilanz, ohne Einfluss auf Ampel und Größe. Die Breiten-Wende (B4) braucht Einzelaktien-Breite und folgt mit T1 in Phase 4
+  - **AM5** Kreditspread High Yield (FRED) als Anzeige, Server-Allowlist erweitert
+  - **W1** `handelsplan.json`: REGELCHECK und Journal lesen Risiko, Positionen usw. daraus. Die Morgenroutine zeigt die Version und warnt, wenn dort ungetestete Ampel-Werte stehen (sie werden nicht verwendet)
+  - Info-Pop-ups mit Ziel / Warum so / So liest du es / Beispiel für Ampel, Voreinstieg, Panik-Wende, Trend/Risiko, Wechsel, Panik-Score, Breite, Kreditspread. Alle Beispielzahlen sind gegen die Rückrechnungsdaten geprüft
+  - Tagesstand speichert jetzt Regelversion, Grundzustand, Trend, Risiko, Breite, Termstruktur, Voreinstieg, Panik-Wende und Kreditspread (Vorarbeit für das Archiv A1b)
+  - **AM7** (Short-Seite mit Journal-Daten) wandert zu T6 in Phase 4: Die Journal-Trades speichern die Phase beim Einstieg noch nicht, das kommt mit A5 in Phase 3
+  - **Offen bei dir:** Live-Probelauf: Erscheinen Kreditspread (FRED) und „Handelsplan 2026.11.1“ in der Zeile unter der Ampel? Steht im Journal 0,25 % als Vorgabe?
 - [ ] Phase 3
 - [ ] Phase 4
 - [ ] Phase 5

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ferit Morgenroutine v6.18 · Markt · Regime · Kontext</title>
+<title>Ferit Morgenroutine v6.19 · Markt · Regime · Kontext</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -104,6 +104,23 @@ a{color:var(--gold)}
 .lb-stop{background:linear-gradient(135deg,#ffeae1,#ffd2bd);color:var(--red)}
 .lb-reverse{background:linear-gradient(135deg,#f1e1ff,#ddc2ef);color:var(--violet)}
 .lb-wait{background:var(--paper3);color:var(--steel)}
+/* v6.19 (AM4): Voreinstieg — hellgrün, klar unterscheidbar von GO */
+.lb-pre .light-label{font-size:25px;letter-spacing:-.01em}
+.lb-pre{background:linear-gradient(135deg,#f1f9e4,#dcefc0);color:#4a7212;border:2px dashed #7aa83a}
+[data-theme="dark"] .lb-pre{background:linear-gradient(135deg,#24360f,#33501a);color:#c3e59a;border-color:#7aa83a}
+/* v6.19: Zusatzanzeigen unter der Ampel */
+.az-zeile{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;font-size:.72rem}
+.az-chip{padding:2px 8px;border-radius:10px;border:1px solid var(--rule);font-weight:700;white-space:nowrap}
+.az-box{margin-top:8px;padding:8px 11px;border-radius:8px;border-left:3px solid var(--rule);background:rgba(127,127,127,.06);font-size:.72rem;line-height:1.55}
+.az-box h4{margin:0 0 3px;font-size:.76rem}
+.az-box .ok{color:var(--green)} .az-box .nein{color:var(--steel)}
+.az-box .bilanz{color:var(--steel);font-size:.66rem;margin-top:4px}
+/* v6.19: Info-Pop-up mit vier Teilen */
+#ipop-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:9000;align-items:center;justify-content:center;padding:16px}
+#ipop{background:var(--paper);color:var(--ink);max-width:620px;width:100%;max-height:85vh;overflow:auto;border-radius:10px;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.35);font-size:.8rem;line-height:1.6}
+#ipop h3{margin:0 0 8px;font-size:1rem}
+#ipop .teil{margin-top:9px} #ipop .teil b{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.6px;color:var(--gold)}
+#ipop .zu{float:right;cursor:pointer;border:none;background:none;font-size:1.1rem;color:var(--ink2)}
 [data-theme="dark"] .lb-go{background:linear-gradient(135deg,#0d3b24,#16502f);color:#8fd2a6}
 [data-theme="dark"] .lb-caution{background:linear-gradient(135deg,#5a3a0a,#8a5b0e);color:#f3c876}
 [data-theme="dark"] .lb-stop{background:linear-gradient(135deg,#5a1a0a,#8a2716);color:#f38f76}
@@ -381,7 +398,7 @@ table.cot td{padding:6px 11px;border-bottom:1px solid var(--rule);color:var(--in
 .hist-card{background:var(--paper);padding:10px 12px;border-radius:3px;border-left:4px solid var(--rule2);font-size:10.5px}
 [data-theme="dark"] .hist-card{background:var(--paper3)}
 .hist-card.go{border-left-color:var(--green)}.hist-card.caution{border-left-color:var(--amber)}
-.hist-card.stop{border-left-color:var(--red)}.hist-card.reverse{border-left-color:var(--violet)}
+.hist-card.stop{border-left-color:var(--red)}.hist-card.reverse{border-left-color:var(--violet)}.hist-card.pre{border-left-color:#7aa83a}
 .hist-date{font-size:8.5px;color:var(--steel);letter-spacing:.08em;text-transform:uppercase}
 .hist-label{font-family:var(--serif);font-size:14px;font-weight:700;margin:2px 0}
 .hist-sub{font-size:9.5px;color:var(--ink2);line-height:1.4}
@@ -506,8 +523,8 @@ footer strong{color:var(--ink2)}
 <header class="mast">
   <div class="mi">
     <div>
-      <div class="mt">Morgenroutine <em>v6.18</em> · Lagebild · Markt · News · Action</div>
-      <div class="msub">Echte Kurse · lokale EMAs · deterministische Phasen · Rohstoffe & FX · Treasury & Fed · CNN direkt · <b style="color:var(--gold)">Build 6.17</b></div>
+      <div class="mt">Morgenroutine <em>v6.19</em> · Lagebild · Markt · News · Action</div>
+      <div class="msub">Echte Kurse · lokale EMAs · deterministische Phasen · Rohstoffe & FX · Treasury & Fed · CNN direkt · <b style="color:var(--gold)">Build 6.19</b></div>
     </div>
     <div style="display:flex;align-items:center;gap:16px">
       <div class="clock">
@@ -655,7 +672,7 @@ footer strong{color:var(--ink2)}
 
   <!-- ════ 01 LAGEBILD ════ -->
   <div class="sec-label"><span class="sec-num">01</span><span class="sec-name">Lagebild</span><span class="sec-meta">Das Bild in 5 Sekunden</span><span class="info-i" onclick="toggleInfo('info-01')" title="Erklärung ein/aus">i</span></div>
-  <div class="sec-info" id="info-01">Tages-Regime auf einen Blick. Die <b>Ampel</b> verdichtet Marktbreite, Index-Phasen und Stress zu GRÜN (Long-Bias) / GELB (selektiv) / ROT (defensiv) / VIOLETT „REVERSE“ (Extremangst: F&amp;G ≤ 15, VIX &gt; 30 und Backwardation — mögliche Bodenbildung, Long erst auf das erste höhere Tagestief) — vor dem ersten Lauf bzw. bei fehlenden Daten steht „WARTE“ — deterministische Regel, kein KI-Rauschen. <b>Panik-Score</b> (0–100): gewichtet aus sieben Signalen — VIX (24), Fear&amp;Greed (20), Put/Call (14), AAII-Bear (12), VVIX, NAAIM und VIX-Terminstruktur (je 10). Der Wert wird auf die tatsächlich erfassten Signale normiert; unter 50 Punkten Abdeckung gilt er als unbestimmt. VIX9D wird angezeigt, fließt aber nicht in den Score ein. <b>US-Phasen</b> zählt, wie viele Leitindizes in P3 (Long) bzw. P6 (Short) stehen. Der <b>Sentiment-Streifen</b> zeigt jeden Einzelwert, eingefärbt nach Beitrag zum Score. Das <b>Executive Briefing</b> ist KI-Text — Zusammenfassung, kein Signal.</div>
+  <div class="sec-info" id="info-01"><b>Ziel:</b> Das Tages-Regime für neue Positionen auf einen Blick. <b>Warum so:</b> Die <b>Ampel</b> ist eine feste Regel (Regelwerk 2026.11, kein KI-Urteil) aus den Lüddemann-Phasen von SPY, QQQ, DIA und IWM, dem VIX, der Sektor-Breite über EMA200 und der VIX-Termstruktur. Jede Regel wurde vorher an 19 Jahren Daten geprüft und musste in beiden Hälften besser sein. <b>So liest du es:</b> GO grün · CAUTION gelb · STOP rot · <b>VOREINSTIEG</b> hellgrün gestrichelt (früher Wiedereinstieg nach Stress, eine Stufe kleiner, mit Prüfliste) · REVERSE violett (Extremangst) · WARTE (Daten fehlen). Darunter stehen <b>Trend</b> und <b>Risiko</b> getrennt, der Kreditspread als Zusatzanzeige und, falls zutreffend, der Hinweis <b>⚡ Panik-Wende</b>. Er ist kein Ampelzustand, weil sein Test nicht bestanden wurde. Der <b>Panik-Score</b> (0–100, gewichtet aus VIX, Fear&amp;Greed, Put/Call, AAII, VVIX, NAAIM und Termstruktur) wird konträr gelesen und zählt nicht mehr zur Ampel. Jedes kleine <i>i</i> öffnet die ausführliche Erklärung mit Testergebnis. <b>Beispiel:</b> 15.07.2020 VOREINSTIEG statt GO am 12.02.2021. Das <b>Executive Briefing</b> ist KI-Text: Zusammenfassung, kein Signal.</div>
   <section class="regime">
     <div class="regime-top">
       <div class="light lb-wait" id="light">
@@ -666,9 +683,11 @@ footer strong{color:var(--ink2)}
       <div class="regime-right">
         <div class="kpi-strip">
           <div class="kpi"><div class="kpi-l">US-Phasen</div><div class="kpi-v" id="k-phase">–</div><div class="kpi-s" id="k-phase-s">P3 / P6 (SPY·QQQ·DIA·IWM)</div></div>
-          <div class="kpi"><div class="kpi-l">Panik-Score</div><div class="kpi-v" id="k-panik">–</div><div class="kpi-s" id="k-panik-s">Skala 0–100, keine Anzahl</div></div>
-          <div class="kpi"><div class="kpi-l">Sektor-Breite</div><div class="kpi-v" id="k-breadth">–</div><div class="kpi-s" id="k-breadth-s">über EMA50</div></div>
+          <div class="kpi"><div class="kpi-l">Panik-Score <span class="info-i" onclick="infoPop('panik')" title="Was bedeutet der Panik-Score?">i</span></div><div class="kpi-v" id="k-panik">–</div><div class="kpi-s" id="k-panik-s">Skala 0–100, keine Anzahl</div></div>
+          <div class="kpi"><div class="kpi-l">Sektor-Breite <span class="info-i" onclick="infoPop('breite')" title="Was bedeutet die Sektor-Breite?">i</span></div><div class="kpi-v" id="k-breadth">–</div><div class="kpi-s" id="k-breadth-s">über EMA200</div></div>
         </div>
+        <!-- v6.19: Zusatzanzeigen (AM2 Trend/Risiko, AM6 Wechsel, AM4 Voreinstieg-Prüfliste, AM9 Panik-Wende) -->
+        <div id="ampel-zusatz"></div>
         <!-- v6.2: Konsequenz-Zeile. Uebersetzt die ohnehin gerechneten Werte in eine
              Aussage ueber NEUE Positionen. Bestaende bleiben ausdruecklich unberuehrt. -->
         <div id="konseq-box" style="margin-top:10px;padding:10px 12px;border-radius:8px;
@@ -867,7 +886,7 @@ footer strong{color:var(--ink2)}
 </main>
 
 <footer>
-  v6.18 · Datenecht: Yahoo-Kurse + lokale EMA-Berechnung · Phasen nach Lüddemann 2-EMA-Modell · CNN direkt · Gemini nur für Text<br>
+  v6.19 · Datenecht: Yahoo-Kurse + lokale EMA-Berechnung · Phasen nach Lüddemann 2-EMA-Modell · CNN direkt · Gemini nur für Text<br>
   Ferit handelt eigenverantwortlich via CapTrader/IB · Ampel = Regime-Einordnung, <strong>keine Handlungsempfehlung</strong>
 </footer>
 
@@ -1919,7 +1938,7 @@ function saveCache(){
     const idxMap={}; (prev.indices||[]).forEach(i=>{ if(i&&i.key) idxMap[i.key]=i; });
     (STATE.indices||[]).filter(i=>!i.err&&!i.stale).forEach(i=>{ idxMap[i.key]={key:i.key,price:i.price,chg:i.chg,e20:i.e20,e50:i.e50,e200:i.e200,phaseCode:i.phase&&i.phase.code,phaseCls:i.phase&&i.phase.cls,phaseLage:i.phase&&i.phase.lage,ema200Dist:i.ema200Dist,score:i.score,atr14:i.atr14,atrPct:i.atrPct,mom6:i.mom6,mom12:i.mom12,asof:i.asof?i.asof.getTime():null,cachedTs:now}; });
     const secMap={}; (prev.sectors||[]).forEach(s=>{ if(s&&s.etf) secMap[s.etf]=s; });
-    (STATE.sectors||[]).filter(s=>!s.err&&!s.stale).forEach(s=>{ secMap[s.etf]={etf:s.etf,rs1m:s.rs1m,rs3m:s.rs3m,perf1w:s.perf1w,perf1m:s.perf1m,perf3m:s.perf3m,perf6m:s.perf6m,price:s.price,e20:s.e20,e50:s.e50,e200:s.e200,ema200Dist:s.ema200Dist,phaseCode:s.phase&&s.phase.code,phaseCls:s.phase&&s.phase.cls,aboveEma50:s.aboveEma50,slope50:s.slope50,score:s.score,cachedTs:now}; });
+    (STATE.sectors||[]).filter(s=>!s.err&&!s.stale).forEach(s=>{ secMap[s.etf]={etf:s.etf,rs1m:s.rs1m,rs3m:s.rs3m,perf1w:s.perf1w,perf1m:s.perf1m,perf3m:s.perf3m,perf6m:s.perf6m,price:s.price,e20:s.e20,e50:s.e50,e200:s.e200,ema200Dist:s.ema200Dist,phaseCode:s.phase&&s.phase.code,phaseCls:s.phase&&s.phase.cls,aboveEma50:s.aboveEma50,aboveEma200:s.aboveEma200,slope50:s.slope50,score:s.score,cachedTs:now}; });
     // Rohstoffe/FX cachen (analog Indizes) — überleben jetzt einen Yahoo-Aussetzer statt "–" zu zeigen
     const comMap={}; (prev.commodities||[]).forEach(x=>{ if(x&&x.key) comMap[x.key]=x; });
     (STATE.commodities||[]).filter(x=>!x.err&&!x.stale).forEach(x=>{ comMap[x.key]={key:x.key,price:x.price,chg:x.chg,e20:x.e20,e50:x.e50,e200:x.e200,phaseCode:x.phase&&x.phase.code,phaseCls:x.phase&&x.phase.cls,ema200Dist:x.ema200Dist,slope50:x.slope50,score:x.score,atr14:x.atr14,atrPct:x.atrPct,asof:x.asof?x.asof.getTime():null,cachedTs:now}; });
@@ -1951,7 +1970,7 @@ function applyCacheFallback(){
   const secMap={}; (c.sectors||[]).forEach(s=>{ if(s&&s.etf) secMap[s.etf]=s; });
   STATE.sectors=(STATE.sectors||[]).map(s=>{
     if(!s.err) return s; const cc=secMap[s.etf]; if(!cc||!okAge(cc)) return s;
-    return {...(SECTORS.find(x=>x.etf===s.etf)||{}), rs1m:cc.rs1m,rs3m:cc.rs3m,perf1w:cc.perf1w,perf1m:cc.perf1m,perf3m:cc.perf3m,perf6m:cc.perf6m,price:cc.price,e20:cc.e20,e50:cc.e50,e200:cc.e200,ema200Dist:cc.ema200Dist,phase:{code:cc.phaseCode||'–',cls:cc.phaseCls||'n',lage:'aus Cache'},aboveEma50:cc.aboveEma50,slope50:cc.slope50,score:cc.score, stale:true, staleDt:fdt(cc.cachedTs||c.ts)};
+    return {...(SECTORS.find(x=>x.etf===s.etf)||{}), rs1m:cc.rs1m,rs3m:cc.rs3m,perf1w:cc.perf1w,perf1m:cc.perf1m,perf3m:cc.perf3m,perf6m:cc.perf6m,price:cc.price,e20:cc.e20,e50:cc.e50,e200:cc.e200,ema200Dist:cc.ema200Dist,phase:{code:cc.phaseCode||'–',cls:cc.phaseCls||'n',lage:'aus Cache'},aboveEma50:cc.aboveEma50,aboveEma200:(cc.aboveEma200!=null?cc.aboveEma200:(cc.e200!=null&&cc.price!=null?cc.price>cc.e200:null)),slope50:cc.slope50,score:cc.score, stale:true, staleDt:fdt(cc.cachedTs||c.ts)};
   });
   // Rohstoffe/FX aus Cache (analog Indizes)
   const comMap={}; (c.commodities||[]).forEach(x=>{ if(x&&x.key) comMap[x.key]=x; });
@@ -2010,6 +2029,7 @@ async function loadPrices(){
   // 2Y-CMT (offizielle Treasury-Quelle, kein Key) parallel starten — fehlertolerant
   const cmtPromise = loadTreasuryCMT();
   const bandPromise = loadFedBand();   // v6.2.5: Zielband live holen, still scheitern erlaubt
+  const kreditPromise = loadKredit();  // v6.19 (AM5)
 
   // Lokalen Proxy einmal prüfen (steuert Concurrency + Statusanzeige)
   if(localProxyAlive===null){ localProxyAlive = await probeLocalProxy(); }
@@ -2051,7 +2071,7 @@ async function loadPrices(){
       slope50: emaSlope(d.closes,50,20), score: trendScore(d.closes,d.price,e50,e200),
       atr14:a, atrPct:(a!=null&&d.price)? a/d.price*100 : null,
       corr: correction(d.closes, d.price, e20, e50, ph.code),
-      mom6: pctNDays(d.closes,126), mom12: pctNDays(d.closes,252), asof:d.asof, closes:d.closes };
+      mom6: pctNDays(d.closes,126), mom12: pctNDays(d.closes,252), asof:d.asof, closes:d.closes, times:d.times };
   });
 
   // Rohstoffe & FX: EMA-Phase + Trendstärke (lokal, analog Indizes)
@@ -2084,12 +2104,15 @@ async function loadPrices(){
       rs1m:(p1!=null&&spy1m!=null?p1-spy1m:null), rs3m:(p3!=null&&spy3m!=null?p3-spy3m:null),
       e20, e50:se50, e200, ema200Dist:(e200?(d.price/e200-1)*100:null),
       phase:ph, aboveEma50:(se50!=null?d.price>se50:null),
+      aboveEma200:(e200!=null?d.price>e200:null),   // v6.19 (AM1)
+      closes:d.closes, times:d.times,              // v6.19: für die STOP-Rückschau des Voreinstiegs
       slope50:emaSlope(d.closes,50,20), score:trendScore(d.closes,d.price,se50,e200) };
   });
 
   // VIX / VVIX / VIX3M / VIX9D + Termstruktur
   const vixD=M['^VIX']?.data, vvixD=M['^VVIX']?.data, vix3D=M['^VIX3M']?.data, vix9D=M['^VIX9D']?.data;
   STATE.vix  = vixD?.price ?? null;
+  STATE.vixSeries = vixD ? {closes:vixD.closes, times:vixD.times} : null;   // v6.19: Rückschau + 5-Tage-Schnitt (AM4/AM9)
   STATE.vixChg = (vixD?.price && vixD?.prev) ? (vixD.price/vixD.prev-1)*100 : null;
   STATE.vvix = vvixD?.price ?? null;
   STATE.vix3m = vix3D?.price ?? null;
@@ -2120,6 +2143,7 @@ async function loadPrices(){
   // Neu: Der Abruf läuft nebenher. Kommt er an, wird der Treasury-Block nachgezeichnet;
   // kommt er nicht, bleibt schlicht der Code-Wert stehen.
   bandPromise.then(ok=>{ if(ok){ try{ renderTreasury(); }catch(e){} } }).catch(()=>{});
+  kreditPromise.then(()=>{ try{ if(STATE.ampel) renderAmpelZusatz(STATE.ampel); }catch(e){} }).catch(()=>{});
   STATE.treasury = TREASURY.map(m=>{
     const r=M[m.y];
     if(!r||r.err) return {...m, err:(r&&r.err)||'Fehler'};
@@ -2242,6 +2266,32 @@ function fedLastPast(){
 // Zielbands, typisch wenige Basispunkte über der Untergrenze. Abrunden auf das
 // nächste 0,25er-Vielfache liefert damit die Untergrenze, plus 0,25 die Obergrenze.
 // Schlägt der Abruf fehl, bleibt der fest hinterlegte Wert stehen — nichts geht kaputt.
+// ── v6.19 (AM5): KREDITSPREAD HIGH YIELD — nur Anzeige ───────────────────────
+// ICE BofA US High Yield Option-Adjusted Spread (FRED: BAMLH0A0HYM2), täglich.
+// In der Rückrechnung half eine Spread-Warnung 2007–2016, schadete 2017–2026 →
+// nicht Teil der Ampel, nur Anzeige und Archiv. FRED sendet keine CORS-Kopfzeilen,
+// deshalb nur über den lokalen Server. Scheitert der Abruf, gilt der letzte Stand.
+function kreditAusCsv(txt){
+  const z = String(txt||'').trim().split(/\r?\n/).slice(1).map(l=>l.split(','))
+    .filter(a=>a.length>=2 && a[1]!=='' && a[1]!=='.' && isFinite(+a[1]));
+  if(z.length<2) return null;
+  const letzte = z[z.length-1], wert = +letzte[1];
+  const vor63 = z.length>63 ? +z[z.length-1-63][1] : null;     // wie hy_chg63 in der Rückrechnung
+  return {wert, datum:letzte[0], chg63:(vor63!=null? wert-vor63 : null)};
+}
+async function loadKredit(){
+  const url='https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2';
+  try{
+    const r = await fetchOnce(LOCAL_PROXY+encodeURIComponent(url), 8000);
+    if(r.ok){
+      const k = kreditAusCsv(await r.text());
+      if(k){ STATE.kredit=k; try{ localStorage.setItem('ferit_mr13_kredit', JSON.stringify(k)); }catch(e){} return true; }
+    }
+  }catch(e){}
+  try{ const alt=JSON.parse(localStorage.getItem('ferit_mr13_kredit')||'null'); if(alt&&isFinite(alt.wert)){ STATE.kredit={...alt, alt:true}; } }catch(e){}
+  return false;
+}
+
 async function loadFedBand(){
   // v6.4.1: Nur lokaler Proxy und Direktversuch, je 4 Sekunden. Die öffentlichen
   // Proxys sind für eine Nebensächlichkeit wie diese das Warten nicht wert —
@@ -3172,7 +3222,9 @@ function renderSentiment(){
   const kp=$('k-panik'); if(kp){ kp.textContent = anz!=null ? anz : '?'; kp.style.color=col; }
   const kps=$('k-panik-s'); if(kps){ kps.innerHTML = anz!=null
     ? `<span style="color:${col};font-weight:700">${P.status}</span> · ${P.covered}/100 erfasst${P.missing?` · ${P.missing} man. offen`:''}`
-    : `<span style="color:var(--amber);font-weight:700">zu wenig Daten</span> · nur ${P.covered}/100 erfasst · Score nicht belastbar`; }
+    : `<span style="color:var(--amber);font-weight:700">zu wenig Daten</span> · nur ${P.covered}/100 erfasst · Score nicht belastbar`;
+    // v6.19 (AM3): konträr lesen — hohe Angst war in der Rückrechnung eher eine Chance als eine Warnung
+    kps.innerHTML += '<br><span style="color:var(--t3)">konträr lesen: hoch = statistisch eher Erholung, kein Warnsignal</span>'; }
   const kpk=kp&&kp.closest('.kpi'); if(kpk) kpk.classList.toggle('kpi-alert', !!(ALERTS.panik && anz!=null && anz>=ALERTS.panik));
   const sevCls=s=> s==='na'?'s-na':s==='ok'?'s-ok':s==='mid'?'s-mid':'s-hi';
   let html='';
@@ -3213,6 +3265,156 @@ function evalAlerts(v){
   if(ALERTS.phaseFlip && v.flips && v.flips.length) fired.push(`Phasenwechsel P3→raus: ${v.flips.join(', ')}`);
   return fired;
 }
+// ═══ v6.19 · PHASE 2: NEUE AMPEL (AM1 + AM3 + AM4) ══════════════════════════
+// Grundlage: Rückrechnung 2007–2026 in auswertung/ (AMPEL_AUSWERTUNG.md, Abschnitte 3 und 7).
+//   AM1  Breite = Sektoren über EMA200 statt EMA50      → in beiden Zeiträumen besser
+//   AM3  Panik-Score nicht mehr Teil der Regel           → Test V4: an keinem Tag ein Unterschied
+//   AM4  VOREINSTIEG nach STOP (60 Handelstage)          → AM1+AM4 bestes Ergebnis in beiden Zeiträumen
+// Die Regel steht als REINE Funktion hier, damit sie der Selbsttest Tag für Tag gegen
+// die Python-Referenz (auswertung/ergebnisse/referenz_ampel_v2.csv) prüfen kann.
+// Wer hier etwas ändert, muss vorher den Prüfstand laufen lassen (AM8).
+const AMPEL_VERSION = '2026.11 · AM1+AM3+AM4';
+const VE_FENSTER = 60;        // Handelstage nach einem STOP
+const VE_GROESSE = 0.75;      // Investitionsgrad im Test
+
+// ── W1: Handelsplan-Datei ──────────────────────────────────────────────────────
+// Die Ampel-Schwellen sind getestet und stehen fest im Code. Weicht der Handelsplan
+// davon ab, rechnet die Seite NICHT still mit ungetesteten Werten, sondern warnt.
+const AMPEL_GETESTET = { breite_ema:200, vix_caution:20, vix_stop:28, voreinstieg_fenster_tage:VE_FENSTER,
+                         voreinstieg_groesse:VE_GROESSE, voreinstieg_term_max:0.98 };
+async function ladeHandelsplanMR(){
+  try{
+    const r = await fetchOnce('http://localhost:8765/handelsplan', 4000);
+    const j = r.ok ? await r.json() : null;
+    if(!j || !j.ok || !j.plan){ STATE.handelsplan = {fehler:(j&&j.fehler)||'nicht erreichbar'}; return; }
+    const a = j.plan.ampel || {};
+    const abw = Object.keys(AMPEL_GETESTET).filter(k=>a[k]!==undefined && +a[k]!==AMPEL_GETESTET[k]);
+    STATE.handelsplan = {version:j.plan.version||'?', abweichungen:abw};
+  }catch(e){ STATE.handelsplan = {fehler:'Server nicht erreichbar'}; }
+  try{ if(STATE.ampel) renderAmpelZusatz(STATE.ampel); }catch(e){}
+}
+
+function ampelRegel(x){
+  const {p3,p6,vix,fg,part,rsBeat,rsTot,term} = x;
+  const narrow = (rsBeat!=null && rsTot>=6 && rsBeat<3);
+  const back = (term==='back-light'||term==='back-strong');
+  if(fg!=null && vix!=null && fg<=15 && vix>30 && back) return {label:'REVERSE', codes:['extremangst']};
+  const stop=[];
+  if(p6>=2) stop.push('p6');
+  if(vix!=null && vix>28) stop.push('vix28');
+  if(part!=null && part<3 && p3<2) stop.push('breite3');
+  if(stop.length) return {label:'STOP', codes:stop};
+  const cau=[];
+  if(p3<3) cau.push('p3');
+  if(vix!=null && vix>=20) cau.push('vix20');
+  if(part!=null && part<6) cau.push('breite6');
+  if(narrow) cau.push('eng');
+  if(back) cau.push('back');
+  if(cau.length) return {label:'CAUTION', codes:cau};
+  if(p3>=3 && (vix==null||vix<20) && (part==null||part>=6) && p6===0) return {label:'GO', codes:[]};
+  return {label:'CAUTION', codes:['unklar']};
+}
+
+// Die vier Bedingungen des Voreinstiegs — als Liste, damit die Anzeige jede einzeln zeigt.
+function voreinstiegPruefung(x){
+  const {p3,p6,n,part,partTot,term,termRatio,base,rueck,indizes} = x;
+  const namen = (indizes||[]).filter(i=>i.phase&&i.phase.code==='P3').map(i=>i.key).join(', ');
+  const liste = [
+    {ok:p3>=3, txt:`${p3}/${n} US-Indizes in P3${namen?' ('+namen+')':''} — nötig: 3`},
+    {ok:p6===0, txt: p6===0 ? 'kein Index in P6' : `${p6} Index/Indizes in P6 — nötig: keiner`},
+    {ok:part!=null && part>=6, txt:`${part!=null?part:'–'}/${partTot} Sektoren über EMA200 — nötig: 6`},
+    {ok:term==='contango', txt:`VIX-Termstruktur ${termRatio!=null?termRatio.toFixed(2).replace('.',','):'–'} — nötig: unter 0,98 (Contango)`},
+  ];
+  const nachStop = !!(rueck && rueck.tageSeit!=null && rueck.tageSeit < VE_FENSTER);
+  const zustandPasst = (base==='STOP' || base==='CAUTION');
+  const aktiv = zustandPasst && nachStop && liste.every(b=>b.ok);
+  return {aktiv, liste, nachStop, zustandPasst, rueck};
+}
+
+// ── Rückschau: Wann war zuletzt STOP? ─────────────────────────────────────────
+// Der Voreinstieg gilt nur nach einer Stressphase. Zwei Quellen:
+//   1. gespeicherte Tagesstände (KPIDAYS, ab v6.19 mit Ampel-Zustand)
+//   2. Nachrechnung aus den geladenen Kursreihen (2 Jahre): Indexphasen, VIX und
+//      Sektor-Breite je Tag. Nicht nachrechenbar ist Fear & Greed; ein Tag mit
+//      Extremangst (REVERSE) zählt hier deshalb als STOP. Das betrifft nur den
+//      Zeitpunkt, nicht die vier Bedingungen von heute.
+function datumAus(ts){ return ts ? new Date(ts*1000).toISOString().slice(0,10) : null; }
+function stopRueckschau(heuteLabel){
+  if(heuteLabel==='STOP') return {tageSeit:0, datum:todayKey(), quelle:'heute'};
+  let best=null;
+  // Quelle 2: Kursreihen
+  try{
+    const spy=(STATE.indices||[]).find(i=>i.key==='SPY'&&i.closes&&i.times);
+    const us=(STATE.indices||[]).filter(i=>i.us&&i.closes&&i.times);
+    const sek=(STATE.sectors||[]).filter(s=>s.closes&&s.times);
+    const vx=STATE.vixSeries;
+    if(spy && us.length>=2){
+      const karte=o=>{ const m={}; o.times.forEach((t,i)=>{ const d=datumAus(t); if(d) m[d]=i; }); return m; };
+      const K=new Map(); us.concat(sek).forEach(o=>K.set(o,karte(o)));
+      const vxK = vx&&vx.times ? karte(vx) : null;
+      const L=spy.times.length;
+      for(let k=1;k<VE_FENSTER && k<L-210;k++){
+        const d=datumAus(spy.times[L-1-k]); if(!d) continue;
+        let p3=0,p6=0,nn=0;
+        us.forEach(o=>{ const i=K.get(o)[d]; if(i==null||i<200) return; const c=o.closes.slice(0,i+1);
+          const ph=luedePhase(c[c.length-1],ema(c,20),ema(c,50),ema(c,200)); nn++; if(ph.code==='P3')p3++; if(ph.code==='P6')p6++; });
+        if(nn<2) continue;
+        let part=null, tot=0;
+        sek.forEach(o=>{ const i=K.get(o)[d]; if(i==null||i<200) return; const c=o.closes.slice(0,i+1); const e=ema(c,200); if(e==null) return; tot++; part=(part||0)+(c[c.length-1]>e?1:0); });
+        const vix = (vxK && vxK[d]!=null) ? vx.closes[vxK[d]] : null;
+        const stop = p6>=2 || (vix!=null&&vix>28) || (part!=null&&part<3&&p3<2);
+        if(stop){ best={tageSeit:k, datum:d, quelle:'Kursreihen'}; break; }
+      }
+    }
+  }catch(e){}
+  // Quelle 1: gespeicherte Tagesstände (Handelstage grob über Kalendertage × 5/7)
+  try{
+    const heute=todayKey();
+    const stopTage=Object.keys(KPIDAYS).filter(d=>d<heute && KPIDAYS[d] && KPIDAYS[d].label==='STOP').sort();
+    if(stopTage.length){
+      const d=stopTage[stopTage.length-1];
+      const kal=Math.round((new Date(heute)-new Date(d))/864e5);
+      const ht=Math.round(kal*5/7);
+      if(!best || ht<best.tageSeit) best={tageSeit:ht, datum:d, quelle:'gespeicherter Tagesstand'};
+    }
+  }catch(e){}
+  return best || {tageSeit:null, datum:null, quelle:null};
+}
+
+// ── AM2: Risiko und Trendrichtung getrennt ────────────────────────────────────
+// Reine Anzeige aus denselben Werten. Die Rückrechnung zeigte: Ein STOP heißt eher
+// „Markt schwankt stark“ als „Markt fällt“ — deshalb zwei getrennte Aussagen.
+function trendUndRisiko(p3,p6,vix,part,term){
+  const trend = (p3>=3 && p6===0) ? 'Long' : (p6>=2 ? 'Short' : 'neutral');
+  let risiko='niedrig';
+  if((vix!=null&&vix>28) || term==='back-strong' || (part!=null&&part<3)) risiko='hoch';
+  else if((vix!=null&&vix>=20) || term==='back-light' || term==='flat' || (part!=null&&part<6)) risiko='erhöht';
+  return {trend, risiko};
+}
+
+// ── AM9: „⚡ Panik-Wende möglich“ — Hinweis, KEIN Ampelzustand ─────────────────
+// Test nicht bestanden (0,13/0,71 bzw. 0,32/0,86) → ändert weder Ampel noch Größe.
+// Regel unverändert wie in am9_panik_einstieg_test.py.
+function panikWendePruefung(panikHeute){
+  const heute=todayKey();
+  const frueher=Object.keys(KPIDAYS).filter(d=>d<heute).sort().slice(-4).map(d=>KPIDAYS[d]&&KPIDAYS[d].panik);
+  const werte=[panikHeute].concat(frueher).filter(v=>v!=null);
+  const maxP = werte.length ? Math.max(...werte) : null;
+  const b1 = maxP!=null && maxP>=55;
+  const vx=STATE.vixSeries, vix=STATE.vix, v3=STATE.vix3m;
+  let mittel5=null; if(vx&&vx.closes&&vx.closes.length>=5){ const z=vx.closes.slice(-5); mittel5=z.reduce((a,b)=>a+b,0)/5; }
+  const b2 = vix!=null && ((v3!=null && vix<v3) || (mittel5!=null && vix<mittel5));
+  const spy=(STATE.indices||[]).find(i=>i.key==='SPY'&&i.closes);
+  let b3=false, hoch3=null, kurs=null;
+  if(spy && spy.closes.length>=4){ const c=spy.closes; kurs=c[c.length-1]; hoch3=Math.max(c[c.length-2],c[c.length-3],c[c.length-4]); b3=kurs>hoch3; }
+  const liste=[
+    {ok:b1, txt:`Panik-Score ≥ 55 an einem der letzten 5 Tage — höchster Wert ${maxP!=null?maxP:'–'} (${werte.length}/5 Tage gespeichert)`},
+    {ok:b2, txt:`VIX beruhigt sich: ${vix!=null?fmtPx(vix,1):'–'} unter VIX3M ${v3!=null?fmtPx(v3,1):'–'} oder unter 5-Tage-Schnitt ${mittel5!=null?fmtPx(mittel5,1):'–'}`},
+    {ok:b3, txt:`SPY schließt über dem höchsten Schluss der 3 Vortage (${kurs!=null?fmtPx(kurs):'–'} gegen ${hoch3!=null?fmtPx(hoch3):'–'})`},
+  ];
+  return {aktiv: b1&&b2&&b3, liste, vollstaendig: werte.length>=5};
+}
+
 function computeAmpel(){
   const idx = (STATE.indices||[]).filter(i=>!i.err && i.phase);
   if(idx.length===0){ return; }
@@ -3224,53 +3426,58 @@ function computeAmpel(){
   const vix = STATE.vix;
   const fg = STATE.fg?.score ?? null;
   const sektOk = (STATE.sectors||[]).filter(s=>!s.err);
-  const partArr = sektOk.filter(s=>s.aboveEma50!=null);
-  const part = partArr.length ? partArr.filter(s=>s.aboveEma50).length : null;   // Beteiligung: Sektoren über eigener EMA50
+  // v6.19 (AM1): Breite = Sektoren über ihrer EMA200 (vorher EMA50). Getestet 2007–2026,
+  // in beiden Zeiträumen besser. Die EMA50-Breite bleibt als Zusatzinfo erhalten.
+  const partArr = sektOk.filter(s=>s.aboveEma200!=null);
+  const part = partArr.length ? partArr.filter(s=>s.aboveEma200).length : null;
   const partTot = partArr.length || 11;
+  const part50Arr = sektOk.filter(s=>s.aboveEma50!=null);
+  const part50 = part50Arr.length ? part50Arr.filter(s=>s.aboveEma50).length : null;
   const rsArr = sektOk.filter(s=>s.rs1m!=null);
   const rsBeat = rsArr.length ? rsArr.filter(s=>s.rs1m>0).length : null;          // Führung: schlagen SPY (1M)
   const rsTot = rsArr.length || 11;
-  const panik = panikComponents().score;
+  const panik = panikComponents().score;   // v6.19 (AM3): nur noch Anzeige, nicht mehr Teil der Regel
   const term = effTerm();
+  const termRatio = STATE.vixTerm ? STATE.vixTerm.ratio : null;
   const narrow = (rsBeat!=null && rsTot>=6 && rsBeat<3);                          // enge, tech-getriebene Führung
 
-  let color='wait', icon='⏸', label='WARTE', sub='Daten unvollständig';
+  const R = ampelRegel({p3,p6,n,vix,fg,part,partTot,rsBeat,rsTot,term});
+  const rueck = stopRueckschau(R.label);
+  const VE = voreinstiegPruefung({p3,p6,n,part,partTot,term,termRatio,base:R.label,rueck,indizes:base});
+  let color, icon, label=R.label, sub;
   const reasons=[];
-
-  // REVERSE: extreme Angst (kontrarian)
-  if(fg!=null && vix!=null && fg<=15 && vix>30 && (term==='back-strong'||term==='back-light')){
-    color='reverse';icon='🔄';label='REVERSE';sub='Max-Angst · Kontrarian-Setup';
+  if(VE.aktiv){
+    color='pre'; icon='🌱'; label='VOREINSTIEG'; sub='Früher Wiedereinstieg · eine Stufe kleiner';
+    reasons.push(`alle 4 Bedingungen des Voreinstiegs erfüllt (Prüfliste oben)`);
+    if(VE.rueck && VE.rueck.datum) reasons.push(`letzter STOP vor ca. ${VE.rueck.tageSeit} Handelstagen — Fenster 60 Handelstage`);
+    reasons.push(`Grundzustand ohne Voreinstieg: ${R.label}`);
+  } else if(label==='REVERSE'){
+    color='reverse';icon='🔄';sub='Max-Angst · Kontrarian-Setup';
     reasons.push(`F&G ${fg} ≤ 15`, `VIX ${fmtPx(vix,1)} > 30`, 'VIX-Backwardation', '⚠ Long nur auf erstes höheres Tagestief');
-  }
-  // STOP: echte Trend-/Vola-Verschlechterung — enge Breite allein löst KEIN STOP aus
-  else if(p6>=2 || (vix!=null&&vix>28) || panik>=70 || (part!=null&&part<3&&p3<2)){
-    color='stop';icon='🔴';label='STOP';sub='Trendregime defensiv';
-    if(p6>=2) reasons.push(`${p6}/${n} US-Indizes in P6`);
-    if(vix!=null&&vix>28) reasons.push(`VIX ${fmtPx(vix,1)} > 28 (Stress)`);
-    if(panik>=70) reasons.push(`Panik-Score ${panik} ≥ 70`);
-    if(part!=null&&part<3&&p3<2) reasons.push(`nur ${part}/${partTot} Sektoren über EMA50 bei schwachem Trend`);
-  }
-  // CAUTION: Trend grundsätzlich intakt, aber Warnsignale (Breite, Führung, erhöhte Vola)
-  else if(p3<3 || (vix!=null&&vix>=20) || (part!=null&&part<6) || narrow || panik>=45 || term==='back-light'||term==='back-strong'){
-    color='caution';icon='🟡';label='CAUTION';
-    sub = (p3>=3 && p6===0 && (vix==null||vix<20)) ? 'Trend intakt · Führung/Breite eng' : 'Selektiv · Stops nachziehen';
-    if(p3<3) reasons.push(`nur ${p3}/${n} US-Indizes in P3`);
-    else reasons.push(`${p3}/${n} US-Indizes in P3 (Trend intakt)`);
-    if(vix!=null&&vix>=20) reasons.push(`VIX ${fmtPx(vix,1)} ≥ 20 (erhöht)`);
-    if(part!=null&&part<6) reasons.push(`Beteiligung dünn: ${part}/${partTot} Sektoren über EMA50`);
-    if(narrow) reasons.push(`enge Führung: nur ${rsBeat}/${rsTot} schlagen SPY (Tech-getrieben)`);
-    if(panik>=45) reasons.push(`Panik-Score ${panik} ≥ 45`);
-    if(term==='back-light'||term==='back-strong') reasons.push('VIX-Backwardation');
-  }
-  // GO: einstimmiger Trend, ruhige Vola, breite Beteiligung
-  else if(p3>=3 && (vix==null||vix<20) && (part==null||part>=6) && p6===0){
-    color='go';icon='🟢';label='GO';sub='Trend-Regime intakt';
+  } else if(label==='STOP'){
+    color='stop';icon='🔴';sub='Trendregime defensiv';
+    if(R.codes.includes('p6')) reasons.push(`${p6}/${n} US-Indizes in P6`);
+    if(R.codes.includes('vix28')) reasons.push(`VIX ${fmtPx(vix,1)} > 28 (Stress)`);
+    if(R.codes.includes('breite3')) reasons.push(`nur ${part}/${partTot} Sektoren über EMA200 bei schwachem Trend`);
+  } else if(label==='GO'){
+    color='go';icon='🟢';sub='Trend-Regime intakt';
     reasons.push(`${p3}/${n} US-Indizes in P3`);
     if(vix!=null) reasons.push(`VIX ${fmtPx(vix,1)} < 20 (ruhig)`);
-    if(part!=null) reasons.push(`${part}/${partTot} Sektoren über EMA50`);
+    if(part!=null) reasons.push(`${part}/${partTot} Sektoren über EMA200`);
     if(rsBeat!=null) reasons.push(`Führung: ${rsBeat}/${rsTot} schlagen SPY`);
+  } else {
+    color='caution';icon='🟡';label='CAUTION';
+    if(R.codes.includes('unklar')){ sub='Kein klarer Trigger'; reasons.push('uneindeutige Signallage'); }
+    else {
+      sub = (p3>=3 && p6===0 && (vix==null||vix<20)) ? 'Trend intakt · Führung/Breite eng' : 'Selektiv · Stops nachziehen';
+      if(p3<3) reasons.push(`nur ${p3}/${n} US-Indizes in P3`);
+      else reasons.push(`${p3}/${n} US-Indizes in P3 (Trend intakt)`);
+      if(R.codes.includes('vix20')) reasons.push(`VIX ${fmtPx(vix,1)} ≥ 20 (erhöht)`);
+      if(R.codes.includes('breite6')) reasons.push(`Beteiligung dünn: ${part}/${partTot} Sektoren über EMA200`);
+      if(R.codes.includes('eng')) reasons.push(`enge Führung: nur ${rsBeat}/${rsTot} schlagen SPY (Tech-getrieben)`);
+      if(R.codes.includes('back')) reasons.push('VIX-Backwardation');
+    }
   }
-  else { color='caution';icon='🟡';label='CAUTION';sub='Kein klarer Trigger'; reasons.push('uneindeutige Signallage'); }
 
   // Vortags-Delta (KPI-Tagesreihe) + Phasen-Flips (P3→raus)
   const today=todayKey();
@@ -3283,13 +3490,20 @@ function computeAmpel(){
   const dP3  =(pv&&pv.p3!=null)?p3-pv.p3:null;
   const flips=(pv&&pv.phases)?Object.keys(pv.phases).filter(k=>pv.phases[k]==='P3'&&curPhases[k]&&curPhases[k]!=='P3'):[];
 
-  const v={color,icon,label,sub,reasons,p3,p6,n,vix,fg,part,partTot,rsBeat,rsTot,panik,
+  // v6.19 (AM2): Risiko und Trendrichtung getrennt · (AM6) Wechsel kennzeichnen · (AM9) Panik-Wende
+  const TR = trendUndRisiko(p3,p6,vix,part,term);
+  const vorLabel = pv ? (pv.label||null) : null;
+  const wechsel = (vorLabel && vorLabel!==label) ? {von:vorLabel, am:prevDates[prevDates.length-1]} : null;
+  const PW = panikWendePruefung(panik);
+  const v={color,icon,label,sub,reasons,p3,p6,n,vix,fg,part,partTot,part50,rsBeat,rsTot,panik,
            breadth:part,breadthTot:partTot, vixTerm:STATE.vixTerm, frontStress:STATE.frontStress, vix9d:STATE.vix9d, dVix,dFg,dPart,dP3,flips,
-           prevDate: prevDates.length?prevDates[prevDates.length-1]:null};
+           prevDate: prevDates.length?prevDates[prevDates.length-1]:null,
+           basis:R.label, codes:R.codes, voreinstieg:VE, trend:TR.trend, risiko:TR.risiko, wechsel, panikWende:PW, version:AMPEL_VERSION};
 
-  // heutige KPI-Werte speichern (für morgen), auf 12 Tage kürzen
-  KPIDAYS[today]={vix,fg,part,p3,p6,rsBeat,phases:curPhases};
-  { const keep=Object.keys(KPIDAYS).sort().slice(-12); const pr={}; keep.forEach(k=>pr[k]=KPIDAYS[k]); KPIDAYS=pr; }
+  // heutige KPI-Werte speichern (für morgen). v6.19: mit Ampel-Zustand und Panik-Score,
+  // 100 Tage statt 12 — die Rückschau des Voreinstiegs braucht 60 Handelstage.
+  KPIDAYS[today]={vix,fg,part,p3,p6,rsBeat,phases:curPhases,label,basis:R.label,panik,pwSignal:PW.aktiv||undefined};
+  { const keep=Object.keys(KPIDAYS).sort().slice(-100); const pr={}; keep.forEach(k=>pr[k]=KPIDAYS[k]); KPIDAYS=pr; }
   try{ localStorage.setItem(SK.kpidays, JSON.stringify(KPIDAYS)); }catch(e){}
 
   STATE.ampel=v;
@@ -3376,6 +3590,10 @@ function tagesKonsequenz(v){
     } else if(v.color === 'stop'){
       g.push('Ampel STOP — spiegelt den Abwärtsmarkt selbst, keine Einschränkung für Short-Setups');
     }
+  } else if(v.color === 'pre'){
+    // v6.19 (AM4): Voreinstieg — getestet mit 75 % Investitionsgrad, also eine Stufe kleiner
+    groesse = (groesse === 'normal') ? 'reduziert' : groesse;
+    g.unshift('VOREINSTIEG — früher Wiedereinstieg nach einer Stressphase, eine Stufe kleiner');
   } else if(v.color === 'reverse'){
     groesse = (groesse === 'normal') ? 'reduziert' : groesse;
     g.unshift('Ampel REVERSE — Extremangst, Kontrarian-Lage. Long nur auf erstes höheres Tagestief.');
@@ -3385,7 +3603,6 @@ function tagesKonsequenz(v){
     module   = 'nur Bestandspflege';
     const warum = [];
     if(v.vix != null && v.vix > 28) warum.push('VIX ' + v.vix.toFixed(1));
-    if(v.panik != null && v.panik >= 70) warum.push('Panik ' + v.panik);
     if(v.part != null && v.part < 3 && p3 < 2) warum.push('Marktbreite ' + v.part + '/' + v.partTot);
     g.unshift('Ampel STOP' + (warum.length ? ' (' + warum.join(', ') + ')' : '') + ' — kein tragfähiges Long-Umfeld');
   } else if(v.color === 'caution' && groesse === 'normal'){
@@ -3533,9 +3750,113 @@ function wochenTermine(){
   return {eintraege, anzahl:eintraege.length, punkte, stufe};
 }
 
+// ═══ v6.19: INFO-POP-UPS — vier feste Teile je Baustein ═════════════════════
+// Ziel · Warum so · So liest du es · Beispiel. Zahlen stammen aus der Rückrechnung
+// (auswertung/AMPEL_AUSWERTUNG.md). Wo ein Test nicht bestanden wurde, steht das dabei.
+const INFO_TEXTE = {
+  ampel: {t:'Ampel (Regelwerk 2026.11)',
+    ziel:'Sagt dir in einem Wort, ob das Marktumfeld heute neue Long-Positionen trägt.',
+    warum:'Sie verbindet die Lüddemann-Phasen der vier US-Indizes (SPY, QQQ, DIA, IWM), den VIX, die Breite (Sektoren über EMA200) und die VIX-Termstruktur. In der Rückrechnung 2007–2026 lag der größte Verlust mit dieser Ampel bei −21 % statt −56 % beim reinen Halten des S&P 500. Die Rendite war niedriger (5,9 % statt 8,7 % pro Jahr); die Ampel schützt also vor allem vor großen Einbrüchen. Gegenüber der Vorgängerversion sind zwei getestete Änderungen eingebaut: Breite über EMA200 (AM1) und der Voreinstieg (AM4). Der Panik-Score zählt nicht mehr mit (AM3), weil er in 4.827 Tagen nie etwas geändert hat.',
+    lesen:'GO = Trend intakt, ruhig, breit getragen. CAUTION = selektiv, eine Stufe kleiner. STOP = keine neuen Long-Positionen. VOREINSTIEG = früher Wiedereinstieg nach Stress, eine Stufe kleiner. REVERSE = Extremangst, Long erst auf das erste höhere Tagestief. WARTE = Daten fehlen. Die Ampel gilt für NEUE Positionen; Bestände führst du nach deinem Stopp.',
+    bsp:'2020 in der Rückrechnung: ab 27.02. REVERSE (Extremangst), ab 20.03. STOP. Das erste GO kam erst am 12.02.2021, als 76 % der Erholung gelaufen waren. Mit dem Voreinstieg ging die Ampel schon am 15.07.2020 auf VOREINSTIEG (44 % der Erholung gelaufen). Ehrliche Grenze: Im kurzen Fenster 2022–2026 war die alte Ampel etwas besser (0,81 gegen 0,74); über 19 Jahre liegt die neue vorn.'},
+  voreinstieg: {t:'🌱 Voreinstieg (AM4) — getestet, bestanden',
+    ziel:'Nach einem Einbruch früher wieder einsteigen können, ohne auf „VIX unter 20“ zu warten.',
+    warum:'Die feste VIX-Grenze hielt die Ampel nach Tiefpunkten oft monatelang zu (nach dem Tief vom März 2020 kam das erste GO erst am 12.02.2021). Der Voreinstieg verlangt stattdessen, dass der Trend wieder steht (3 Indizes in P3, keiner in P6), die Breite zurück ist (6 Sektoren über EMA200) und die Termstruktur sich normalisiert hat (Contango). Er gilt nur in den 60 Handelstagen nach einem STOP. Die Regel wurde vor dem Test festgelegt und nicht nachjustiert; sie war 2007–2016 UND 2017–2026 besser.',
+    lesen:'Die Prüfliste zeigt jede Bedingung mit aktuellem Wert. Erst wenn alle vier ✓ haben UND der letzte STOP weniger als 60 Handelstage zurückliegt, springt die Ampel auf VOREINSTIEG. Größe: eine Stufe kleiner (im Test 75 %). „3/4 erfüllt“ heißt: noch nicht, aber nah dran.',
+    bsp:'07.08.2009 Voreinstieg statt GO am 22.12.2009. Bilanz im Test: nach 20 Tagen im Schnitt +1,5 %, 75 % positiv. Fehlstarts: sechsmal über 7 % Rückschlag (vor dem Flash-Crash 2010, Mai/Juni 2010, Juli 2011), dazu Herbst 2007 mit −8 bis −14 % in 60 Tagen. Hinweis: Der letzte STOP wird aus den Kursreihen nachgerechnet; Fear & Greed lässt sich nicht nachrechnen, ein Tag mit Extremangst zählt dort als STOP.'},
+  panikwende: {t:'⚡ Panik-Wende möglich (AM9) — nur Hinweis, Test NICHT bestanden',
+    ziel:'Den Lüddemann-Gedanken abbilden: Wenn die Panik am größten ist, ist eine Wende am wahrscheinlichsten — Einstieg klein, aber erst beim ersten Lebenszeichen.',
+    warum:'Bedingungen: Panik-Score ≥ 55 an einem der letzten 5 Tage, der VIX beruhigt sich (unter VIX3M oder unter seinem 5-Tage-Schnitt), und der SPY schließt über dem höchsten Schluss der 3 Vortage. In der Rückrechnung hat diese Regel die Ampel nicht verbessert (0,13/0,71 bzw. 0,32/0,86). Deshalb ändert sie weder Ampel noch Konsequenz-Zeile.',
+    lesen:'Erscheint der Kasten mit ⚡, sind alle drei Bedingungen erfüllt. Erscheint er ohne ⚡, ist nur die Panik hoch und die Stabilisierung fehlt noch. Wenn du handelst: nur kleine Positionen, nur in starken Indizes oder Aktien, Stopp unter dem Tief.',
+    bsp:'Treffer kurz nach Tiefs: 10.03.2009, 05.10.2011, 24.03.2020, 13.10.2022, 09.04.2025. Fehlsignale mitten im Fall: Herbst 2008 (danach −16 bis −27 %), 04.03.2020 (−26 %). Bilanz: 67 Signale, nach 20 Tagen +1,4 %, 64 % positiv, in 15 % vorher über 7 % Rückschlag. Die treffsicherere Breiten-Wende (+2,9 % nach 20 Tagen) braucht die Breite aus Einzelaktien und kommt mit Phase 4.'},
+  trendrisiko: {t:'Trend und Risiko getrennt (AM2)',
+    ziel:'Zwei Fragen getrennt beantworten: In welche Richtung läuft der Markt? Wie stark schwankt er?',
+    warum:'Die Rückrechnung zeigte: Ein STOP bedeutete meist „Markt schwankt stark“, nicht „Markt fällt“. Nach STOP wegen VIX > 28 oder dünner Breite stieg der S&P 500 danach im Schnitt um 1,5 bis 1,6 %. Nur „2 Indizes in P6“ war ein echtes Abwärtssignal (schwächste Folgerendite, tiefste Rückschläge). Beides in einem Wort zu vermischen führt in die Irre.',
+    lesen:'Trend: Long (3 Indizes in P3, keiner in P6), Short (2 oder mehr in P6), sonst neutral. Risiko: hoch (VIX > 28, starke Backwardation oder Breite unter 3), erhöht (VIX ≥ 20, flache oder leichte Backwardation, Breite unter 6), sonst niedrig. Reine Anzeige, ändert die Ampel nicht.',
+    bsp:'Typischer Fall: Trend Long, Risiko erhöht — Aufwärtstrend steht, aber der VIX liegt bei 23. Typisch nach einem Rücksetzer — Long möglich, Positionen kleiner, Stopps enger beobachten.'},
+  wechsel: {t:'Wechsel heute (AM6)',
+    ziel:'Zeigen, dass der Zustand heute neu ist und noch nicht bestätigt.',
+    warum:'Rund ein Drittel aller Ampelphasen dauerte in der Rückrechnung nur einen Tag. Die Ampel deshalb erst nach zwei Tagen umschalten zu lassen, hat im Test aber Rendite gekostet (0,24/0,61 statt 0,24/0,71). Darum bleibt die Ampel unverändert, und der Wechsel wird nur gekennzeichnet.',
+    lesen:'Steht hier „Wechsel heute“, ist der neue Zustand gültig. Er ist aber frisch: Besonders bei GO ↔ CAUTION lohnt ein Blick, ob es morgen hält.',
+    bsp:'Typischer Fall: CAUTION → GO am Montag, Dienstag wieder CAUTION — kein Fehler, sondern eine Lage auf der Kippe. Grundlage ist der gespeicherte Stand des letzten Laufs.'},
+  panik: {t:'Panik-Score (konträr lesen, AM3)',
+    ziel:'Wie viel Angst steckt im Markt? Gewichtet aus VIX, Fear & Greed, Put/Call, AAII-Bären, VVIX, NAAIM und Termstruktur.',
+    warum:'Als Warnsignal hat der Score in 19 Jahren nie etwas bewirkt: Immer war vorher schon ein anderes Signal da. Und er wirkt umgekehrt: Je höher die Angst, desto besser lief der Markt danach. Folgerendite nach 60 Tagen: ruhig +1,7 %, normal +2,8 %, erhöht +3,1 %, hoch +3,6 %, extrem +5,4 %. Das deckt sich mit Studien zu AAII und Fear & Greed.',
+    lesen:'Hoher Wert = viel Angst = statistisch eher Erholungschance, aber mit großen Schwankungen. Er ist nicht mehr Teil der Ampel, sondern speist den Hinweis „⚡ Panik-Wende möglich“. Unter 50 Punkten Abdeckung ist er unbestimmt.',
+    bsp:'2020 in der Rückrechnung: Panik 76 am 27.02., danach weiter bis 100 Mitte März — und der S&P 500 fiel weiter bis zum Tief am 23.03.2020. Hohe Angst sagt also „Chance in Sicht“, nicht „heute kaufen“.'},
+  breite: {t:'Sektor-Breite über EMA200 (AM1)',
+    ziel:'Trägt der ganze Markt den Trend oder nur wenige Sektoren?',
+    warum:'Gezählt werden die 11 Sektor-ETFs, die über ihrer EMA200 stehen. Vorher war es die EMA50 — die schwankt stark und löste oft STOP aus, kurz bevor sich der Markt fing. Mit EMA200 wurden in der Rückrechnung 272 STOP-Tage zu CAUTION; die Ampel war in beiden Zeiträumen besser (0,39/0,75 statt 0,24/0,71).',
+    lesen:'6 oder mehr: breit getragen. Unter 6: Warnzeichen (CAUTION). Unter 3 bei schwachem Trend: STOP. Die EMA50-Zahl steht klein daneben als Frühindikator.',
+    bsp:'Typischer Fall (ausgedacht zur Veranschaulichung): 8/11 über EMA200, aber nur 4/11 über EMA50: Der lange Trend steht, kurzfristig gibt es einen Rücksetzer — typischer Fall für „Bewegung–Korrektur–Bewegung“.'},
+  kredit: {t:'Kreditspread High Yield (AM5) — nur Anzeige',
+    ziel:'Zeigt, ob Kreditgeber für riskante Firmenanleihen mehr Aufschlag verlangen — ein Stressmaß außerhalb des Aktienmarkts.',
+    warum:'Der Kreditmarkt fehlte bisher völlig. In der Rückrechnung half eine Spread-Warnung 2007–2016, schadete aber 2017–2026 (0,43/0,68). Deshalb fließt er nicht in die Ampel, sondern wird beobachtet und archiviert.',
+    lesen:'Niveau in Prozentpunkten (ICE BofA US High Yield, Quelle FRED) und Veränderung über rund 3 Monate. Anstieg über 0,5 Punkte: erhöhte Vorsicht; über 1,0 Punkt: deutlicher Stress.',
+    bsp:'Werte aus der Rückrechnung: 2008 zwischen 6,1 und 21,8 %, im März/April 2020 Sprung von 3,6 auf 10,9 %. Ruhige Jahre: 2017–2019 meist um 3,8 %, 2024–2026 meist um 3,0 %.'},
+};
+function infoPop(key){
+  const x = INFO_TEXTE[key]; if(!x) return;
+  let bg = document.getElementById('ipop-bg');
+  if(!bg){
+    bg = document.createElement('div'); bg.id='ipop-bg';
+    bg.innerHTML = '<div id="ipop" role="dialog" aria-modal="true"></div>';
+    bg.addEventListener('click', e=>{ if(e.target===bg) bg.style.display='none'; });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') bg.style.display='none'; });
+    document.body.appendChild(bg);
+  }
+  document.getElementById('ipop').innerHTML =
+    `<button class="zu" onclick="document.getElementById('ipop-bg').style.display='none'" aria-label="Schließen">✕</button>`
+    + `<h3>${esc(x.t)}</h3>`
+    + `<div class="teil"><b>Ziel</b>${esc(x.ziel)}</div>`
+    + `<div class="teil"><b>Warum so</b>${esc(x.warum)}</div>`
+    + `<div class="teil"><b>So liest du es</b>${esc(x.lesen)}</div>`
+    + `<div class="teil"><b>Beispiel</b>${esc(x.bsp)}</div>`;
+  bg.style.display='flex';
+}
+
+// ═══ v6.19: ZUSATZANZEIGEN UNTER DER AMPEL ═══════════════════════════════════
+function renderAmpelZusatz(v){
+  const el=$('ampel-zusatz'); if(!el) return;
+  const datumDE = d => d ? new Date(d+'T12:00:00').toLocaleDateString('de-DE') : '–';
+  const tf = v.trend==='Long'?'var(--green)':v.trend==='Short'?'var(--red)':'var(--steel)';
+  const rf = v.risiko==='hoch'?'var(--red)':v.risiko==='erhöht'?'var(--amber)':'var(--green)';
+  let h = `<div class="az-zeile"><span class="az-chip" style="color:${tf}">Trend: ${esc(v.trend)}</span>`
+        + `<span class="az-chip" style="color:${rf}">Risiko: ${esc(v.risiko)}</span><span class="info-i" onclick="infoPop('trendrisiko')" title="Trend und Risiko">i</span>`;
+  if(v.wechsel) h += `<span class="az-chip" style="color:var(--gold)">🆕 Wechsel: ${esc(v.wechsel.von)} → ${esc(v.label)}</span><span class="info-i" onclick="infoPop('wechsel')" title="Wechsel">i</span>`;
+  if(STATE.kredit && STATE.kredit.wert!=null){
+    const k=STATE.kredit, d=k.chg63;
+    const kf = d==null?'var(--steel)': d>1.0?'var(--red)': d>0.5?'var(--amber)':'var(--steel)';
+    h += `<span class="az-chip" style="color:${kf}" title="ICE BofA US High Yield OAS (FRED), Stand ${esc(k.datum||'')}${k.alt?' — letzter gespeicherter Wert, Abruf gescheitert':''}">Kredit HY ${k.wert.toFixed(2).replace('.',',')} %${d!=null?` (${d>=0?'+':''}${d.toFixed(2).replace('.',',')} in 3M)`:''}</span><span class="info-i" onclick="infoPop('kredit')" title="Kreditspread">i</span>`;
+  }
+  const hp = STATE.handelsplan;
+  const hpTxt = !hp ? '' : hp.fehler ? ` · <span title="${esc(hp.fehler)}">Handelsplan: –</span>`
+    : ` · Handelsplan ${esc(hp.version)}${hp.abweichungen&&hp.abweichungen.length?` <b style="color:var(--red)" title="Diese Werte in handelsplan.json weichen von den getesteten ab und werden NICHT verwendet: ${esc(hp.abweichungen.join(', '))}. Erst über auswertung/ prüfen.">⚠ ungetestete Ampel-Werte in der Datei</b>`:''}`;
+  h += `<span style="color:var(--t3);margin-left:auto">Regelwerk ${esc(v.version||'')}${hpTxt} <span class="info-i" onclick="infoPop('ampel')" title="Wie die Ampel rechnet">i</span></span></div>`;
+
+  const VE=v.voreinstieg;
+  if(VE && (VE.aktiv || (VE.nachStop && VE.zustandPasst))){
+    const nOk=VE.liste.filter(x=>x.ok).length;
+    const r=VE.rueck||{};
+    h += `<div class="az-box" style="border-left-color:${VE.aktiv?'#7aa83a':'var(--rule)'}">`
+       + `<h4>🌱 Voreinstieg ${VE.aktiv?'<span class="ok">— alle Bedingungen erfüllt</span>':`— ${nOk}/4 Bedingungen erfüllt`} <span class="info-i" onclick="infoPop('voreinstieg')" title="Voreinstieg">i</span></h4>`
+       + VE.liste.map(x=>`<div class="${x.ok?'ok':'nein'}">${x.ok?'✓':'○'} ${esc(x.txt)}</div>`).join('')
+       + `<div class="bilanz">Letzter STOP: ${datumDE(r.datum)}${r.tageSeit!=null?` (vor ca. ${r.tageSeit} Handelstagen, Quelle: ${esc(r.quelle||'')})`:''} · Fenster 60 Handelstage · getestet und in beiden Zeiträumen bestanden · Größe eine Stufe kleiner</div></div>`;
+  }
+
+  const PW=v.panikWende;
+  if(PW && (PW.aktiv || PW.liste[0].ok)){
+    h += `<div class="az-box" style="border-left-color:${PW.aktiv?'var(--violet)':'var(--rule)'}">`
+       + `<h4>${PW.aktiv?'⚡ Panik-Wende möglich':'Panik hoch — Stabilisierung fehlt noch'} <span class="info-i" onclick="infoPop('panikwende')" title="Panik-Wende">i</span></h4>`
+       + PW.liste.map(x=>`<div class="${x.ok?'ok':'nein'}">${x.ok?'✓':'○'} ${esc(x.txt)}</div>`).join('')
+       + `<div class="bilanz">Nur Hinweis, kein Ampelzustand: Test nicht bestanden. Rückrechnung: 67 Signale, nach 20 Tagen +1,4 %, 64 % positiv, in 15 % vorher über 7 % Rückschlag. Wenn überhaupt: klein, nur starke Indizes/Aktien, Stopp unter dem Tief.${PW.vollstaendig?'':' Panik-Werte der Vortage sind nur für Tage mit Lauf gespeichert.'}</div></div>`;
+  }
+  el.innerHTML = h;
+}
+
 function renderRegime(v){
   // v6.17: Ampel im Tab-Titel — sichtbar, auch wenn die Seite im Hintergrund-Tab liegt
-  try{ document.title = v.icon+' '+v.label+' · Morgenroutine v6.17'; }catch(e){}
+  try{ document.title = v.icon+' '+v.label+' · Morgenroutine v6.19'; }catch(e){}
   const light=$('light');
   light.className='light lb-'+v.color;
   light.innerHTML=`<div class="light-icon">${v.icon}</div><div class="light-label">${v.label}</div><div class="light-sub">${v.sub}</div>`;
@@ -3561,8 +3882,9 @@ function renderRegime(v){
       + `<span style="color:var(--t3)">${v.p3}× P3 / ${v.p6}× P6 von ${v.n}${dTxt(v.dP3,'',0,true)}</span>`
     : `${v.p3}× P3 / ${v.p6}× P6 von ${v.n}${dTxt(v.dP3,'',0,true)}`;
   renderKonsequenz(v);   // v6.2
+  try{ renderAmpelZusatz(v); }catch(e){ console.error(e); }   // v6.19
   $('k-breadth').textContent = v.part==null?'–':`${v.part}/${v.partTot}`;
-  $('k-breadth-s').innerHTML = (v.rsBeat!=null ? `über EMA50 · ${v.rsBeat}/${v.rsTot} schlagen SPY` : 'über EMA50') + dTxt(v.dPart,'',0,true);
+  $('k-breadth-s').innerHTML = (v.rsBeat!=null ? `über EMA200 · ${v.rsBeat}/${v.rsTot} schlagen SPY` : 'über EMA200')+(v.part50!=null?` · EMA50: ${v.part50}`:'') + dTxt(v.dPart,'',0,true);
   $('regime-reason').innerHTML = `<strong>Begründung:</strong> ${v.reasons.map(r=>`<span class="rr-line">→ ${r}</span>`).join('')}`;
   // KPI-Alarm-Ringe
   const ring=(id,on)=>{ const el=$(id); const k=el&&el.closest('.kpi'); if(k) k.classList.toggle('kpi-alert',!!on); };
@@ -3960,7 +4282,7 @@ async function genBriefing(v, erzwingen){
     phasen:`${v.p3}× P3 / ${v.p6}× P6`, vix:v.vix, vix_vortag:(v.dVix!=null?(v.dVix>0?'+':'')+v.dVix.toFixed(1):null),
     vix_termstruktur:(v.vixTerm?v.vixTerm.regime:null), fg:v.fg,
     vix9d_front:(STATE.frontStress?`VIX9D ${fmtPx(STATE.vix9d,1)} > VIX — Front-End-Stress`:null),
-    beteiligung:(v.part!=null?`${v.part}/${v.partTot} Sektoren über EMA50`:null), fuehrung:(v.rsBeat!=null?`${v.rsBeat}/${v.rsTot} schlagen SPY`:null), panik:v.panik,
+    beteiligung:(v.part!=null?`${v.part}/${v.partTot} Sektoren über EMA200`:null), fuehrung:(v.rsBeat!=null?`${v.rsBeat}/${v.rsTot} schlagen SPY`:null), panik:v.panik,
     atr_spy:(spy&&spy.atrPct!=null?spy.atrPct.toFixed(1)+'%':null),
     einstiegszonen_p3:(STATE.indices||[]).filter(i=>i.corr&&i.corr.zone).map(i=>i.key),
     topSektor: (STATE.sectors||[]).filter(s=>!s.err&&s.rs1m!=null).sort((a,b)=>b.rs1m-a.rs1m)[0]?.name };
@@ -4145,6 +4467,14 @@ function snapshotDaten(){
   return {
     tag: tagesSchluessel(), date:fmtD(new Date()), time:fmtT(new Date()),
     label:v.label, color:v.color, sub:v.sub,
+    // v6.19: Regelversion und Rohwerte für die spätere Auswertung (Grundlage für A1b)
+    version:v.version||null, basis:v.basis||null, trend:v.trend||null, risiko:v.risiko||null,
+    breite200:v.part, breite50:v.part50, term:(STATE.vixTerm&&STATE.vixTerm.regime)||null,
+    termRatio:(STATE.vixTerm&&STATE.vixTerm.ratio!=null)?+STATE.vixTerm.ratio.toFixed(3):null,
+    voreinstieg: v.voreinstieg ? {aktiv:v.voreinstieg.aktiv, erfuellt:v.voreinstieg.liste.filter(x=>x.ok).length, stopVor:v.voreinstieg.rueck?v.voreinstieg.rueck.tageSeit:null} : null,
+    panikWende: v.panikWende ? v.panikWende.aktiv : null,
+    kreditHY: (STATE.kredit&&STATE.kredit.wert!=null) ? STATE.kredit.wert : null,
+    kreditHY63: (STATE.kredit&&STATE.kredit.chg63!=null) ? +STATE.kredit.chg63.toFixed(2) : null,
     panik:v.panik, fg:v.fg, p3:v.p3, p6:v.p6, n:v.n,
     // v6.10: deutlich mehr Kontext — beim Zurückblättern ist genau das die Frage:
     // "Wie war die Lage, als ich diesen Trade gemacht habe?"
@@ -4249,7 +4579,7 @@ function exportSnapshot(){
   L.push(`- US-Phasen: ${v.p3}× P3 / ${v.p6}× P6 (von ${v.n})`);
   L.push(`- VIX: ${v.vix!=null?fmtPx(v.vix,1):'–'}${v.vixTerm?` · Termstruktur ${v.vixTerm.regime} (VX/VX3M ${v.vixTerm.ratio.toFixed(2)})`:''}${v.frontStress?` · ⚠ Front-End-Stress (VIX9D ${fmtPx(v.vix9d,1)} > VIX)`:''}`);
   L.push(`- Fear & Greed: ${v.fg!=null?v.fg:'–'} (${STATE.fg?.rating||'–'})`);
-  L.push(`- Sektor-Breite: ${v.part!=null?`${v.part}/${v.partTot} über EMA50`:'–'} · Führung ${v.rsBeat!=null?`${v.rsBeat}/${v.rsTot} schlagen SPY`:'–'}`);
+  L.push(`- Sektor-Breite: ${v.part!=null?`${v.part}/${v.partTot} über EMA200`:'–'} · Führung ${v.rsBeat!=null?`${v.rsBeat}/${v.rsTot} schlagen SPY`:'–'}`);
   // v6.18 FIX (F7): unbestimmter Score (zu geringe Abdeckung) stand als „null“ im Export
   { let cov=null; try{ const P=panikComponents(); cov=P?P.covered:null; }catch(e){}
     L.push(`- Panik-Score: ${v.panik!=null ? v.panik : 'unbestimmt'}${cov!=null?` (${cov}/100 erfasst)`:''}`); }
@@ -4444,6 +4774,7 @@ async function runMorning(){
 window.addEventListener('DOMContentLoaded', ()=>{
   // v6.11: Erst den Stand vom Laufwerk holen, dann anzeigen. Ohne Server bleibt
   // alles wie bisher — die Funktion scheitert still.
+  ladeHandelsplanMR();   // v6.19 (W1)
   mrLoadSettings().then(neu=>{
     if(neu){
       STATE.watch = (Array.isArray(loadLS(SK.watch, [])) ? loadLS(SK.watch, []) : []);

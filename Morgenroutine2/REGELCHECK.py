@@ -53,6 +53,40 @@ REGELN = {
     "bar_abgerechnet":    {"SPX", "NDX", "RUT", "VIX", "XSP", "DJX", "XEO", "OEX"},
 }
 
+
+# v1.4 (W1): Werte aus handelsplan.json uebernehmen, damit Journal, Morgenroutine und
+# REGELCHECK dieselben Regeln verwenden. Fehlt die Datei oder ist sie unlesbar, gelten
+# die Werte oben - der Lauf meldet das in der Uebersicht.
+HANDELSPLAN = {"version": None, "fehler": None}
+
+def lade_handelsplan(pfad=None):
+    pfad = pfad or os.path.join(os.path.dirname(os.path.abspath(__file__)), "handelsplan.json")
+    try:
+        with open(pfad, "r", encoding="utf-8") as f:
+            plan = json.load(f)
+    except FileNotFoundError:
+        HANDELSPLAN.update(version=None, fehler="handelsplan.json nicht gefunden - eingebaute Werte")
+        return
+    except Exception as e:
+        HANDELSPLAN.update(version=None, fehler="handelsplan.json unlesbar (%s) - eingebaute Werte" % e)
+        return
+    zuordnung = [
+        (("risiko", "trend_pct"), "risiko_trend_pct"),
+        (("risiko", "gap_pct"), "risiko_gap_pct"),
+        (("risiko", "akj_fix_eur"), "risiko_akj_fix"),
+        (("risiko", "toleranz"), "risiko_toleranz"),
+        (("positionen", "max_trend"), "max_positionen"),
+        (("optionen", "dte_warnung"), "dte_warnung"),
+        (("universum", "mindestkurs"), "mindestkurs"),
+    ]
+    for (block, feld), schluessel in zuordnung:
+        wert = (plan.get(block) or {}).get(feld)
+        if isinstance(wert, (int, float)) and not isinstance(wert, bool):
+            REGELN[schluessel] = int(wert) if isinstance(REGELN[schluessel], int) else float(wert)
+    HANDELSPLAN.update(version=plan.get("version"), fehler=None)
+
+lade_handelsplan()
+
 # ─────────────────────────────────────────────────────────────────────────────
 
 ROT, GELB, GRUEN, GRAU, AUS = "\033[91m", "\033[93m", "\033[92m", "\033[90m", "\033[0m"
@@ -329,6 +363,7 @@ def analyse(ordner=None):
     Wird vom Server (/regelcheck) fuer die Anzeige in der Morgenroutine genutzt;
     main() nutzt dieselbe Funktion, damit es nur EINE Pruefung gibt."""
     ordner = ordner or datenordner()
+    lade_handelsplan()      # v1.4: bei jedem Lauf neu, damit Aenderungen ohne Neustart greifen
     b = Bericht()
     teile = {}
     for schluessel, datei, fn in (("journal", "trading_journal.json", pruefe_trades),
@@ -342,8 +377,9 @@ def analyse(ordner=None):
             teile[schluessel] = {"gefunden": True, "fehler": None, "infos": b.infos[vorher:]}
     return {
         "ok": True,
-        "version": "1.2",
+        "version": "1.4",
         "ordner": ordner,
+        "handelsplan": {"version": HANDELSPLAN.get("version"), "fehler": HANDELSPLAN.get("fehler")},
         "stand": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "teile": teile,
         "befunde": [{"stufe": e[0], "bereich": e[1], "text": e[2], "hinweis": e[3]} for e in b.eintraege],
@@ -364,6 +400,8 @@ def main():
 
     erg = analyse(ordner)
     b = erg["_bericht"]
+    hp = erg["handelsplan"]
+    print("Handelsplan: %s" % (("Version " + str(hp["version"])) if hp["version"] else (GELB + str(hp["fehler"]) + AUS)))
     gefunden = 0
     for titel, schl in (("RICHTUNGS-JOURNAL", "journal"), ("STILLHALTER-JOURNAL", "stillhalter")):
         teil = erg["teile"][schl]

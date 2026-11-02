@@ -61,8 +61,8 @@ const ctx = {
 ctx.window = ctx; ctx.self = ctx; ctx.globalThis = ctx;
 vm.createContext(ctx);
 // Top-Level-const/let sind im vm nicht als Eigenschaften sichtbar — deshalb am Ende exportieren.
-const exporte = ['luedePhase','computeAmpel','usBoersenStatus','xetraStatus','etNachBerlin','makroStufe','makroRegion',
-  'korrigiereZeit','wochenTermine','isoLokal','mrSyncWert','STATE','SK'];
+const exporte = ['luedePhase','computeAmpel','ampelRegel','voreinstiegPruefung','trendUndRisiko','usBoersenStatus','xetraStatus','etNachBerlin','makroStufe','makroRegion',
+  'korrigiereZeit','wochenTermine','kreditAusCsv','isoLokal','mrSyncWert','STATE','SK'];
 vm.runInContext(code + '\n;globalThis.__T={' + exporte.map(n => `${n}:(typeof ${n}!=='undefined'?${n}:undefined)`).join(',') + '};',
   ctx, { filename: 'ferit_morgenroutine_v6.html' });
 const T = ctx.__T;
@@ -90,7 +90,7 @@ ctx.document.getElementById = () => attrappe();      // renderRegime() zeichnet 
 function ampel({p3 = 4, p6 = 0, vix = 15, fg = 60, ueber = 8, schlagen = 6, term = null}) {
   const ph = i => ({ code: i < p3 ? 'P3' : i < p3 + p6 ? 'P6' : 'P4' });
   T.STATE.indices = [0, 1, 2, 3].map(i => ({ key: 'I' + i, us: true, phase: ph(i) }));
-  T.STATE.sectors = Array.from({ length: 11 }, (_, i) => ({ etf: 'S' + i, aboveEma50: i < ueber, rs1m: i < schlagen ? 1 : -1 }));
+  T.STATE.sectors = Array.from({ length: 11 }, (_, i) => ({ etf: 'S' + i, aboveEma50: i < ueber, aboveEma200: i < ueber, rs1m: i < schlagen ? 1 : -1 }));
   T.STATE.vix = vix; T.STATE.fg = { score: fg }; T.STATE.vixTerm = term ? { regime: term } : null;
   return T.computeAmpel().label;
 }
@@ -102,6 +102,58 @@ if (typeof T.computeAmpel === 'function') {
   pruefe('STOP: VIX 30', ampel({ vix: 30, fg: 40 }), 'STOP');
   pruefe('REVERSE: F&G 10, VIX 35, Backwardation', ampel({ p3: 0, p6: 3, vix: 35, fg: 10, term: 'back-strong' }), 'REVERSE');
 } else { fehl++; console.log('  ✗ computeAmpel nicht gefunden'); }
+
+// ── Voreinstieg live: STOP-Rückschau aus Kursreihen ──────────────────────────
+abschnitt('Voreinstieg mit Rückschau aus Kursreihen');
+function liveFall(spitzeVorTagen) {
+  const L = 400, t0 = Date.UTC(2025, 0, 2) / 1000;
+  const times = []; for (let i = 0, d = 0; i < L; d++) { const w = new Date((t0 + d * 86400) * 1000).getUTCDay(); if (w === 0 || w === 6) continue; times.push(t0 + d * 86400 + 14 * 3600); i++; }
+  const steigend = Array.from({ length: L }, (_, i) => 100 + i * 0.2);
+  T.STATE.indices = ['SPY', 'QQQ', 'DIA', 'IWM'].map(k => ({ key: k, us: true, phase: { code: 'P3' }, closes: steigend.slice(), times }));
+  T.STATE.sectors = Array.from({ length: 11 }, (_, i) => ({ etf: 'S' + i, aboveEma50: true, aboveEma200: true, rs1m: 1, closes: steigend.slice(), times }));
+  const vx = Array.from({ length: L }, () => 15); if (spitzeVorTagen != null) vx[L - 1 - spitzeVorTagen] = 35;
+  T.STATE.vixSeries = { closes: vx, times };
+  T.STATE.vix = 22; T.STATE.vix3m = 25; T.STATE.fg = { score: 40 }; T.STATE.vixTerm = { regime: 'contango', ratio: 0.88 };
+  const v = T.computeAmpel();
+  return { label: v.label, tageSeit: v.voreinstieg.rueck.tageSeit, basis: v.basis };
+}
+{
+  const a = liveFall(30), b = liveFall(null), c = liveFall(65);
+  pruefe('VIX-Spitze vor 30 Tagen, heute VIX 22 → VOREINSTIEG', [a.label, a.tageSeit, a.basis], ['VOREINSTIEG', 30, 'CAUTION']);
+  pruefe('ohne STOP in der Rückschau → CAUTION', b.label, 'CAUTION');
+  pruefe('STOP vor 65 Tagen (außerhalb des Fensters) → CAUTION', c.label, 'CAUTION');
+}
+
+// ── Ampel gegen die Rückrechnung 2007–2026 (AM8: Prüfstand) ───────────────────
+// Die Referenz erzeugt auswertung/referenz_ampel_v2.py mit dem Python-Code, mit dem
+// die Regeln getestet wurden. Die Seite muss an JEDEM Tag dasselbe liefern.
+abschnitt('Ampel gegen Rückrechnung 2007–2026');
+{
+  const refPfad = path.join(__dirname, '..', 'auswertung', 'ergebnisse', 'referenz_ampel_v2.csv');
+  if (!fs.existsSync(refPfad)) { fehl++; console.log('  ✗ Referenzdatei fehlt: python3 auswertung/referenz_ampel_v2.py'); }
+  else {
+    const zeilen = fs.readFileSync(refPfad, 'utf8').trim().split(/\r?\n/);
+    const kopf = zeilen[0].split(','); const sp = k => kopf.indexOf(k);
+    const zahl = v => (v === '' || v === undefined || isNaN(+v)) ? null : +v;
+    const basisListe = []; let gleich = 0, abw = []; let ve = 0;
+    zeilen.slice(1).forEach(z => {
+      const c = z.split(',');
+      const x = { p3: +c[sp('p3')], p6: +c[sp('p6')], n: +c[sp('n')], vix: zahl(c[sp('vix')]), fg: zahl(c[sp('fg')]),
+        part: zahl(c[sp('breite200')]), partTot: zahl(c[sp('breiteTot')]) || 11, rsBeat: zahl(c[sp('rsBeat')]),
+        rsTot: zahl(c[sp('rsTot')]) || 11, term: c[sp('term')] || null };
+      const basis = T.ampelRegel(x).label;
+      basisListe.push(basis);
+      const fenster = basisListe.slice(-60);
+      const letzterStop = fenster.lastIndexOf('STOP');
+      const rueck = { tageSeit: letzterStop < 0 ? null : fenster.length - 1 - letzterStop };
+      const V = T.voreinstiegPruefung({ ...x, base: basis, rueck, termRatio: null, indizes: [] });
+      const label = V.aktiv ? 'VOREINSTIEG' : basis;
+      if (V.aktiv) ve++;
+      if (label === c[sp('ampel_v2')]) gleich++; else abw.push(c[0] + ': JS ' + label + ' / Python ' + c[sp('ampel_v2')]);
+    });
+    pruefe(`alle ${zeilen.length - 1} Handelstage identisch (davon ${ve} VOREINSTIEG)`, abw.slice(0, 5), []);
+  }
+}
 
 // ── Börsenkalender ───────────────────────────────────────────────────────────
 abschnitt('Börsenkalender');
@@ -146,6 +198,18 @@ abschnitt('Watchlist-Sync');
 const a = T.mrSyncWert(T.SK.watch, JSON.stringify([{ ticker: 'AAPL', price: 100, e20: 1 }]));
 const b = T.mrSyncWert(T.SK.watch, JSON.stringify([{ ticker: 'AAPL', price: 101, e20: 2, pe: 30 }]));
 pruefe('reine Kursänderung ändert den Sync-Inhalt nicht', a === b, true);
+
+// ── Kreditspread (AM5): CSV im FRED-Format ───────────────────────────────────
+abschnitt('Kreditspread');
+{
+  const zeilen = ['observation_date,BAMLH0A0HYM2'];
+  for (let i = 0; i < 70; i++) zeilen.push(`2026-07-${String(i).padStart(2, '0')},${(3 + i * 0.01).toFixed(2)}`);
+  zeilen.push('2026-10-29,.');                       // FRED markiert Lücken mit Punkt
+  const k = T.kreditAusCsv(zeilen.join('\n'));
+  pruefe('letzter gültiger Wert, Lücke übersprungen', k && k.wert, 3.69);
+  pruefe('Veränderung über 63 Beobachtungen', k && +k.chg63.toFixed(2), 0.63);
+  pruefe('leere Antwort → null', T.kreditAusCsv(''), null);
+}
 
 // ── Ergebnis ─────────────────────────────────────────────────────────────────
 console.log(`\n${ok} bestanden, ${fehl} fehlgeschlagen`);

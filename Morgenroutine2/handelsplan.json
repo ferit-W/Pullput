@@ -1,0 +1,32 @@
+{
+  "_hinweis": "Handelsplan als Datei (W1). Alle Werkzeuge lesen hieraus: REGELCHECK, Trading Journal, Morgenroutine. Nach jeder Aenderung 'version' erhoehen. Werte im Block 'ampel' sind getestet und stehen fest im Code; weicht hier etwas ab, zeigt die Morgenroutine eine Warnung statt still mit ungetesteten Werten zu rechnen. Neue Ampel-Regeln erst ueber auswertung/ pruefen (AM8).",
+  "version": "2026.11.1",
+  "stand": "2026-11-02",
+
+  "risiko": {
+    "trend_pct": 0.25,
+    "gap_pct": 0.40,
+    "akj_fix_eur": 100.0,
+    "toleranz": 0.20
+  },
+  "positionen": {
+    "max_trend": 10
+  },
+  "optionen": {
+    "dte_warnung": 21
+  },
+  "universum": {
+    "mindestkurs": 10.0,
+    "liquiditaet_mio_eur": 1.0,
+    "max_vorschlaege": 20
+  },
+  "ampel": {
+    "regelwerk": "2026.11 · AM1+AM3+AM4",
+    "breite_ema": 200,
+    "vix_caution": 20,
+    "vix_stop": 28,
+    "voreinstieg_fenster_tage": 60,
+    "voreinstieg_groesse": 0.75,
+    "voreinstieg_term_max": 0.98
+  }
+}

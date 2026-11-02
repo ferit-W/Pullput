@@ -478,3 +478,14 @@ Es gab 29 Signale.
 ### Verwendung
 
 Die Breiten-Wende wird Teil des Hinweises **„⚡ Panik-Wende möglich“** und steht dort neben dem VIX-basierten Signal aus AM9. Beide werden mit eigener Prüfliste und ehrlicher Bilanz angezeigt. Ist **auch** die Breiten-Wende erfüllt, also nicht nur das VIX-Signal, wird das als stärkere Lage gekennzeichnet. Ampel und Investitionsgrad ändert der Hinweis nicht. Jedes Signal wird im Archiv mitgeschrieben.
+
+---
+
+## 11. Einbau in die Morgenroutine (v6.19, 02.11.2026)
+
+Eingebaut sind AM1, AM3 und AM4 genau wie getestet. `referenz_ampel_v2.py` erzeugt aus `ergebnisse/ampel_taeglich.csv` die erwartete Ampel für jeden Handelstag. Der Selbsttest der Morgenroutine (`node tests/selbsttest.js`) rechnet dieselben Tage mit dem JavaScript der Seite nach:
+
+- **Ergebnis:** alle 4.827 Tage identisch, davon 376 VOREINSTIEG
+- **AM3:** Mit und ohne Panik-Score ergeben sich 0 abweichende Tage. Der Score ist deshalb aus der Regel genommen und wird nur noch angezeigt.
+
+Eine Einschränkung im Live-Betrieb: Die Rückschau „STOP in den letzten 60 Handelstagen“ rechnet die Seite aus den geladenen Kursreihen nach (Indexphasen, VIX, Sektor-Breite). Fear & Greed lässt sich nicht nachrechnen. Ein Tag mit Extremangst (REVERSE) zählt dort deshalb als STOP. Das verschiebt höchstens den Beginn des 60-Tage-Fensters, nicht die vier Bedingungen des Tages.

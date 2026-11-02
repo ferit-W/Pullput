@@ -3474,12 +3474,33 @@ function getTradeById(id) { return allTrades.find(t => t.id === id); }
 // v6.4 FIX (J8): Das Formular startete mit 1,0 % Risiko, REGELCHECK prüft aber 0,25 % (Trend)
 // bzw. 0,40 % (Gap/News). Jetzt folgt die Vorgabe dem Setup — nur bei neuen Trades und nur,
 // solange der Wert nicht von Hand geändert wurde.
+// v6.6 (W1): Die Vorgaben kommen aus handelsplan.json (über den Server). Ohne Server
+// gelten 0,25 / 0,40 wie bisher.
+let HANDELSPLAN_RISIKO = { trend: 0.25, gap: 0.40, version: null };
+async function ladeHandelsplan() {
+  try {
+    const r = await fetch('http://localhost:8765/handelsplan', { cache: 'no-store' });
+    const j = r.ok ? await r.json() : null;
+    const ri = j && j.ok && j.plan && j.plan.risiko;
+    if (ri && isFinite(+ri.trend_pct) && isFinite(+ri.gap_pct)) {
+      HANDELSPLAN_RISIKO = { trend: +ri.trend_pct, gap: +ri.gap_pct, version: j.plan.version || null };
+      const f = document.getElementById('riskPerTrade');
+      const neu = !((document.getElementById('currentTradeId') || {}).value);
+      if (f && neu && !f.dataset.manuell) {
+        const s = (document.getElementById('entrySetup') || {}).value || '';
+        f.value = String(/gap|news/i.test(s) ? HANDELSPLAN_RISIKO.gap : HANDELSPLAN_RISIKO.trend);
+      }
+      if (f) f.title = `Vorgabe laut Handelsplan ${HANDELSPLAN_RISIKO.version || ''}: ${HANDELSPLAN_RISIKO.trend} % Trend, ${HANDELSPLAN_RISIKO.gap} % Gap/News`;
+    }
+  } catch (e) { /* ohne Server: eingebaute Werte */ }
+}
+ladeHandelsplan();
 document.addEventListener('change', e => {
   if (!e.target || e.target.id !== 'entrySetup') return;
   if ((document.getElementById('currentTradeId') || {}).value) return;
   const f = document.getElementById('riskPerTrade');
   if (!f || f.dataset.manuell) return;
-  f.value = /gap|news/i.test(e.target.value || '') ? '0.40' : '0.25';
+  f.value = String(/gap|news/i.test(e.target.value || '') ? HANDELSPLAN_RISIKO.gap : HANDELSPLAN_RISIKO.trend);
   if (typeof debouncedCalculatePosition === 'function') debouncedCalculatePosition();
 });
 

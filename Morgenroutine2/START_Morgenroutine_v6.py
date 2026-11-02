@@ -52,6 +52,8 @@ ALLOWED_HOSTS = (
     # ohne Schluessel. Daraus wird das aktuelle Zielband abgeleitet, damit es nicht
     # mehr von Hand im Code gepflegt werden muss.
     "markets.newyorkfed.org",
+    # v6.19 (AM5): Kreditspread High Yield (BAMLH0A0HYM2) als CSV - nur Anzeige
+    "fred.stlouisfed.org",
 )
 
 # ── v15.15: Persistenz auf dem Laufwerk (statt nur Browser-localStorage) ─────
@@ -281,6 +283,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._data_list()
         if self.path.startswith("/regelcheck"):
             return self._regelcheck()
+        # v6.19 (W1): Handelsplan als Datei - alle Werkzeuge lesen dieselben Regeln
+        if self.path == "/handelsplan" or self.path.startswith("/handelsplan?"):
+            fp = os.path.join(DIRECTORY, "handelsplan.json")
+            try:
+                with open(fp, "r", encoding="utf-8") as f:
+                    return self._send_json({"ok": True, "plan": json.load(f)})
+            except FileNotFoundError:
+                return self._send_json({"ok": False, "fehler": "handelsplan.json fehlt im Programmordner"})
+            except Exception as e:
+                return self._send_json({"ok": False, "fehler": "handelsplan.json unlesbar: %s" % e})
         if self.path == "/ping" or self.path.startswith("/ping?"):
             return self._ping()
         if self.path.startswith("/quote?"):
