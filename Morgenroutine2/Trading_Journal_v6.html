@@ -3638,6 +3638,16 @@ function runIntegrityChecks(list){
   if(waisen.length) add('hoch','Trades ohne gültiges Konto',
     `${waisen.length} Datensätze verweisen auf ein Konto, das es nicht mehr gibt. Sie tauchen in keiner Auswertung auf, belegen aber Speicher und erscheinen in der Sicherung.`);
 
+  // ── 13. Altlast des IB-Imports vor v6.4 (J2) ──────────────────────────────
+  // Der alte Import machte aus der Verkaufszeile einen geschlossenen Trade mit
+  // Einstieg = Ausstieg und ließ die Kaufzeile als Geisterposition offen.
+  const ibAlt=T.filter(t=>(t.tags||[]).includes('ib-import') && !t.ibIds && t.status==='Closed'
+    && +t.entryPrice===+t.closePrice);
+  if(ibAlt.length) add('hoch','Fehlerhafter IB-Import aus älterer Version',
+    `${ibAlt.length} geschlossene Import-Trades haben Einstieg = Ausstieg; die zugehörigen Kaufzeilen stehen vermutlich noch als „offen“ im Journal. `
+    +`Empfehlung: diese Trades und die offenen Import-Positionen derselben Symbole löschen und die Flex-Datei neu importieren — der Import führt Ein- und Ausstieg jetzt zusammen. `
+    +`Betroffen: ${ibAlt.slice(0,6).map(label).join(', ')}${ibAlt.length>6?' …':''}`, ibAlt.map(t=>t.id));
+
   return F;
 }
 
@@ -5378,138 +5388,191 @@ function importIBFlexCSV(event) {
         return;
       }
       
-      let imported = 0, skipped = 0;
-      const baseNum = allTrades.length > 0 ? Math.max(...allTrades.map(t => t.tradeNumber || 0)) : 0;
-      
+      // ── v6.4 FIX (J2): EINSTIEG UND AUSSTIEG ZUSAMMENFÜHREN ─────────────────
+      // Vorher wurde jede Zeile ein eigener Trade: die Kaufzeile blieb für immer
+      // „offen“ (Geisterposition in Slots, Risiko und REGELCHECK), die Verkaufszeile
+      // wurde ein geschlossener Trade mit Einstieg = Ausstieg, und der realisierte
+      // Gewinn stand in Dollar im Euro-Feld.
+      // Jetzt in zwei Durchgängen:
+      //  1. Alle Zeilen lesen und zeitlich sortieren.
+      //  2. Eröffnende Zeile → neue offene Position. Schließende Zeile → die älteste
+      //     passende offene Position (gleiches Symbol, Richtung, Konto) wird
+      //     geschlossen, bei kleinerer Menge teilverkauft — exakt nach den Formeln
+      //     von closeTrade() und executePartialSale(). Nur wenn keine offene
+      //     Position existiert, entsteht ein geschlossener Trade, dessen Einstieg
+      //     aus dem realisierten Gewinn zurückgerechnet und markiert wird.
+      // Dubletten: Jede Zeile bekommt eine Kennung (TradeID, sonst Symbol|Zeit|
+      // Seite|Menge|Kurs). Bereits importierte Zeilen werden übersprungen.
+      const iOC  = col('open/closeindicator', 'openCloseIndicator', 'open/close');
+      const iTid = col('tradeID', 'ibExecID', 'transactionID');
+      let neu = 0, zu = 0, teil = 0, ohneEinstieg = 0, dupl = 0, skipped = 0;
+      let nextNum = allTrades.length > 0 ? Math.max(...allTrades.map(t => t.tradeNumber || 0)) : 0;
+      const zeilen = [];
+
       for (let i = 1; i < lines.length; i++) {
         const vals = lines[i].split(delim).map(v => v.trim().replace(/"/g, ''));
         if (vals.length < 3) continue;
-        
         const getV = idx => idx >= 0 && idx < vals.length ? vals[idx] : '';
-        const sym = getV(iULSym >= 0 ? iULSym : iSym) || getV(iSym) || '';
+        const sym = (getV(iULSym >= 0 ? iULSym : iSym) || getV(iSym) || '').toUpperCase();
         const rawDate = getV(iDate);
-        const bs = getV(iBS);
-        const qty = Math.abs(parseInt(getV(iQty)) || 1);
+        const qty = Math.abs(parseFloat(getV(iQty)) || 1);
         const price = Math.abs(parseFloat(getV(iPrice)) || 0);
-        const comm = Math.abs(parseFloat(getV(iComm)) || 0);
         const asset = getV(iAsset).toLowerCase();
-        const ccy = getV(iCcy) || 'USD';
-        const mult = parseInt(getV(iMult)) || 1;
-        const realPnL = parseFloat(getV(iRealPnL)) || null;
-        
-        // Datum parsen: 20240315 oder 2024-03-15 oder 20240315;143025
         let dateStr = '';
         if (rawDate.includes('-')) dateStr = rawDate.substring(0, 10);
         else if (rawDate.length >= 8) dateStr = rawDate.substring(0,4) + '-' + rawDate.substring(4,6) + '-' + rawDate.substring(6,8);
-        
         if (!dateStr || !sym || price <= 0) { skipped++; continue; }
-        
-        // Nur Aktien (STK) und Futures (FUT) importieren, Optionen überspringen
-        let instrumentType = 'stock';
+        let instrumentType;
         if (asset.includes('fut')) instrumentType = 'future';
         else if (asset.includes('opt')) { skipped++; continue; } // Optionen → Stillhalter-Journal
         else if (asset.includes('stk') || asset.includes('stock') || !asset) instrumentType = 'stock';
         else { skipped++; continue; }
-        
-        // ── v6.3 FIX (RICHTUNG BEI SCHLIESSENDEN ZEILEN) ────────────────────
-        // Eine Flex-Datei liefert Einstieg und Ausstieg als GETRENNTE Zeilen.
-        // Bisher wurde jede Zeile mit "SELL" als Short gebucht — auch dann, wenn
-        // sie in Wahrheit einen Long GESCHLOSSEN hat. Im Journal stand danach eine
-        // geschlossene Short-Position, die es nie gegeben hat.
-        // Ein realisierter Gewinn/Verlust in der Zeile bedeutet: es ist ein Ausstieg.
-        // Dann war die ursprüngliche Richtung das Gegenteil der Order.
-        const isSell = bs.toLowerCase().includes('sell');
-        const istAusstieg = (realPnL !== null && realPnL !== undefined);
-        const isLong = istAusstieg ? isSell : !isSell;
-        const direction = isLong ? 'Long' : 'Short';
+        const rp = getV(iRealPnL).trim();
+        const realPnL = rp === '' ? null : (parseFloat(rp) || 0);
+        const oc = getV(iOC).toUpperCase();
+        const bs = getV(iBS);
+        zeilen.push({ i, sym, rawDate, dateStr, bs, qty, price, instrumentType, realPnL,
+          isSell: bs.toLowerCase().includes('sell'),
+          // Ausstieg: laut Open/Close-Spalte, sonst an einem realisierten Gewinn ≠ 0 erkennbar
+          istAusstieg: oc ? oc.includes('C') : (realPnL !== null && realPnL !== 0),
+          comm: Math.abs(parseFloat(getV(iComm)) || 0),
+          ccy: getV(iCcy) || 'USD',
+          mult: parseFloat(getV(iMult)) || 1,
+          kennung: getV(iTid) || [sym, rawDate, bs, qty, price].join('|') });
+      }
+      zeilen.sort((a, b) => a.rawDate < b.rawDate ? -1 : a.rawDate > b.rawDate ? 1 : a.i - b.i);
+      const bekannt = new Set(allTrades.flatMap(t => t.ibIds || []));
 
-        // v6.3: Kontraktzahl, Punktwert und Risiko je Einheit vorab bestimmen —
-        // sie werden an mehreren Stellen des Trade-Objekts gebraucht.
-        const kontrakte = instrumentType === 'future'
-          ? Math.max(1, Math.round(qty / (mult > 1 ? mult : 1)))
-          : qty;
-        const punktwert = (mult > 1 ? mult : 1);
-        const stoppAbstand = price * 0.05;   // 5-%-Vorgabestopp
-        const risikoJeEinheit = (instrumentType === 'future'
-          ? stoppAbstand * punktwert          // Future: Punkte × Kontraktwert
-          : stoppAbstand                      // Aktie: Punkte = Euro/Dollar
-        ) / _impFx(ccy);
-
-        const num = baseNum + imported + 1;
-        const trade = {
-          id: 'ib_' + Date.now() + '_' + i,
-          tradeNumber: num,
-          positionId: num,
-          productName: sym.toUpperCase(),
-          direction,
-          entryPrice: price,
-          slPrice: price * (isLong ? 0.95 : 1.05), // 5% Default-Stop
+      const sektorZu = sym => {
+        if (typeof SECTOR_MAP === 'undefined') return '';
+        for (const [sector, keywords] of Object.entries(SECTOR_MAP))
+          if (keywords.some(kw => sym === kw.toUpperCase())) return sector;
+        return '';
+      };
+      const brutto = (t, kurs, menge) => {   // wie closeTrade()
+        const dir = t.direction === 'Long' ? 1 : -1;
+        return (t.instrumentType === 'future' && t.tickSize && t.tickValue)
+          ? ((kurs - t.entryPrice) * dir / t.tickSize) * t.tickValue * menge
+          : (kurs - t.entryPrice) * menge * dir;
+      };
+      const neuerTrade = (z, direction, entryPrice) => {
+        const punktwert = z.mult > 1 ? z.mult : 1;
+        const kontrakte = z.instrumentType === 'future' ? Math.max(1, Math.round(z.qty / punktwert)) : z.qty;
+        const isLong = direction === 'Long';
+        // Risiko aus dem 5-%-Vorgabestopp, in Euro (v6.1.3/v6.3)
+        const risikoJeEinheit = entryPrice * 0.05 * (z.instrumentType === 'future' ? punktwert : 1) / _impFx(z.ccy);
+        nextNum++;
+        return {
+          id: 'ib_' + Date.now() + '_' + z.i,
+          tradeNumber: nextNum, positionId: nextNum,
+          productName: z.sym, direction, entryPrice,
+          slPrice: entryPrice * (isLong ? 0.95 : 1.05),
           size: kontrakte,
-          // v6.1.6: Die Flex-Datei liefert die Kommission in der Währung des Trades.
-          // Das Gebührenfeld führt jetzt EURO (CapTrader rechnet so ab), also
-          // muss hier über denselben Kurs umgerechnet werden wie das Risiko.
-          fees: comm / _impFx(ccy),
-          riskPerTrade: 1,
-          targetCRV: 2,
-          // v6.1.3 FIX: Das geschätzte Risiko aus dem 5%-Vorgabestopp stand in der
-          // Instrumentenwährung, wurde aber als maxRiskEuro (= Euro) gespeichert.
-          // Bei USD-Werten lag das Risiko dadurch rund 8 % zu hoch, und alle
-          // R-Vielfachen importierter Trades entsprechend zu niedrig.
-          // v6.3 FIX (FUTURES): Zwei Fehler an einer Stelle.
-          // Erstens fehlten tickSize und tickValue völlig. Ohne sie greift beim
-          // Schließen der Futures-Zweig nicht — der Kontrakt wurde wie eine Aktie
-          // abgerechnet, also Punkte mal Stückzahl statt Punkte mal Kontraktwert.
-          // Zweitens rechnete maxRiskEuro mit der ROHEN Stückzahl, während size
-          // durch den Multiplikator geteilt wurde. Beide Werte passten nicht zusammen.
-          // DAX-Future, 25 EUR je Punkt, Kurs 18.000, 5-%-Stopp = 900 Punkte:
-          // richtig sind 22.500 EUR Risiko — gerechnet wurden 900.
-          tickSize:  instrumentType === 'future' ? 1 : null,
-          tickValue: instrumentType === 'future' ? punktwert : null,
+          fees: 0,
+          riskPerTrade: 1, targetCRV: 2,
+          tickSize:  z.instrumentType === 'future' ? 1 : null,
+          tickValue: z.instrumentType === 'future' ? punktwert : null,
           riskPerUnit: risikoJeEinheit,
           maxRiskEuro: kontrakte * risikoJeEinheit,
-          sizeFx: _impFx(ccy),
-          setup: 'IB-Import',
-          sector: '',
-          timeframe: '1D',
-          entryNotes: `IB/CapTrader Import · ${ccy} · ${rawDate}`,
-          dateOpened: dateStr + 'T09:30',
-          accountId: currentAccountId,
-          instrumentType,
+          sizeFx: _impFx(z.ccy),
+          setup: 'IB-Import', sector: sektorZu(z.sym), timeframe: '1D',
+          entryNotes: `IB/CapTrader Import · ${z.ccy} · ${z.rawDate}`,
+          dateOpened: z.dateStr + 'T09:30',
+          accountId: currentAccountId, instrumentType: z.instrumentType,
           timestamp: new Date().toISOString(),
-          status: realPnL !== null ? 'Closed' : 'Open',
-          tags: ['ib-import'],
+          status: 'Open', tags: ['ib-import'], ibIds: [z.kennung],
         };
-        
-        // Wenn P&L vorhanden → als geschlossenen Trade importieren
-        if (trade.status === 'Closed' && realPnL !== null) {
-          trade.profitEuro = realPnL;
-          trade.closePrice = price; // IB gibt oft nur den Close-Preis
-          trade.dateClosed = dateStr + 'T16:00';
-          trade.profitR = trade.maxRiskEuro > 0 ? realPnL / trade.maxRiskEuro : 0;
-          trade.exitReason = 'IB-Import';
+      };
+
+      for (const z of zeilen) {
+        if (bekannt.has(z.kennung)) { dupl++; continue; }
+        bekannt.add(z.kennung);
+        const usdJeEur = _impFx(z.ccy);          // Abfrage-Konvention: USD je EUR
+        const fxClose = 1 / usdJeEur;            // Journal-Konvention: EUR je USD
+        const kommEur = z.comm / usdJeEur;       // Gebühren führt das Journal in Euro
+
+        if (!z.istAusstieg) {
+          const t = neuerTrade(z, z.isSell ? 'Short' : 'Long', z.price);
+          t.fees = Math.round(kommEur * 100) / 100;
+          allTrades.push(t); neu++;
+          continue;
         }
-        
-        // Auto-Sektor versuchen
-        if (typeof SECTOR_MAP !== 'undefined') {
-          for (const [sector, keywords] of Object.entries(SECTOR_MAP)) {
-            if (keywords.some(kw => sym.toUpperCase() === kw.toUpperCase())) {
-              trade.sector = sector;
-              break;
-            }
+
+        // Schließende Zeile: Verkauf schließt Long, Kauf schließt Short
+        const posDir = z.isSell ? 'Long' : 'Short';
+        const einheiten = z.instrumentType === 'future'
+          ? Math.max(1, Math.round(z.qty / (z.mult > 1 ? z.mult : 1))) : z.qty;
+        let rest = einheiten;
+        const offen = allTrades
+          .filter(t => t.accountId === currentAccountId && t.status === 'Open'
+            && String(t.productName || '').toUpperCase() === z.sym && t.direction === posDir
+            && (t.instrumentType || 'stock') === z.instrumentType && +t.size > 0)
+          .sort((a, b) => String(a.dateOpened).localeCompare(String(b.dateOpened)));   // FIFO wie IB
+
+        for (const t of offen) {
+          if (rest <= 0) break;
+          const menge = Math.min(rest, +t.size);
+          const gebuehrAnteil = Math.round(kommEur * (menge / einheiten) * 100) / 100;
+          if (menge === +t.size) {
+            const fees = Math.round(((+t.fees || 0) + gebuehrAnteil) * 100) / 100;
+            const pEuro = brutto(t, z.price, menge) * fxClose - fees;
+            Object.assign(t, { status: 'Closed', closePrice: z.price, dateClosed: z.dateStr + 'T16:00',
+              fxClose, fees, profitEuro: pEuro, profitR: t.maxRiskEuro > 0 ? pEuro / t.maxRiskEuro : 0,
+              exitReason: t.exitReason || 'IB-Import', ibIds: [...(t.ibIds || []), z.kennung] });
+            zu++;
+          } else {
+            // Teilverkauf wie executePartialSale()
+            const anteil = menge / +t.size;
+            const altGeb = Math.round((+t.fees || 0) * anteil * 100) / 100;
+            t.fees = Math.round(((+t.fees || 0) - altGeb) * 100) / 100;
+            t.size = +t.size - menge;
+            t.maxRiskEuro = t.size * t.riskPerUnit;
+            t.subStatus = 'Teilgeschlossen';
+            const fees = Math.round((altGeb + gebuehrAnteil) * 100) / 100;
+            const pEuro = brutto(t, z.price, menge) * fxClose - fees;
+            const risiko = menge * t.riskPerUnit;
+            nextNum++;
+            allTrades.push({ ...t, id: 'ib_' + Date.now() + '_' + z.i + '_t',
+              positionId: t.positionId || t.tradeNumber, tradeNumber: nextNum,
+              size: menge, maxRiskEuro: risiko, status: 'Closed', subStatus: undefined,
+              closePrice: z.price, dateClosed: z.dateStr + 'T16:00', fxClose, fees,
+              profitEuro: pEuro, profitR: risiko > 0 ? pEuro / risiko : 0,
+              entryNotes: `Teilverkauf von Trade #${t.tradeNumber} (IB-Import).\n` + (t.entryNotes || ''),
+              exitReason: 'Teilverkauf', exitSetup: 'Teilverkauf',
+              ibIds: [z.kennung], timestamp: new Date().toISOString() });
+            teil++;
           }
+          rest -= menge;
         }
-        
-        allTrades.push(trade);
-        imported++;
+
+        if (rest > 0) {
+          // Kein passender Einstieg im Journal (z. B. vor dem ersten Import eröffnet).
+          // Einstieg aus dem realisierten Gewinn zurückrechnen. Annahme: IB weist ihn
+          // nach Gebühren aus — dann ist das Ergebnis in Euro genau IB-Gewinn / Kurs.
+          const anteil = rest / einheiten;
+          const punktwert = z.instrumentType === 'future' ? (z.mult > 1 ? z.mult : 1) : 1;
+          const bruttoCcy = ((z.realPnL || 0) + z.comm) * anteil;
+          const proEinheit = bruttoCcy / (rest * punktwert);
+          const einstieg = posDir === 'Long' ? z.price - proEinheit : z.price + proEinheit;
+          const t = neuerTrade({ ...z, qty: z.instrumentType === 'future' ? rest * punktwert : rest }, posDir, einstieg);
+          const fees = Math.round(kommEur * anteil * 100) / 100;
+          const pEuro = brutto(t, z.price, rest) * fxClose - fees;
+          Object.assign(t, { status: 'Closed', closePrice: z.price, dateClosed: z.dateStr + 'T16:00',
+            fxClose, fees, profitEuro: pEuro, profitR: t.maxRiskEuro > 0 ? pEuro / t.maxRiskEuro : 0,
+            exitReason: 'IB-Import', tags: ['ib-import', 'ib-ohne-einstieg'],
+            entryNotes: `IB/CapTrader Import · ${z.ccy} · ${z.rawDate}\nKein Einstieg im Journal gefunden: Einstiegskurs aus dem von IB gemeldeten Gewinn (${z.realPnL} ${z.ccy}) zurückgerechnet, Datum = Ausstiegsdatum.` });
+          allTrades.push(t); ohneEinstieg++;
+        }
       }
-      
-      if (!imported) {
-        showToast(`Keine Aktien/Futures-Trades erkannt (${skipped} übersprungen/Optionen).`, true);
+
+      if (!neu && !zu && !teil && !ohneEinstieg) {
+        showToast(dupl ? `Alle ${dupl} Zeilen waren bereits importiert.` : `Keine Aktien/Futures-Trades erkannt (${skipped} übersprungen/Optionen).`, true);
         return;
       }
-      
-      saveAndRefresh(`${imported} IB/CapTrader Trades importiert (${skipped} übersprungen).`);
-      showToast(`✅ ${imported} Trades importiert. Optionen wurden übersprungen (→ Stillhalter-Journal).`);
+      const msg = `IB-Import: ${neu} eröffnet, ${zu} geschlossen, ${teil} teilverkauft`
+        + (ohneEinstieg ? `, ${ohneEinstieg} Ausstiege ohne Einstieg (markiert)` : '')
+        + (dupl ? `, ${dupl} bereits vorhanden` : '') + (skipped ? `, ${skipped} übersprungen/Optionen` : '') + '.';
+      saveAndRefresh('✅ ' + msg);
       
     } catch (err) {
       showToast('IB Import Fehler: ' + err.message, true);
