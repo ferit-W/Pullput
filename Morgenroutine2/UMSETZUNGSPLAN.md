@@ -104,7 +104,7 @@ Diese Punkte setze ich erst um, wenn du dich entschieden hast:
 
 Wird nach jeder Phase hier fortgeschrieben.
 
-- [ ] Phase 1
+- [ ] Phase 1 — erledigt und getestet: J1, J3, J4, J6 · offen: J2, J7, J8, C1, C2, F-Fehler, V3, V10, V16
 - [ ] Phase 2
 - [ ] Phase 3
 - [ ] Phase 4

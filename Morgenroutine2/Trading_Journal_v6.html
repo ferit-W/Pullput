@@ -1788,9 +1788,10 @@ function checkAutoBackupRecovery() {
 
 // Beim Schließen der Seite: Sofort-Save + Warnung wenn kein Backup
 window.onbeforeunload = function() {
-    // v5.1: Immer sofort speichern beim Verlassen
-    try { localDb.save(); } catch(e) {}
-    
+    // v6.5 FIX (J6): KEIN Speichern beim Verlassen mehr. Jede Änderung wird ohnehin
+    // sofort gespeichert (saveAndRefresh). Das zusätzliche Speichern hier hat beim
+    // Schließen eines ÄLTEREN Tabs dessen veralteten Stand über den neueren eines
+    // anderen Tabs geschrieben.
     if (saveStatus !== 'green') {
         return "ACHTUNG: Kein manuelles Backup erstellt. Daten sind nur im Browser-Speicher. Fortfahren?";
     }
@@ -4429,6 +4430,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   loadApiKey();
   initSlotLimits(); // v5.4
+  // v6.5 FIX (J4): Das Auto-Backup alle 15 Minuten war beschrieben, wurde aber nie
+  // gestartet — der Knopf "Auto-Restore" fand deshalb nie eine Sicherung.
+  try { startAutoBackupTimer(); } catch(e) {}
+  // v6.5 FIX (J6): Ändert ein anderer Tab das Journal, wird dieser Tab gewarnt,
+  // statt mit veraltetem Stand weiterzuarbeiten.
+  window.addEventListener('storage', ev => {
+    if (ev.key === STORAGE_KEYS.trades || ev.key === STORAGE_KEYS.cashFlows) {
+      setSaveStatus('red', '⚠ In einem anderen Tab geändert — bitte diesen Tab neu laden (F5), bevor du hier etwas speicherst.');
+      showToast('Journal wurde in einem anderen Tab geändert — bitte neu laden.', true);
+    }
+  });
   loadAndRenderEverything(); // Beinhaltet loadUsername()
   
   // Alte Auto-Save-Logik entfernt
@@ -5165,7 +5177,11 @@ function importIBCashTransactions(event) {
         
         // EUR-Betrag
         const amountEUR = ccy === 'EUR' ? amount : (eurusd > 0 ? amount / eurusd : amount);
-        
+
+        // v6.5 FIX (J3): Dublettenschutz — dieselbe Datei zweimal importiert hat
+        // bisher jede Kontobewegung doppelt gebucht und den Kontostand verfälscht.
+        const _schl = [currentAccountId, dateStr, cfType, sym || '', Math.round(amount * 100) / 100, ccy, desc || rawType || cfType].join('|');
+        if (cashFlows.some(f => [f.accountId, f.date, f.type, f.symbol || '', f.amount, f.currency, f.description].join('|') === _schl)) { skipped++; continue; }
         cashFlows.push({
           id: 'cf_' + Date.now() + '_' + i,
           date: dateStr,
@@ -5183,10 +5199,11 @@ function importIBCashTransactions(event) {
       
       if (!imported) { showToast(`Keine Cash-Transaktionen erkannt (${skipped} übersprungen).`, true); return; }
       
-      localDb.save();
+      // v6.5 FIX (J3): über saveAndRefresh — sichert auch aufs Laufwerk und rechnet
+      // den Kontostand (Basis der Positionsgröße) sofort neu.
+      saveAndRefresh(`✅ ${imported} Konto-Bewegungen importiert (${skipped} übersprungen/Dubletten).`);
       renderCashFlows();
       renderCashFlowDashboard();
-      showToast(`✅ ${imported} Konto-Bewegungen importiert (${skipped} übersprungen).`);
       
     } catch (err) {
       showToast('IB Cash Import Fehler: ' + err.message, true);
@@ -5286,9 +5303,8 @@ function renderCashFlows() {
 
 function deleteCashFlow(id) {
   cashFlows = cashFlows.filter(f => f.id !== id);
-  localDb.save();
+  saveAndRefresh('Eintrag gelöscht.');   // v6.5 FIX (J3): auch aufs Laufwerk, Kontostand neu
   renderCashFlows();
-  showToast('Eintrag gelöscht.');
 }
 
 function renderCashFlowDashboard() {
@@ -5299,8 +5315,10 @@ function renderCashFlowDashboard() {
 // v5.2: cashFlows beim App-Start rendern
 const _origLoadRender = window.loadAndRenderEverything;
 if (_origLoadRender) {
-  window.loadAndRenderEverything = function() {
-    _origLoadRender();
+  window.loadAndRenderEverything = async function() {
+    // v6.5 FIX (J3/J10): erst den Laufwerks-Sync abwarten, dann zeichnen — sonst
+    // zeigte die Liste die alten Browser-Kontobewegungen statt der vom Laufwerk.
+    try { await _origLoadRender(); } catch(e) { console.error(e); }
     renderCashFlows();
   };
 }
