@@ -183,6 +183,7 @@ Kennungen AM1 bis AM8, zur Freigabe. Bei jedem steht, wie gut er belegt ist.
 **AM1 · Breite über EMA200 statt EMA50** (getestet, in beiden Zeiträumen besser)
 - **Was es bringt:** weniger Fehlalarme durch kurze Rücksetzer einzelner Sektoren.
 - **Vorteil gegenüber heute:** Die EMA50-Breite schwankt stark und hat oft STOP ausgelöst, wenn der Markt kurz davor stand, sich wieder zu fangen.
+- **Was es nicht ändert:** Den Zeitpunkt des ersten GO nach einem Tief. Der ist in allen sieben Einbrüchen identisch. Die Verbesserung kommt daher, dass 272 STOP-Tage, die allein wegen „Breite unter 3“ entstanden waren, großteils zu CAUTION werden (STOP-Anteil 22 % → 17 %). Für den früheren Wiedereinstieg ist AM4 zuständig. Die Indexphasen (P3/P6 mit EMA50/EMA200) bleiben unverändert.
 
 **AM2 · Zwei Anzeigen statt einer: „Risiko“ und „Trendrichtung“** (folgt aus den Ergebnissen)
 Die Ampel zeigt künftig getrennt:
