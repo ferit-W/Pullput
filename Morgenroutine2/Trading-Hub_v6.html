@@ -55,9 +55,9 @@
     <a class="tile" href="/depot_cockpit_v6.html" target="_blank" rel="noopener"><span class="ico">🎛️</span>
       <div class="tt">Depot-Cockpit</div>
       <div class="td">Gesamtbild · Steuerjahr · Portfolio-Drawdown · Risiko-Ampel · FX-Fix · liest beide Journale</div></a>
-    <a class="tile" href="http://127.0.0.1:8770/" target="_blank" rel="noopener"><span class="ico">📡</span>
+    <a class="tile" href="http://127.0.0.1:8770/" id="tile-sammler" onclick="sammlerOeffnen(event)"><span class="ico">📡</span>
       <div class="tt">Marktsammler</div>
-      <div class="td">Statusseite des CapTrader-Sammlers (eigenes Programm, Port 8770) · Tages-, IV-, Stunden- und 5-Minuten-Daten · Vollständigkeit je Index</div></a>
+      <div class="td">Ein Klick startet den CapTrader-Sammler (falls er nicht läuft) und öffnet seine Statusseite (Port 8770) · Tages-, IV-, Stunden- und 5-Minuten-Daten · Vollständigkeit je Index</div></a>
   </div>
 
   <div class="foot mono">
@@ -66,6 +66,17 @@
   </div>
 
 <script>
+// Marktsammler: Klick startet ihn über den Server und öffnet dann die Statusseite.
+function sammlerOeffnen(ev){
+  ev.preventDefault();
+  const fenster = window.open('', '_blank');
+  const td = document.querySelector('#tile-sammler .td'), alt = td.textContent;
+  td.textContent = 'Starte Marktsammler …';
+  fetch('/sammler/start').then(r=>r.json()).then(d=>{
+    if (d.ok) { if (fenster) fenster.location = 'http://127.0.0.1:8770/'; else location = 'http://127.0.0.1:8770/'; td.textContent = alt; }
+    else { if (fenster) fenster.close(); td.textContent = alt; alert('Marktsammler: ' + (d.grund || 'unbekannter Fehler')); }
+  }).catch(()=>{ if (fenster) fenster.close(); td.textContent = alt; alert('Der Morgenroutine-Server antwortet nicht (Port 8765).'); });
+}
 // v1.2: Doppelklick-Schutz — wenn die Datei per file:// geoeffnet wurde, funktionieren die
 // Kachel-Links nicht (die brauchen den Server). Deutlicher Hinweis statt toter Buttons.
 if (location.protocol === 'file:') {

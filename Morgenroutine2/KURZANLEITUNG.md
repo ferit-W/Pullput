@@ -11,7 +11,9 @@ Stand: 02.11.2026 · Morgenroutine v6.19 · Journal v6.7 · Stillhalter v6.4 · 
 ## 2. Marktsammler auf v1.2.7
 
 - Im Marktsammler-Ordner `sammler.py`, `README.md` und `start_sammler.bat` durch die Dateien aus `Marktsammler/` ersetzen. `daten/` bleibt, wie es ist.
-- Starten. Die Statusseite zeigt die neue Karte **IV-Tageswerte**. Beim ersten Lauf holt der Sammler die IV-Historie, danach täglich nur das Fehlende.
+- **Starten:** im Hub auf die Kachel **Marktsammler** klicken. Der Server startet den Sammler dann selbst in einem eigenen Fenster (dieses offen lassen) und öffnet die Statusseite. Alternativ `start_sammler.bat`. Der Ordner `Marktsammler` muss dafür neben `Morgenroutine2` liegen oder unter ⚙ eingetragen sein.
+- Einmalig nötig: `pip install ib_insync`, und die TWS muss laufen (API-Port 7497 Paper bzw. 7496 Live). Fehlt eines davon, startet die Statusseite trotzdem, aber es kommen keine Daten. Die Ursache steht im Sammler-Fenster und in `sammler.log`.
+- Die Statusseite zeigt die neue Karte **IV-Tageswerte**. Beim ersten Lauf holt der Sammler die IV-Historie, danach täglich nur das Fehlende.
 - In der Morgenroutine unter **⚙ → Marktsammler-Ordner** den Ordner eintragen, in dem `sammler.py` liegt.
 
 ## 3. KI (optional)

@@ -283,6 +283,56 @@ def _ms_modul():
 _SCAN_LOCK = threading.Lock()
 
 
+def _sammler_ordner():
+    """Ordner mit sammler.py: erst der in den Einstellungen/marktsammler_ordner.txt eingetragene,
+    sonst ../Marktsammler (so liegt es im Download-Paket) bzw. ./Marktsammler."""
+    kandidaten = []
+    try:
+        with open(os.path.join(DIRECTORY, "marktsammler_ordner.txt"), encoding="utf-8-sig") as f:
+            p = f.read().strip().strip('"')
+        if p:
+            kandidaten += [p, os.path.dirname(os.path.normpath(p))]
+    except Exception:
+        pass
+    kandidaten += [os.path.join(os.path.dirname(DIRECTORY), "Marktsammler"), os.path.join(DIRECTORY, "Marktsammler")]
+    for k in kandidaten:
+        if os.path.isfile(os.path.join(k, "sammler.py")):
+            return k
+    return None
+
+
+def _sammler_laeuft():
+    import socket
+    try:
+        with socket.create_connection(("127.0.0.1", 8770), timeout=1):
+            return True
+    except OSError:
+        return False
+
+
+def sammler_starten():
+    """Hub-Kachel 'Marktsammler': startet sammler.py in einem eigenen Konsolenfenster (falls nicht schon aktiv)."""
+    if _sammler_laeuft():
+        return {"ok": True, "laeuft": True, "gestartet": False}
+    ordner = _sammler_ordner()
+    if not ordner:
+        return {"ok": False, "grund": "sammler.py nicht gefunden. Ordner unter Einstellungen (Marktsammler-Ordner) eintragen oder den Ordner Marktsammler neben Morgenroutine2 legen."}
+    import subprocess
+    try:
+        kw = {"cwd": ordner}
+        if os.name == "nt":
+            kw["creationflags"] = subprocess.CREATE_NEW_CONSOLE
+        subprocess.Popen([sys.executable, "sammler.py"], **kw)
+    except Exception as e:
+        return {"ok": False, "grund": "Start fehlgeschlagen: %s" % e}
+    for _ in range(20):
+        _time.sleep(0.5)
+        if _sammler_laeuft():
+            return {"ok": True, "laeuft": True, "gestartet": True, "ordner": ordner}
+    return {"ok": False, "gestartet": True, "ordner": ordner,
+            "grund": "Gestartet, aber die Statusseite antwortet nicht. Im neuen Konsolenfenster (oder sammler.log im Ordner %s) steht die Ursache, meist fehlt ib_insync (pip install ib_insync)." % ordner}
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
 
     def __init__(self, *args, **kwargs):
@@ -392,6 +442,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self._send_json(_ms_modul().iv_fuer(sym))
             except Exception as e:
                 return self._send_json({"ok": False, "grund": "iv: %s" % e})
+        if self.path.startswith("/sammler/start"):
+            return self._send_json(sammler_starten())
         if self.path.startswith("/config/marktsammler"):
             return self._send_json(_ms_modul().status())
         if self.path.startswith("/config/ki"):
