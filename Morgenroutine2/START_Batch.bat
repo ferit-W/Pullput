@@ -2,7 +2,7 @@
 chcp 65001 >nul
 cd /d "%~dp0"
 echo ================================================================
-echo  Morgenroutine v6.0 - START   (Port 8765)
+echo  Morgenroutine v6.18 - START   (Port 8765)
 echo ================================================================
 echo.
 
@@ -80,7 +80,7 @@ if not exist "START_Morgenroutine_v6.py" (
   echo  START_Morgenroutine_v6.py FEHLT in diesem Ordner:
   echo  %CD%
   echo.
-  echo  Pruefe die Dateinamen buchstabengenau. Alle sieben Dateien
+  echo  Pruefe die Dateinamen buchstabengenau. Alle Programmdateien
   echo  gehoeren in DIESEN Ordner.
   echo ================================================================
   echo.

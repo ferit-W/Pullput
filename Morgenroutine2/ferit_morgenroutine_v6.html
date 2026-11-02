@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ferit Morgenroutine v6.17 · Markt · Regime · Kontext</title>
+<title>Ferit Morgenroutine v6.18 · Markt · Regime · Kontext</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -495,6 +495,7 @@ footer strong{color:var(--ink2)}
 .toast{background:var(--ink);color:var(--paper);padding:10px 14px;border-radius:3px;font-size:11px;box-shadow:0 4px 16px rgba(0,0,0,.3);border-left:4px solid var(--gold);animation:slide .3s}
 .toast.err{border-left-color:var(--red)}.toast.ok{border-left-color:var(--green)}
 @keyframes slide{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums} /* v6.18 (F15): Klasse wurde 14-mal benutzt, war aber nie definiert */
 </style>
 </head>
 <body>
@@ -505,7 +506,7 @@ footer strong{color:var(--ink2)}
 <header class="mast">
   <div class="mi">
     <div>
-      <div class="mt">Morgenroutine <em>v6.17</em> · Lagebild · Markt · News · Action</div>
+      <div class="mt">Morgenroutine <em>v6.18</em> · Lagebild · Markt · News · Action</div>
       <div class="msub">Echte Kurse · lokale EMAs · deterministische Phasen · Rohstoffe & FX · Treasury & Fed · CNN direkt · <b style="color:var(--gold)">Build 6.17</b></div>
     </div>
     <div style="display:flex;align-items:center;gap:16px">
@@ -539,7 +540,7 @@ footer strong{color:var(--ink2)}
     <button class="tb-link" onclick="exportSnapshot()">📋 Export</button>
     <button class="tb-link" onclick="printView()">🖨 Druck/PDF</button>
     <div class="src-note">
-      <strong>Datenquelle:</strong> Yahoo Finance über CORS-Proxy-Kette · läuft nur über <strong>http://localhost</strong> (Python-Server / START.bat), nicht über file:// · EMAs werden lokal aus Tagesschlusskursen gerechnet · Gemini liefert nur Text (Briefing + Kalender).
+      <strong>Datenquelle:</strong> Yahoo Finance über CORS-Proxy-Kette · läuft nur über <strong>http://localhost</strong> (Python-Server / START_Batch.bat), nicht über file:// · EMAs werden lokal aus Tagesschlusskursen gerechnet · Gemini liefert nur Text (Briefing + Kalender).
     </div>
   </div>
   <!-- Drawer: manuelle Sentiment-Werte -->
@@ -654,7 +655,7 @@ footer strong{color:var(--ink2)}
 
   <!-- ════ 01 LAGEBILD ════ -->
   <div class="sec-label"><span class="sec-num">01</span><span class="sec-name">Lagebild</span><span class="sec-meta">Das Bild in 5 Sekunden</span><span class="info-i" onclick="toggleInfo('info-01')" title="Erklärung ein/aus">i</span></div>
-  <div class="sec-info" id="info-01">Tages-Regime auf einen Blick. Die <b>Ampel</b> verdichtet Marktbreite, Index-Phasen und Stress zu GRÜN (Long-Bias) / GELB (selektiv) / ROT (defensiv) — deterministische Regel, kein KI-Rauschen. <b>Panik-Score</b> (0–100): gewichtet aus sieben Signalen — VIX (24), Fear&amp;Greed (20), Put/Call (14), AAII-Bear (12), VVIX, NAAIM und VIX-Terminstruktur (je 10). Der Wert wird auf die tatsächlich erfassten Signale normiert; unter 50 Punkten Abdeckung gilt er als unbestimmt. VIX9D wird angezeigt, fließt aber nicht in den Score ein. <b>US-Phasen</b> zählt, wie viele Leitindizes in P3 (Long) bzw. P6 (Short) stehen. Der <b>Sentiment-Streifen</b> zeigt jeden Einzelwert, eingefärbt nach Beitrag zum Score. Das <b>Executive Briefing</b> ist KI-Text — Zusammenfassung, kein Signal.</div>
+  <div class="sec-info" id="info-01">Tages-Regime auf einen Blick. Die <b>Ampel</b> verdichtet Marktbreite, Index-Phasen und Stress zu GRÜN (Long-Bias) / GELB (selektiv) / ROT (defensiv) / VIOLETT „REVERSE“ (Extremangst: F&amp;G ≤ 15, VIX &gt; 30 und Backwardation — mögliche Bodenbildung, Long erst auf das erste höhere Tagestief) — vor dem ersten Lauf bzw. bei fehlenden Daten steht „WARTE“ — deterministische Regel, kein KI-Rauschen. <b>Panik-Score</b> (0–100): gewichtet aus sieben Signalen — VIX (24), Fear&amp;Greed (20), Put/Call (14), AAII-Bear (12), VVIX, NAAIM und VIX-Terminstruktur (je 10). Der Wert wird auf die tatsächlich erfassten Signale normiert; unter 50 Punkten Abdeckung gilt er als unbestimmt. VIX9D wird angezeigt, fließt aber nicht in den Score ein. <b>US-Phasen</b> zählt, wie viele Leitindizes in P3 (Long) bzw. P6 (Short) stehen. Der <b>Sentiment-Streifen</b> zeigt jeden Einzelwert, eingefärbt nach Beitrag zum Score. Das <b>Executive Briefing</b> ist KI-Text — Zusammenfassung, kein Signal.</div>
   <section class="regime">
     <div class="regime-top">
       <div class="light lb-wait" id="light">
@@ -779,7 +780,7 @@ footer strong{color:var(--ink2)}
 
   <!-- ════ 02 MARKT ════ -->
   <div class="sec-label"><span class="sec-num">02</span><span class="sec-name">Markt</span><span class="pop-trigger" onclick="openPhasen()" title="6-Phasen-Modell als Schnellreferenz"><span class="hex">⬡</span> 6 Phasen</span><span class="sec-meta">Indizes + Rohstoffe &amp; FX · nach Trendstärke · P3 Long Kurs&gt;EMA50&gt;EMA200 · P6 Short Kurs&lt;EMA20&lt;EMA200</span><span class="info-i" onclick="toggleInfo('info-02')" title="Erklärung ein/aus">i</span></div>
-  <div class="sec-info" id="info-02">Index-, Rohstoff- und FX-Trends nach <b>Lüddemann-Markttechnik</b>, lokal aus echten Kursen gerechnet. <b>P3 · Long</b> = Kurs &gt; EMA50 &gt; EMA200 (intakter Aufwärtstrend); <b>P6 · Short</b> = Kurs &lt; EMA20 &lt; EMA200 (intakter Abwärtstrend); alles dazwischen ist „–" (kein sauberes Setup). Sortiert nach <b>Trend-Stärke</b> = Abstand EMA50↔EMA200 in % (Trend-Winkel und -Reife). Ein <b>🎯/📉-Tag</b> markiert eine laufende Korrektur — die Zone für Bewegung-Korrektur-Bewegung. <b>Rohstoffe &amp; FX</b> (Gold, Silber, EUR/USD, DXY) nutzen dieselbe Phasenlogik.</div>
+  <div class="sec-info" id="info-02">Index-, Rohstoff- und FX-Trends nach <b>Lüddemann-Markttechnik</b>, lokal aus echten Kursen gerechnet. <b>P3 · Long</b> = Kurs &gt; EMA50 &gt; EMA200 (intakter Aufwärtstrend); <b>P6 · Short</b> = Kurs &lt; EMA20 &lt; EMA200 (intakter Abwärtstrend); die Übergangsphasen zeigen ihr Kürzel mit „kein Setup“ (z. B. „P4 · kein Setup“). Sortiert nach <b>Trend-Stärke</b> = Mischwert aus EMA50-Steigung, 0,25 × Abstand zur EMA200 und 0,25 × 1-Monats-Momentum. Ein <b>🎯/📉-Tag</b> markiert eine laufende Korrektur — die Zone für Bewegung-Korrektur-Bewegung. <b>Rohstoffe &amp; FX</b> (Gold, Silber, EUR/USD, DXY) nutzen dieselbe Phasenlogik.</div>
   <section class="card" id="c-idx">
     <div class="idx-grid" id="idx-grid"><div class="init">Indizes (inkl. MDAX/SDAX) — nach EMA-Trendstärke gerankt, Abstände in % statt Absolutwerten.</div></div>
   </section>
@@ -833,7 +834,7 @@ footer strong{color:var(--ink2)}
 
   <!-- ════ 05 WERKZEUGE ════ -->
   <div class="sec-label"><span class="sec-num">05</span><span class="sec-name">Werkzeuge</span><span class="sec-meta">Watchlist · History · Diagnose — bei Bedarf</span><span class="info-i" onclick="toggleInfo('info-05')" title="Erklärung ein/aus">i</span></div>
-  <div class="sec-info" id="info-05">Sekundäres. <b>Watchlist</b>: eigene Ticker mit echten Yahoo-Kursen, lokal im Browser gespeichert. <b>History</b>: gespeicherte Ampel-Snapshots zum Vergleich über die Tage. <b>Diagnose</b>: Frische jeder Datenquelle und Proxy-Statistik — der erste Blick, wenn etwas nicht lädt.</div>
+  <div class="sec-info" id="info-05">Sekundäres. <b>Watchlist</b>: eigene Ticker mit echten Yahoo-Kursen, im Browser und (Ticker und Gap-Kontext) auf dem Laufwerk gesichert. <b>History</b>: gespeicherte Ampel-Snapshots zum Vergleich über die Tage. <b>Diagnose</b>: Frische jeder Datenquelle und Proxy-Statistik — der erste Blick, wenn etwas nicht lädt.</div>
   <section class="subpanel collapsed" id="sp-watch">
     <div class="sp-head" onclick="toggleSub('sp-watch',event)">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="sp-t">👁 Watchlist</span><span class="sp-meta">echte Yahoo-Kurse · lokal gespeichert</span></div>
@@ -866,7 +867,7 @@ footer strong{color:var(--ink2)}
 </main>
 
 <footer>
-  v6.17 · Datenecht: Yahoo-Kurse + lokale EMA-Berechnung · Phasen nach Lüddemann 2-EMA-Modell · CNN direkt · Gemini nur für Text<br>
+  v6.18 · Datenecht: Yahoo-Kurse + lokale EMA-Berechnung · Phasen nach Lüddemann 2-EMA-Modell · CNN direkt · Gemini nur für Text<br>
   Ferit handelt eigenverantwortlich via CapTrader/IB · Ampel = Regime-Einordnung, <strong>keine Handlungsempfehlung</strong>
 </footer>
 
@@ -876,7 +877,7 @@ const SK = {
   gem:'ferit_mr13_gem', model:'ferit_mr13_model', manual:'ferit_mr13_manual',
   watch:'ferit_mr13_watch', hist:'ferit_mr13_hist', theme:'ferit_mr13_theme',
   collapse:'ferit_mr13_collapse',
-  cache:'ferit_mr13_cache', kpidays:'ferit_mr13_kpidays', check:'ferit_mr13_check', alerts:'ferit_mr13_alerts', watchseed:'ferit_mr13_watchseed',
+  cache:'ferit_mr13_cache', kpidays:'ferit_mr13_kpidays', alerts:'ferit_mr13_alerts', watchseed:'ferit_mr13_watchseed',
   // v6.2.1 FIX: wurde in wochenTermine() gelesen, war aber nie definiert — der
   // Zugriff lief ins Leere und eigene Termine konnten gar nicht erfasst werden.
   termine:'ferit_mr13_termine',
@@ -903,12 +904,31 @@ function loadLS(key, fallback){
 }
 // Gegenstück zu loadLS: Schreiben darf nie werfen (QuotaExceededError, gesperrter Storage).
 // Gibt true/false zurück, damit Aufrufer bei Bedarf reagieren können.
+// ── v6.18 FIX (F5): NUR ECHTE ÄNDERUNGEN SYNCHRONISIEREN ─────────────────────
+// refreshWatch() speichert bei jedem Lauf die Watchlist samt Kursen, EMAs und
+// Fundamentaldaten. Weil die Watchlist synchronisiert wird, schrieb jeder Lauf auf
+// den Server — am zweiten Rechner erschien danach scheinbar grundlos „ACHTUNG —
+// fremder Stand auf dem Laufwerk“. Synchronisiert wird jetzt nur, was du selbst
+// festlegst: Ticker, Name und Gap-Kontext. Kurse holt jeder Rechner selbst.
+function mrSyncWert(k, v){
+  if(v==null || k!==SK.watch) return v;
+  try{
+    const arr=JSON.parse(v); if(!Array.isArray(arr)) return v;
+    return JSON.stringify(arr.map(w=>{ const o={ticker:w.ticker}; if(w.name)o.name=w.name; if(w.gap)o.gap=w.gap; return o; }));
+  }catch(e){ return v; }
+}
 function saveLS(key, value){
   try{
-    localStorage.setItem(key, typeof value==='string'?value:JSON.stringify(value));
+    const str = typeof value==='string'?value:JSON.stringify(value);
+    // v6.18 FIX (F9): MR_SYNC_KEYS entsteht erst weiter unten im Skript. Beim ersten
+    // Aufruf (seedWatch) warf schon der Zugriff — der Fehler wurde verschluckt und
+    // saveLS meldete „nicht gespeichert“, obwohl gespeichert war.
+    let sync=false; try{ sync = MR_SYNC_KEYS.indexOf(key)>=0; }catch(_){ sync=false; }
+    const vorher = sync ? mrSyncWert(key, localStorage.getItem(key)) : null;
+    localStorage.setItem(key, str);
     // v6.11: Zentral anstoßen statt an zehn Speicherstellen einzeln — wird eine
     // neue Stelle ergänzt, ist sie automatisch mit dabei.
-    if(typeof MR_SYNC_KEYS!=='undefined' && MR_SYNC_KEYS.indexOf(key)>=0) mrTouch();
+    if(sync && mrSyncWert(key, str)!==vorher) mrTouch();
     return true;
   }
   catch(e){ return false; }
@@ -969,7 +989,7 @@ const HOLDINGS = {
 
 const LOCAL_PROXY = 'http://localhost:8765/proxy?url=';
 const PROXIES = [
-  u => LOCAL_PROXY+encodeURIComponent(u),                                    // lokaler Python-Proxy (START.bat) — kein CORS, keine Limits
+  u => LOCAL_PROXY+encodeURIComponent(u),                                    // lokaler Python-Proxy (START_Batch.bat) — kein CORS, keine Limits
   u => u,                                                                    // Direktversuch
   u => 'https://api.codetabs.com/v1/proxy/?quest='+encodeURIComponent(u),
   u => 'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
@@ -1103,7 +1123,6 @@ const ALERT_DEFAULTS = { vix:25, panik:55, phaseFlip:true };
 let ALERTS = Object.assign({}, ALERT_DEFAULTS, loadLS(SK.alerts, {}));
 // KPI-Tagesreihe (für Vortags-Delta) + manuelle Checklisten-Haken
 let KPIDAYS = loadLS(SK.kpidays, {});
-let CHECK = loadLS(SK.check, {});
 
 const STATE = { indices:null, sectors:null, vix:null, vvix:null, vixTerm:null, fg:null, cot:null, ampel:null,
   ts:{}, priceAsof:null, alertsFired:[], seas:null, watchAI:{},
@@ -1378,7 +1397,10 @@ document.addEventListener('keydown', e=>{
   else if(e.key==='g'||e.key==='G'){ e.preventDefault(); const p=$('sp-gap'); if(p&&p.classList.contains('collapsed')) toggleSub('sp-gap'); runGapScan(); }
 });
 function toggleSub(id, ev){ if(ev && ev.target.classList.contains('sp-btn')) return; const p=$(id); p.classList.toggle('collapsed'); const s=loadLS(SK.collapse,{}); s[id]=p.classList.contains('collapsed'); saveLS(SK.collapse,s); }   /* v6.17: saveLS statt direkt — sonst kein Server-Sync */
-function initCollapse(){ const s=loadLS(SK.collapse,{}); Object.entries(s).forEach(([id,c])=>{ if($(id)){ $(id).classList.toggle('collapsed', !!c); } }); }
+function initCollapse(){ const s=loadLS(SK.collapse,{}); let weg=false;
+  Object.entries(s).forEach(([id,c])=>{ if($(id)){ $(id).classList.toggle('collapsed', !!c); } else { delete s[id]; weg=true; } });
+  // v6.18 (F15): Klappzustände von Panels, die es nicht mehr gibt (sp-panik, sp-cot, sp-check), aufräumen
+  if(weg) saveLS(SK.collapse, s); }
 // ── v6.11: EINSTELLUNGEN AUF DEM SERVER ────────────────────────────────────
 // Bis hierher lagen Watchliste, eigene Termine und History NUR im Browser. Wer am
 // Laptop arbeitet, fing bei null an — und beim Löschen der Websitedaten war alles weg.
@@ -1407,7 +1429,7 @@ function mrSetTs(t){ try{ localStorage.setItem(MR_SYNC_TS,String(t||Date.now()))
 // kommentarlos die Arbeit des ersten.
 async function mrSaveSettings(erzwingen){
   const daten = {};
-  MR_SYNC_KEYS.forEach(k=>{ const v=localStorage.getItem(k); if(v!=null) daten[k]=v; });
+  MR_SYNC_KEYS.forEach(k=>{ const v=localStorage.getItem(k); if(v!=null) daten[k]=mrSyncWert(k, v); });   // v6.18 (F5)
   const jetzt = Date.now();
   try{
     if(!erzwingen){
@@ -1568,10 +1590,21 @@ function stundeIn(zone, d){
   try{ return parseInt(new Intl.DateTimeFormat('en-US',{timeZone:zone,hour:'numeric',hour12:false}).format(d),10) % 24; }
   catch(e){ return d.getUTCHours(); }
 }
+// v6.18 (F6): Minuten statt Stunden — sonst lassen sich 9:30 und 17:30 nicht abbilden.
+function minuteIn(zone, d){
+  try{
+    const t={}; new Intl.DateTimeFormat('en-US',{timeZone:zone,hour:'numeric',minute:'numeric',hourCycle:'h23'}).formatToParts(d).forEach(p=>{t[p.type]=p.value;});
+    return ((+t.hour)%24)*60 + (+t.minute);
+  }catch(e){ return d.getUTCHours()*60 + d.getUTCMinutes(); }
+}
 function initClock(){ function tick(){ const n=new Date(); $('clk-d').textContent=fmtD(n); $('clk-t').textContent=fmtT(n); $('clk-k').textContent=kw(n);
-    const ny=stundeIn('America/New_York',n), be=stundeIn('Europe/Berlin',n);
-    const usOffen = ny>=9 && ny<16;        // 9:30–16:00 ET (die halbe Stunde vor Eröffnung zählt mit)
-    const deOffen = be>=9 && be<18;        // 9:00–17:30 MEZ/MESZ
+    const ny=stundeIn('America/New_York',n);
+    const nyMin=minuteIn('America/New_York',n), beMin=minuteIn('Europe/Berlin',n);
+    // v6.18 FIX (F6): US-Kernzeit erst ab 9:30 ET (vorher ab 9:00), XETRA bis 17:30
+    // (vorher bis 18:00) und nur an XETRA-Handelstagen — vorher zeigte die Uhr am
+    // Ostermontag, 1. Mai, Heiligabend und Silvester „XETRA offen“, wenn New York handelte.
+    const usOffen = nyMin>=570 && nyMin<960;                                // 9:30–16:00 ET
+    const deOffen = beMin>=540 && beMin<1050 && xetraStatus(n).offen;      // 9:00–17:30 MEZ/MESZ
     // v6.14: Feiertag hat Vorrang vor der Uhrzeit — "US-Kernzeit" an einem Tag mit
     // geschlossener Börse ist die irreführendste Anzeige, die die Seite haben kann.
     const bs = usBoersenStatus(n);
@@ -1583,7 +1616,7 @@ function initClock(){ function tick(){ const n=new Date(); $('clk-d').textConten
     } else if(bs.halb && ny>=9){
       el.innerHTML = '<span style="color:var(--gold);font-weight:700">🇺🇸 halber Tag · Schluss '+(etNachBerlin('13:00',n)||'19:00')+' · '+esc(bs.grund)+'</span>';   // v6.17: zeitumstellungsfest
     } else {
-      el.textContent = usOffen?'🇺🇸 US-Kernzeit':deOffen?'🇩🇪 XETRA offen':(ny>=16&&ny<20)?'🌙 Nachbörslich':'💤 Übernacht';
+      el.textContent = usOffen?'🇺🇸 US-Kernzeit':deOffen?'🇩🇪 XETRA offen':(nyMin>=240&&nyMin<570)?'🌅 US-Vorbörse':(ny>=16&&ny<20)?'🌙 Nachbörslich':'💤 Übernacht';
     }
     zeigeDatenStand(); } tick(); setInterval(tick,30000); }
 
@@ -2232,14 +2265,31 @@ async function loadFedBand(){
       datum: r.effectiveDate || null,
       quelle: 'live'
     };
+    // v6.18 (F20): letzten Live-Wert merken — er ist als Rückfall besser als der Code-Wert
+    try{ localStorage.setItem('ferit_mr13_fedband', JSON.stringify({lo, hi:lo+0.25, effr:kurs, datum:r.effectiveDate||null})); }catch(e){}
     return true;
   }catch(e){ return false; }
 }
 
 // Liefert das gültige Band — live, wenn vorhanden, sonst den Code-Wert.
+// ── v6.18 FIX (F20): RÜCKFALL OHNE STILLE ALTERUNG ─────────────────────────
+// Der im Code hinterlegte Wert stammt vom 17.06.2026 und veraltet mit jeder Sitzung
+// still. Neue Reihenfolge: live → zuletzt live geholter Wert (Browser) → Code-Wert.
+// Ein Datum wird NICHT geraten; die Warnung unten vergleicht den Stand mit der
+// letzten Sitzung und nennt, worauf der Wert beruht.
+function fedBandGemerkt(){
+  try{
+    const m = JSON.parse(localStorage.getItem('ferit_mr13_fedband')||'null');
+    if(m && isFinite(m.lo) && isFinite(m.hi) && m.datum) return {lo:+m.lo, hi:+m.hi, effr:m.effr, quelle:'gemerkt', datum:m.datum};
+  }catch(e){}
+  return null;
+}
 function fedBand(){
   if(STATE.fedBand) return STATE.fedBand;
-  return { lo:FED_BAND.lo, hi:FED_BAND.hi, quelle:'code', datum:FED_BAND.asofISO };
+  const g = fedBandGemerkt();
+  const codeISO = FED_BAND.asofISO;
+  if(g && (!codeISO || String(g.datum) >= codeISO)) return g;
+  return { lo:FED_BAND.lo, hi:FED_BAND.hi, quelle:'code', datum:codeISO };
 }
 
 function fedBandWarning(){
@@ -2248,11 +2298,14 @@ function fedBandWarning(){
     return null;
   }
   const lp=fedLastPast();
-  const bandDate=FED_BAND.asofISO?new Date(FED_BAND.asofISO+'T00:00:00'):null;
+  const fb=fedBand();
+  const bandDate=fb.datum?new Date(String(fb.datum).slice(0,10)+'T00:00:00'):null;
+  const herkunft = fb.quelle==='gemerkt' ? 'zuletzt live geholte Wert' : 'im Code hinterlegte Wert';
   if(lp && bandDate && bandDate<lp){
-    return '⚠ <b>Zielband evtl. veraltet:</b> Band-Stand '+bandDate.toLocaleDateString('de-DE')
-      +', letzte FOMC-Sitzung war am '+lp.toLocaleDateString('de-DE')
-      +' — FED_BAND im Code prüfen/aktualisieren. Markt-Erwartung unten bis dahin NICHT verwenden.';
+    return '⚠ <b>Zielband evtl. veraltet:</b> Abruf bei der New Yorker Fed gescheitert, es gilt der '+herkunft
+      +' vom '+bandDate.toLocaleDateString('de-DE')
+      +'. Die letzte FOMC-Sitzung war am '+lp.toLocaleDateString('de-DE')
+      +' — Markt-Erwartung unten bis zum nächsten erfolgreichen Abruf NICHT verwenden.';
   }
   if(!fedNext()) return '⚠ <b>FOMC-Terminliste abgelaufen</b> — FOMC_20xx im Code für das neue Jahr pflegen.';
   return null;
@@ -2366,9 +2419,14 @@ async function aiAnleihen(btn){
   if(!GEM_KEY){ box.innerHTML='<span style="color:var(--gold)">Kein Gemini-Key hinterlegt (⚙ Einstellungen → Key speichern).</span>'; return; }
 
   // Zahlen aus dem laufenden Stand zusammenstellen — nichts wird geraten.
-  const T=(STATE.treasury||[]).filter(x=>!x.err&&x.cur!=null);
+  // v6.18 FIX (F1): Die 2-jährige Rendite liegt getrennt in STATE.t2y — vorher fand der
+  // Erklärer sie nie und meldete immer „Kurvenspread nicht berechenbar“.
+  const T=(STATE.treasury||[]).filter(x=>!x.err&&x.cur!=null&&x.key!=='2Y');
+  if(STATE.t2y && !STATE.t2y.err && STATE.t2y.cur!=null) T.push({...STATE.t2y, key:'2Y'});
   if(T.length<3){ box.innerHTML='<span style="color:var(--gold)">Zu wenige Renditedaten geladen — erst die Routine durchlaufen lassen.</span>'; return; }
-  const zeilen = T.map(t=>`${t.key}: ${t.cur.toFixed(2)} % (5 Tage: ${t.chg5>0?'+':''}${t.chg5} bp, seit Jahresanfang: ${t.chgYtd>0?'+':''}${t.chgYtd} bp)`).join('\n');
+  // v6.18 FIX (F1): Basispunkte gerundet, fehlende Werte als „k. A.“ statt „null bp“
+  const bpTxt=v=>(v==null||!isFinite(v))?'k. A.':`${v>0?'+':''}${Math.round(v)} bp`;
+  const zeilen = T.map(t=>`${t.key}: ${t.cur.toFixed(2)} % (5 Tage: ${bpTxt(t.chg5)}, seit Jahresanfang: ${bpTxt(t.chgYtd)})`).join('\n');
   const b=fedBand();
   const g=(k)=>{const x=T.find(y=>y.key===k); return x?x.cur:null;};
   const s10=g('10Y'), s2=g('2Y'), s3=g('3M');
@@ -2487,12 +2545,12 @@ function renderSectors(){
   const ranked=[...ok].sort((a,b)=>(b.score==null?-1e9:b.score)-(a.score==null?-1e9:a.score));
   const errs = STATE.sectors.filter(s=>s.err);
   const mc=n=>n==null?'':n>0?'up':n<0?'down':'';
-  let html='<div class="sekt-meta">Kacheln nach <b>Trendstärke</b> (EMA50↔200-Winkel + Steigung) · <span style="color:var(--green)">grün = P3 Long</span> Kurs&gt;EMA50&gt;EMA200 · <span style="color:var(--red)">rot = P6 Short</span> Kurs&lt;EMA20&lt;EMA200 · große Zahl = EMA50/200-Spread, darunter 1M absolut. Tippen für Details.</div><div class="sekt-heat">';
+  let html='<div class="sekt-meta">Kacheln nach <b>Trendstärke</b> (Mischwert: EMA50-Steigung + 0,25 × Abstand zur EMA200 + 0,25 × 1M-Momentum) · <span style="color:var(--green)">grün = P3 Long</span> Kurs&gt;EMA50&gt;EMA200 · <span style="color:var(--red)">rot = P6 Short</span> Kurs&lt;EMA20&lt;EMA200 · große Zahl = EMA50/200-Spread (bei P6: EMA20/200), darunter 1M absolut. Tippen für Details.</div><div class="sekt-heat">';
   ranked.forEach(s=>{
     const ph=s.phase?s.phase.code:'–';
     const spread = (ph==='P6') ? ((s.e20!=null&&s.e200!=null)?(s.e20/s.e200-1)*100:null) : ((s.e50!=null&&s.e200!=null)?(s.e50/s.e200-1)*100:null);
     const seas=STATE.seas&&STATE.seas[s.etf];
-    const tip=`${s.name}${s.stale?' (aus Cache)':''}\nPhase ${ph} · EMA50/200-Spread ${fmtPct(spread,1)}\n1W ${s.perf1w!=null?fmtPct(s.perf1w):'–'} · 1M ${fmtPct(s.perf1m)} · 3M ${fmtPct(s.perf3m)} · 6M ${fmtPct(s.perf6m)}\nRS 1M vs SPY ${fmtPct(s.rs1m)} · EMA200-Abstand ${fmtPct(s.ema200Dist)}${seas?`\nSaison: im Schnitt ${seas.fwd>=0?'+':''}${seas.fwd.toFixed(1)}% über ${seas.bars} Handelstage, ${Math.round(seas.hit)}% positiv bei ${seas.n} Stichproben\n(Stichproben überlappen sich stark — 15 Jahre ergeben nur ~15 unabhängige Fälle)`:''}`;
+    const tip=`${s.name}${s.stale?' (aus Cache)':''}\nPhase ${ph} · ${ph==='P6'?'EMA20/200':'EMA50/200'}-Spread ${fmtPct(spread,1)}\n1W ${s.perf1w!=null?fmtPct(s.perf1w):'–'} · 1M ${fmtPct(s.perf1m)} · 3M ${fmtPct(s.perf3m)} · 6M ${fmtPct(s.perf6m)}\nRS 1M vs SPY ${fmtPct(s.rs1m)} · EMA200-Abstand ${fmtPct(s.ema200Dist)}${seas?`\nSaison: im Schnitt ${seas.fwd>=0?'+':''}${seas.fwd.toFixed(1)}% über ${seas.bars} Handelstage, ${Math.round(seas.hit)}% positiv bei ${seas.n} Stichproben\n(Stichproben überlappen sich stark — 15 Jahre ergeben nur ~15 unabhängige Fälle)`:''}`;
     html+=`<div class="hc ${scoreCls(s.score)}${s.stale?' is-stale':''}" title="${tip}">
       <div class="hc-tick"><b>${s.etf}</b> <span class="phase-mini ${ph==='P3'?'pm-l':ph==='P6'?'pm-s':'pm-n'}">${ph}</span></div>
       <div class="hc-name">${s.name}${s.stale?' ·alt':''}</div>
@@ -3435,7 +3493,11 @@ function saveTermine(){
 
 function wochenTermine(){
   const heute = new Date(); heute.setHours(0,0,0,0);
-  const bis = new Date(heute.getTime() + 7*864e5);
+  // v6.18 FIX (F13): Fenster = heute plus die nächsten Handelstage, bis fünf Handelstage
+  // erreicht sind (Wochenenden zählen nicht). Vorher heute bis heute + 7 Tage
+  // einschließlich — an einem Montag sechs Handelstage samt dem folgenden Montag.
+  const bis = new Date(heute); let ht = (heute.getDay()%6!==0) ? 1 : 0;
+  while(ht < 5){ bis.setDate(bis.getDate()+1); if(bis.getDay()%6!==0) ht++; }
   const inFenster = d => { const x = new Date(d+'T00:00:00'); return x >= heute && x <= bis; };
   const eintraege = [];
 
@@ -3705,6 +3767,9 @@ function datumZuWochentag(kurz){
 // weil dann etwas anderes nicht stimmt.
 function korrigiereZeit(e){
   if(!e || !e.time) return;
+  // v6.18 FIX (F4): Die Tabelle enthält New Yorker Zeiten — nur auf US-Termine anwenden.
+  // Vorher wurde „Schweiz: Verbraucherpreise (CPI)“ um 08:30 auf 14:30 „korrigiert“.
+  if(makroRegion(e.title)!=='US') return;
   const sollET = (TERMIN_ZEITEN.find(([r])=>r.test(String(e.title||''))) || [])[1];
   if(!sollET) return;
   // v6.17: deutsche Zeit für den konkreten Tag (Zeitumstellung beachtet)
@@ -3731,7 +3796,8 @@ function makroRegion(titel){
   const t = String(titel||'');
   if(/\b(usa|us|amerikan|fed|fomc|powell|warsh)\b/i.test(t) || /^us[\s\-:]/i.test(t)) return 'US';
   if(/(eurozone|euro-?raum|ezb|ecb|lagarde|deutschland|german|frankreich|france|italien|italy|spanien|spain|europa|\bEU\b)/i.test(t)) return 'EU';
-  if(/(china|japan|australien|australia|kanada|canada|uk|british|gro(ß|ss)britannien|schweiz|swiss|korea|indien|india|brasilien|mexiko|neuseeland|schweden|norwegen)/i.test(t)) return 'sonst';
+  // v6.18 FIX (F3): „uk“ nur als eigenes Wort — vorher traf es Industrieprod-uk-tion, Prod-uk-tivität, BIP …
+  if(/(china|japan|australien|australia|kanada|canada|\buk\b|british|gro(ß|ss)britannien|schweiz|swiss|korea|indien|india|brasilien|mexiko|neuseeland|schweden|norwegen)/i.test(t)) return 'sonst';
   return 'US';   // Ohne Länderangabe sind es fast immer US-Daten
 }
 
@@ -3744,9 +3810,21 @@ function makroStufe(titel){
   // v6.8.1 FIX: Die Liste stand nur auf Englisch. Gemini antwortet aber auf Deutsch —
   // "Kanada Zinsentscheid" fiel durch und landete als marktbewegend ganz oben,
   // obwohl die Bank of Canada für US-Aktien und den DAX ohne Belang ist.
-  if(/(eurozone|euro-?raum|china|japan|japanisch|uk|british|gro(ß|ss)britannien|deutschland|german|frankreich|france|italien|italy|spanien|spain|kanada|canada|australien|australia|schweiz|swiss|schweden|norwegen|mexiko|brasilien|indien|india|korea|neuseeland)/i.test(t)
-     && !/(fed|fomc|powell|warsh)/i.test(t)){
-    return /(cpi|inflation|gdp|bip)/i.test(t) ? 'mittel' : 'niedrig';
+  // v6.18 FIX (F2/F3): Erst die Region bestimmen, dann die Listen anwenden. Vorher stufte
+  // ein Länder-Präfix alles herunter: „Eurozone: EZB-Zinsentscheid“ wurde niedrig,
+  // „Deutschland: ifo-Geschäftsklima“ ebenfalls — obwohl du den DAX handelst.
+  //   sonstige Länder: Inflation/BIP mittel, sonst niedrig (wie bisher)
+  //   Europa: EZB-Entscheid hoch; Einträge der Mittel-Liste (ifo, ZEW …) und
+  //           Inflation/BIP mittel; US-Stichworte der Hoch-Liste (Arbeitslosenquote …)
+  //           gelten für Europa NICHT als hoch.
+  if(!/(fed|fomc|powell|warsh)/i.test(t)){
+    const reg = makroRegion(t);
+    if(reg==='sonst') return /(cpi|inflation|gdp|bip)/i.test(t) ? 'mittel' : 'niedrig';
+    if(reg==='EU'){
+      if(/(ezb|ecb|lagarde)/i.test(t) && MAKRO_HOCH.some(r=>r.test(t))) return 'hoch';
+      if(MAKRO_MITTEL.some(r=>r.test(t)) || /(cpi|inflation|verbraucherpreis|gdp|bip)/i.test(t)) return 'mittel';
+      return 'niedrig';
+    }
   }
   if(MAKRO_HOCH.some(r=>r.test(t)))   return 'hoch';
   if(MAKRO_MITTEL.some(r=>r.test(t))) return 'mittel';
@@ -4076,7 +4154,11 @@ function snapshotDaten(){
     phasen: idx.map(x=>({s:x.sym||x.key, p:(x.phase&&x.phase.code)||'–'})),
     y10: (STATE.treasury||[]).find(t=>t.key==='10Y')?.cur ?? null,
     y2:  (STATE.t2y && !STATE.t2y.err) ? STATE.t2y.cur : null,
-    sektorTop: (STATE.sectors||[]).filter(x=>!x.err).sort((a,b)=>(b.score||0)-(a.score||0))[0]?.etf || null
+    // v6.18 FIX (F14): „stärkster Sektor“ heißt überall relative Stärke über einen Monat
+    // gegen SPY — wie im Briefing und im Export. Der Trendstärke-Spitzenreiter steht
+    // getrennt und eindeutig benannt daneben, damit beim Rückblick nichts verwechselt wird.
+    sektorTop: (STATE.sectors||[]).filter(x=>!x.err&&x.rs1m!=null).sort((a,b)=>b.rs1m-a.rs1m)[0]?.etf || null,
+    sektorTrendTop: (STATE.sectors||[]).filter(x=>!x.err).sort((a,b)=>(b.score||0)-(a.score||0))[0]?.etf || null
   };
 }
 
@@ -4148,13 +4230,7 @@ function renderDiag(){
   html+=`<div class="diag-proxy"><b>Proxy:</b> ${localProxyAlive?'lokal aktiv':'öffentlich'} · lokal ${PROXY_DIAG.local} · direkt ${PROXY_DIAG.direct} · öffentlich ${PROXY_DIAG.public} · Fehlschläge ${PROXY_DIAG.fail}${PROXY_DIAG.lastMs!=null?` · letzte Antwort ${PROXY_DIAG.lastMs} ms (${PROXY_DIAG.lastVia})`:''}<br><span style="opacity:.7">*Alter approximiert über Kalendertage — Mo/nach Feiertagen normal höher.</span></div>`;
   el.innerHTML=html;
 }
-const MANUAL_CHECKS=[
-  {id:'h4', t:'Kerzenbild / Bewegung-Korrektur-Bewegung auf Trading-TF geprüft'},
-  {id:'risk', t:'Risiko je Trade ≤ 0,5 % gesetzt (ATR-Stop berechnet)'},
-  {id:'earn', t:'Earnings / Ex-Div der Watchlist-Titel beachtet'},
-  {id:'macro', t:'Makro-Kalender (Fed/CPI/NFP) der Woche gesichtet'},
-  {id:'orders', t:'Offene Orders / Stops im Broker aktualisiert'}
-];
+// v6.18 (F15): MANUAL_CHECKS entfernt — seit dem Wegfall der Checkliste ungenutzt (nannte außerdem 0,5 % statt 0,25 % Risiko).
 // Tages-Signal-Checkliste entfernt: Auto-Teil redundant zur Ampel, manuelle Haken ungenutzt
 function exportSnapshot(){
   const v=STATE.ampel;
@@ -4169,7 +4245,9 @@ function exportSnapshot(){
   L.push(`- VIX: ${v.vix!=null?fmtPx(v.vix,1):'–'}${v.vixTerm?` · Termstruktur ${v.vixTerm.regime} (VX/VX3M ${v.vixTerm.ratio.toFixed(2)})`:''}${v.frontStress?` · ⚠ Front-End-Stress (VIX9D ${fmtPx(v.vix9d,1)} > VIX)`:''}`);
   L.push(`- Fear & Greed: ${v.fg!=null?v.fg:'–'} (${STATE.fg?.rating||'–'})`);
   L.push(`- Sektor-Breite: ${v.part!=null?`${v.part}/${v.partTot} über EMA50`:'–'} · Führung ${v.rsBeat!=null?`${v.rsBeat}/${v.rsTot} schlagen SPY`:'–'}`);
-  L.push(`- Panik-Score: ${v.panik}`);
+  // v6.18 FIX (F7): unbestimmter Score (zu geringe Abdeckung) stand als „null“ im Export
+  { let cov=null; try{ const P=panikComponents(); cov=P?P.covered:null; }catch(e){}
+    L.push(`- Panik-Score: ${v.panik!=null ? v.panik : 'unbestimmt'}${cov!=null?` (${cov}/100 erfasst)`:''}`); }
   L.push('','## Indizes');
   (STATE.indices||[]).filter(i=>!i.err).forEach(i=>L.push(`- ${i.key} (${i.name}): ${i.phase.code} · Kurs ${fmtPx(i.price)} · EMA200-Abstand ${fmtPct(i.ema200Dist)}${i.atrPct!=null?` · ATR ${i.atrPct.toFixed(1)}%`:''}${i.corr&&i.corr.active?` · ${i.corr.txt}`:''}${i.stale?' (alt)':''}`));
   const sr=(STATE.sectors||[]).filter(s=>!s.err&&s.rs1m!=null).sort((a,b)=>b.rs1m-a.rs1m);
@@ -4366,6 +4444,11 @@ window.addEventListener('DOMContentLoaded', ()=>{
       STATE.watch = (Array.isArray(loadLS(SK.watch, [])) ? loadLS(SK.watch, []) : []);
       STATE.hist  = (Array.isArray(loadLS(SK.hist, []))  ? loadLS(SK.hist, [])  : []);
       ALERTS      = Object.assign({}, ALERT_DEFAULTS, loadLS(SK.alerts, {}));
+      // v6.18 FIX (F8): auch „KI beim Laden“ und die FOMC-Termine sofort übernehmen —
+      // vorher griffen sie erst nach dem nächsten Neuladen.
+      AI_AUTO = (localStorage.getItem('ferit_mr13_aiauto') !== '0');
+      try{ const ga=document.getElementById('gem-auto'); if(ga) ga.value = AI_AUTO ? '1' : '0'; }catch(e){}
+      try{ initFomc(); }catch(e){}
       try{ initCollapse(); initAlerts(); initAutostart(); renderWatch(); renderHist(); renderHeute(); }catch(e){}
       toast('Einstellungen vom Laufwerk übernommen','ok');
     }

@@ -166,12 +166,14 @@ def pruefe_trades(daten, b):
     # REGELCHECK meldete sie trotzdem als KRITISCH, zaehlte sie aufs Slot-Limit und
     # rechnete sie ins offene Trading-Risiko. Ebenso zaehlte AKJ auf das Limit des
     # Trend-Handels, obwohl AKJ einen eigenen Zaehler hat.
-    def kat(t):
+    # v1.3 FIX (F16): Funktion hiess wie die Schleifenvariable weiter unten und wurde
+    # dort mit einem Text ueberschrieben. Jetzt eindeutiger Name.
+    def kategorie_von(t):
         return str(t.get("category") or "Trading")
-    trading   = [t for t in offen if kat(t) in ("Trading", "AKJ")]       # aktive Regeln
-    trend     = [t for t in trading if kat(t) == "Trading"]               # nur fuers Slot-Limit
-    langfrist = [t for t in offen if kat(t) == "Langfrist"]
-    altbest   = [t for t in offen if kat(t) == "Altbestand"]
+    trading   = [t for t in offen if kategorie_von(t) in ("Trading", "AKJ")]   # aktive Regeln
+    trend     = [t for t in trading if kategorie_von(t) == "Trading"]           # nur fuers Slot-Limit
+    langfrist = [t for t in offen if kategorie_von(t) == "Langfrist"]
+    altbest   = [t for t in offen if kategorie_von(t) == "Altbestand"]
 
     b.info("%d offene Positionen (%d Trading, %d AKJ, %d Langfrist, %d Altbestand)"
            % (len(offen), len(trend), len(trading) - len(trend), len(langfrist), len(altbest)))
@@ -187,7 +189,7 @@ def pruefe_trades(daten, b):
         nr = t.get("tradeNumber") or t.get("id") or "?"
         name = t.get("productName") or "?"
         kennung = "#%s %s" % (nr, name)
-        kat = str(t.get("category", "Trading"))
+        kat = kategorie_von(t)
         setup = str(t.get("setup", "") or "")
 
         # ── Stopp vorhanden und auf der richtigen Seite ──────────────────────

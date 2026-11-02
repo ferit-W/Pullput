@@ -750,6 +750,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                                 ref, src = op, "Open"
                         if not ref:
                             continue
+                        # v6.18 FIX (F18, Verdachtsteil): Fuer ein Pre-Market-Gap ist die Basis der
+                        # letzte regulaere Schluss. Vor der Eroeffnung ist das regularMarketPrice.
+                        # regularMarketPreviousClose kann in der Vorboerse noch der Schluss von
+                        # VORGESTERN sein - dann zaehlte das Gap die ganze gestrige Bewegung mit.
+                        # Waehrend der Handelszeit bleibt es bei regularMarketPreviousClose.
+                        rmp = q.get("regularMarketPrice")
+                        if src == "Pre" and state not in ("REGULAR", "POST") and rmp and rmp > 0:
+                            pc = rmp
                         quoted += 1
                         gap = (ref - pc) / pc * 100.0
                         if abs(gap) >= thr:
@@ -759,6 +767,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                             # Build 15.14: "Open" aus einer Session, die >16 h zurueckliegt, ist GESTERN
                             # (typisch: DE-Titel vor XETRA-Eroeffnung, US-Titel am fruehen Morgen).
                             old = bool(src == "Open" and qt and (_time.time() - qt) > 16 * 3600)
+                            # v6.18 FIX (F18): Auch Pre-Market-Kurse auf Alter pruefen. Die US-Vorboerse
+                            # beginnt 4:00 New York = 10:00 deutscher Zeit; ein Scan davor kann einen
+                            # Pre-Market-Kurs vom Vortag zeigen - bisher ohne Warnung.
+                            pmt = q.get("preMarketTime")
+                            if src == "Pre" and pmt and (_time.time() - pmt) > 16 * 3600:
+                                old = True
                             out.append({
                                 "symbol": sym,
                                 "name": q.get("shortName") or q.get("longName") or sym,
