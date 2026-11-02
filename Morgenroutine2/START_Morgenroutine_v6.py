@@ -245,6 +245,15 @@ def breite_aus_quotes(quotes):
 
 _BREITE_CACHE = {"ts": 0, "daten": None}
 _SCAN_CACHE = {"ts": 0, "daten": None}
+
+
+def _ms_modul():
+    """marktsammler.py frisch laden (Aenderungen am Ordner greifen ohne Neustart)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("marktsammler_mod", os.path.join(DIRECTORY, "marktsammler.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 _SCAN_LOCK = threading.Lock()
 
 
@@ -346,6 +355,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._gapscan()
         if self.path.startswith("/breite"):
             return self._breite()
+        if self.path.startswith("/kerzen?"):
+            return self._kerzen()
+        if self.path.startswith("/config/marktsammler"):
+            return self._send_json(_ms_modul().status())
         if self.path.startswith("/scan"):
             return self._scan()
         if self.path.startswith("/gapdetail"):
@@ -400,6 +413,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._archiv_tage()
         if self.path.startswith("/archiv/befuellen"):
             return self._archiv_werkzeug("befuellen")
+        if self.path.startswith("/config/marktsammler"):
+            return self._ms_setzen()
         if self.path.startswith("/config/datadir"):
             return self._set_datadir()
         self.send_error(404, "unknown POST endpoint")
@@ -883,7 +898,19 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 except Exception:
                     plan = {}
                 zusatz = [s for s in ((plan.get("universum") or {}).get("de_zusatz") or []) if isinstance(s, str) and _SYM_RE.match(s)]
-                erg = mod.scanne(_yget, self._batch_quote, SP500_SYMS, list(dict.fromkeys(DAX_SYMS + zusatz)), plan)
+                # v6.19 (N4): Mit Marktsammler zuerst dessen Kerzen, und MDAX/SDAX aus seiner Watchlist
+                ms = None
+                try:
+                    ms = _ms_modul()
+                    if not ms.status().get("ok"):
+                        ms = None
+                except Exception:
+                    ms = None
+                us = list(SP500_SYMS); de = list(DAX_SYMS)
+                if ms:
+                    u = ms.universum()
+                    us = list(dict.fromkeys(us + u["US"])); de = list(dict.fromkeys(de + u["DE"]))
+                erg = mod.scanne(_yget, self._batch_quote, us, list(dict.fromkeys(de + zusatz)), plan, sammler=ms)
                 _SCAN_CACHE.update(ts=jetzt, daten=erg)
                 try:
                     os.makedirs(DATA_DIR, exist_ok=True)
@@ -899,6 +926,31 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self._send_json({"ok": False, "fehler": "scan: %s" % e}, 500)
             except Exception:
                 pass
+
+    def _kerzen(self):
+        """v6.19 (N4): Tageskerzen aus dem Marktsammler (CapTrader/TWS). ?symbol=SPY&n=520
+        Antwort wie fetchYahoo der Morgenroutine; ok=false, wenn der Wert fehlt."""
+        try:
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            sym = (q.get("symbol", [""])[0] or "").strip()
+            if not _SYM_RE.match(sym):
+                return self.send_error(400, "bad symbol")
+            try:
+                n = max(30, min(int(q.get("n", ["520"])[0]), 6500))
+            except ValueError:
+                n = 520
+            return self._send_json(_ms_modul().kerzen_fuer(sym, n))
+        except Exception as e:
+            return self._send_json({"ok": False, "grund": "kerzen: %s" % e})
+
+    def _ms_setzen(self):
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+            body = json.loads(self.rfile.read(length).decode("utf-8")) if length else {}
+            ok, fehler = _ms_modul().ordner_setzen(body.get("pfad", ""))
+            return self._send_json({"ok": ok, "fehler": fehler, "status": _ms_modul().status()})
+        except Exception as e:
+            return self._send_json({"ok": False, "fehler": str(e)})
 
     def _gapscan(self):
         """Scannt SP500_SYMS + DAX_SYMS auf Open-vs-PrevClose-Gaps >= threshold (Default 5%)."""

@@ -198,10 +198,17 @@ Wird nach jeder Phase hier fortgeschrieben.
   - **V1** Sentiment mit Datum · **V2** Abstand zur nächsten Schwelle · **V4** „vorläufig“ während der Handelszeit · **V5** YTD gegen Vorjahresschluss · **V9** ✓✓ doppelte Bestätigung · **V11** KI-Check 24 h gespeichert · **V12** Farbstreifen · **V13** Pflege-Übersicht · **V8** war mit F18 erledigt
   - Selbsttest: 61 Prüfungen
   - **Nicht umgesetzt:**
-    - **N4** zweite Datenquelle: Aus der Prüfumgebung ließ sich keine freie Alternative zu Yahoo verlässlich prüfen. Ein ungeprüfter Ersatz würde im Ernstfall still versagen. Bleibt offen für einen Live-Test bei dir
+    - **N4** zweite Datenquelle: ~~offen~~ → **erledigt mit dem Marktsammler** (siehe unten)
     - **N7** Recherche historischer Earnings-Termine und einer Datenquelle ohne Survivorship-Verzerrung: offen
     - Short-Seite im Scanner: nicht getestet, deshalb nur Long
     - Gleichlauf (Korrelation) im Gesamtrisiko: noch nicht berechnet
   - **Offen bei dir (Live):** einmal „🎯 Setup-Scanner ▶ Scannen“ (1–3 Minuten). Prüfen, ob unter der Ampel die Aktien-Breite mit rund 500 Werten erscheint. Im Cockpit die Gold- und Silber-ETFs eintragen
+- [x] **N4 Marktsammler als erste Kursquelle** (02.11.2026):
+  - `marktsammler.py` liest die Tageskerzen des Marktsammlers (CapTrader/TWS, ab v1.2) und bildet dessen Dateinamen-Regel nach (z. B. MRK = Merck US, MRK_DE = Merck KGaA, ES_FUT, BRK_B)
+  - Morgenroutine: Für Zeiträume ab 6 Monaten zuerst Sammler, sonst Yahoo. Kurze Zeiträume und Werte ohne Sammler-Datei (VIX3M, VIX9D, VVIX, Anleihen, Devisen) bleiben bei Yahoo. Veraltete Dateien werden nicht verwendet
+  - Setup-Scanner: Kerzen von der Platte, Universum zusätzlich MDAX und SDAX aus der Sammler-Watchlist. Die Volumen-Einheit der TWS (Stück oder 100er-Stück) wird gegen Yahoo erkannt
+  - Einstellung „Marktsammler-Ordner“ und Kursquelle in ⚙, Status in der Pflege-Übersicht
+  - **Hinweis:** Laut README des Sammlers (v1.2.6) gibt es noch keine Historie der impliziten Volatilität, die ist für v1.3 geplant. Gespeichert wird bisher nur die SPX-Optionskette mit TWS-IV. Eine IV-Auswertung (z. B. IV-Rang im Stillhalter-Journal) folgt, sobald v1.3 das liefert
+  - **Offen bei dir:** Ordner eintragen und in der Pflege-Übersicht prüfen: „dieser Lauf: x× Sammler, y× Yahoo“. Beim ersten Scan prüfen, ob „Volumen-Einheit ungeprüft“ erscheint
 - [ ] Phase 5
 - [ ] Phase 6

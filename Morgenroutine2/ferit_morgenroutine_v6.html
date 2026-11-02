@@ -626,6 +626,17 @@ footer strong{color:var(--ink2)}
           </div>
           <span class="hint" id="cfg-datadir-info">wird geladen …</span>
         </div>
+        <!-- v6.19 (N4): Marktsammler (CapTrader/TWS) als erste Kursquelle -->
+        <div class="field" style="grid-column:1/-1">
+          <label>Marktsammler-Ordner (CapTrader-Kerzen, erste Kursquelle)</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <input id="cfg-sammler" type="text" spellcheck="false" style="flex:1 1 320px" placeholder="z. B. C:\Trading\Marktsammler_v1.2.6">
+            <button class="cp-btn" onclick="saveSammler()">Ordner setzen</button>
+            <select id="cfg-quelle" onchange="try{localStorage.setItem('ferit_mr13_kursquelle',this.value)}catch(e){}; toast('Kursquelle beim nächsten Lauf aktiv','ok')">
+              <option value="sammler">zuerst Marktsammler, sonst Yahoo</option><option value="yahoo">nur Yahoo</option></select>
+          </div>
+          <span class="hint" id="cfg-sammler-info">Ordner, in dem sammler.py und der Unterordner daten liegen. Leer lassen = nur Yahoo.</span>
+        </div>
         <!-- v6.13: FOMC-Termine. Die Liste im Code deckt nur 2026 ab; ab Januar 2027
              stünde dort sonst dauerhaft "Terminliste abgelaufen". Einmal im Jahr
              acht Zeilen eintragen — die Termine stehen Jahre vorher fest. -->
@@ -1116,6 +1127,21 @@ function resetFomc(){
 }
 
 // ── v6.12: Datenordner aus der Oberfläche setzen ───────────────────────────
+async function saveSammler(){
+  const pfad=($('cfg-sammler')||{}).value||''; const info=$('cfg-sammler-info');
+  try{ const r=await fetchOnce('http://localhost:8765/config/marktsammler', 6000, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pfad})});
+       const j=await r.json();
+       if(!j.ok){ info.innerHTML='<span style="color:var(--red)">'+esc(j.fehler||'Fehler')+'</span>'; return; }
+       STATE.sammler=j.status; zeigeSammler();
+  }catch(e){ info.innerHTML='<span style="color:var(--red)">Server nicht erreichbar</span>'; }
+}
+function zeigeSammler(){
+  const m=STATE.sammler, info=$('cfg-sammler-info'), q=$('cfg-quelle'); if(q) q.value=kursquelleWahl();
+  if(!info) return;
+  if(!m||!m.eingetragen){ info.textContent='Nicht eingetragen — Kurse kommen nur von Yahoo.'; return; }
+  if($('cfg-sammler')&&!$('cfg-sammler').value) $('cfg-sammler').value=m.ordner||'';
+  info.innerHTML=`<span style="color:${m.frisch?'var(--green)':'var(--amber)'}">${m.dateien} Werte mit Tageskerzen · SPY bis ${esc(m.spy_letzte||'–')}${m.frisch?' · aktuell':' · nicht aktuell, es wird Yahoo verwendet'}</span>`;
+}
 async function loadDataDir(){
   const inp=document.getElementById('cfg-datadir'), info=document.getElementById('cfg-datadir-info');
   if(!inp) return;
@@ -1893,7 +1919,39 @@ function updateProxyStatus(){
   const isFile = location.protocol==='file:';
   const pb=$('proxy-banner'); if(pb) pb.style.display=(!localProxyAlive && !isFile)?'block':'none';
 }
+// ── v6.19 (N4): MARKTSAMMLER (CapTrader/TWS) ALS ERSTE KURSQUELLE ─────────────
+// Ist der Ordner des Marktsammlers eingetragen, kommen Tageskerzen für längere
+// Zeiträume (6 Monate bis 5 Jahre) von dort: eigene Brokerdaten, kein Yahoo-Limit.
+// Nur wenn der Wert dort fehlt oder die letzte Kerze älter als der letzte Handelstag ist,
+// geht die Anfrage wie bisher an Yahoo. Kurze Zeiträume (Über Nacht) und Werte, die der
+// Sammler nicht führt (VIX3M, VIX9D, VVIX, Anleihen, Devisen), bleiben bei Yahoo.
+// Hinweis: Der Sammler liefert Tagesschlüsse — während der Handelszeit fehlt die
+// laufende Kerze. Das passt zur Rückrechnung (Signal zum Schluss).
+const MS_TAGE = {'6mo':130, '1y':260, '2y':520, '5y':1300};
+STATE.quellen = {sammler:0, yahoo:0};
+function kursquelleWahl(){ try{ return localStorage.getItem('ferit_mr13_kursquelle') || 'sammler'; }catch(e){ return 'sammler'; } }
+async function sammlerStatus(){
+  try{ const r=await fetchOnce('http://localhost:8765/config/marktsammler', 4000); STATE.sammler = r.ok ? await r.json() : null; }
+  catch(e){ STATE.sammler = null; }
+  return STATE.sammler;
+}
 async function fetchYahoo(symbol, range='2y'){
+  if(STATE.sammler && STATE.sammler.ok && MS_TAGE[range] && kursquelleWahl()==='sammler'){
+    try{
+      const r=await fetchOnce('http://localhost:8765/kerzen?symbol='+encodeURIComponent(symbol)+'&n='+MS_TAGE[range], 8000);
+      const j=r.ok ? await r.json() : null;
+      if(j && j.ok && j.frisch && j.closes.length>=2){
+        STATE.quellen.sammler++;
+        const n=j.closes.length;
+        return { closes:j.closes, highs:j.highs, lows:j.lows, times:j.times, price:j.closes[n-1], prev:j.closes[n-2],
+                 asof:new Date(j.times[n-1]*1000), currency:(/\.DE$|^\^(GDAXI|MDAXI|SDAXI|STOXX50E)$/.test(symbol)?'EUR':'USD'), quelle:'Marktsammler' };
+      }
+    }catch(e){ /* weiter mit Yahoo */ }
+  }
+  STATE.quellen.yahoo++;
+  return fetchYahooDirekt(symbol, range);
+}
+async function fetchYahooDirekt(symbol, range='2y'){
   const path = `/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=1d&includePrePost=false`;
   let j=null, lastErr='';
   for(const host of ['query1.finance.yahoo.com','query2.finance.yahoo.com']){
@@ -4945,7 +5003,7 @@ async function setupScan(neu){
   const f=(x,n=2)=>x==null?'–':(+x).toFixed(n).replace('.',',');
   const mio=x=>x==null?'–':(x/1e6).toFixed(1).replace('.',',')+' Mio';
   const amp=STATE.ampel?STATE.ampel.label:null;
-  let h=`<div style="font-size:.7rem;color:var(--steel);margin-bottom:6px">Stand ${new Date(j.ts).toLocaleString('de-DE')} · ${j.gescannt} Titel geprüft${j.ohne_daten?`, ${j.ohne_daten} ohne Daten`:''} · Liquidität mindestens ${mio(j.min_umsatz)} Umsatz/Tag (Handelsplan) · höchstens ${j.max_vorschlaege} je Markt${amp?` · Ampel heute: <b>${esc(amp)}</b>`:''}</div>`;
+  let h=`<div style="font-size:.7rem;color:var(--steel);margin-bottom:6px">Stand ${new Date(j.ts).toLocaleString('de-DE')} · ${j.gescannt} Titel geprüft${j.ohne_daten?`, ${j.ohne_daten} ohne Daten`:''} · Liquidität mindestens ${mio(j.min_umsatz)} Umsatz/Tag (Handelsplan) · höchstens ${j.max_vorschlaege} je Markt${amp?` · Ampel heute: <b>${esc(amp)}</b>`:''}${j.quellen?` · Kerzen: ${Object.entries(j.quellen).map(([k,v])=>esc(k)+' '+v).join(', ')}`:''}${j.volumen_geprueft===false?' · <span style="color:var(--amber)" title="Die Einheit des TWS-Volumens ließ sich nicht gegen Yahoo prüfen — Liquiditätsfilter mit Vorsicht lesen">Volumen-Einheit ungeprüft</span>':''}</div>`;
   ['US','DE'].forEach(m=>{
     const M=j.maerkte[m]; if(!M) return;
     h+=`<div style="margin-top:6px"><b>${m==='US'?'🇺🇸 S&amp;P 500':'🇩🇪 DAX'+(j.maerkte.DE&&j.maerkte.DE.vorschlaege.some(x=>x.vergleich!=='^GDAXI')?'':'')}</b> — ${M.signale} Rücksetzer-Signale, ${M.an_liquiditaet_gescheitert} an der Liquidität gescheitert, ${M.ohne_platz} ohne Platz bis zum Widerstand → <b>${M.vorschlaege.length} Vorschläge</b>${M.weitere?` (+${M.weitere} weitere)`:''}</div>`;
@@ -5100,6 +5158,10 @@ function pflegeUebersicht(){
   { const hp=STATE.handelsplan; z.push({n:'Handelsplan', ok:!!(hp&&!hp.fehler&&!(hp.abweichungen||[]).length), txt:hp?(hp.fehler||('Version '+hp.version+((hp.abweichungen||[]).length?' · ungetestete Ampel-Werte!':''))):'nicht geladen', hint:''}); }
   { const k=STATE.kredit; z.push({n:'Kreditspread (FRED)', ok:!!(k&&!k.alt), txt:k?`Stand ${k.datum}${k.alt?' (gespeichert, Abruf gescheitert)':''}`:'nicht geladen', hint:''}); }
   { const ab=STATE.aktienBreite; z.push({n:'Aktien-Breite', ok:!!(ab&&ab.US&&ab.US.n>400), txt:ab&&ab.US?`${ab.US.n} S&P-Aktien · ${ab.DE?ab.DE.n:0} DAX`:'nicht geladen', hint:ab&&ab.US&&ab.US.n<400?'weniger als 400 Aktien — Abruf unvollständig':''}); }
+  { const m=STATE.sammler, q=STATE.quellen||{};
+    z.push({n:'Marktsammler (CapTrader)', ok:!!(m&&m.ok&&m.frisch), txt: !m||!m.eingetragen ? 'nicht eingetragen — Kurse nur von Yahoo' :
+      `${m.dateien} Werte · SPY bis ${m.spy_letzte||'–'}${m.frisch?'':' (nicht aktuell)'} · Quelle ${kursquelleWahl()==='sammler'?'zuerst Sammler':'nur Yahoo'} · dieser Lauf: ${q.sammler||0}× Sammler, ${q.yahoo||0}× Yahoo`,
+      hint: m&&m.eingetragen&&!m.frisch ? 'Sammler läuft nicht oder ist noch nicht durch — es wird Yahoo verwendet' : ''}); }
   z.push({n:'Tagesarchiv', ok:STATE.archivOk===true, txt:STATE.archivOk===true?'heute geschrieben':STATE.archivOk===false?'Schreiben gescheitert':'noch kein Lauf', hint:STATE.archivOk===false?'Server/Datenordner prüfen':''});
   z.push({n:'Desktop-Mitteilungen', ok:('Notification' in window)&&Notification.permission==='granted', txt:('Notification' in window)?Notification.permission:'nicht unterstützt', hint:''});
   z.push({n:'Sektor-Liste S&P 500 (sektoren.json)', ok:true, txt:'Stand 02.11.2026', hint:'bei Indexänderungen neu erzeugen'});
@@ -5417,6 +5479,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
   // v6.11: Erst den Stand vom Laufwerk holen, dann anzeigen. Ohne Server bleibt
   // alles wie bisher — die Funktion scheitert still.
   ladeHandelsplanMR();   // v6.19 (W1)
+  sammlerStatus().then(zeigeSammler);       // v6.19 (N4)
   mrLoadSettings().then(neu=>{
     if(neu){
       STATE.watch = (Array.isArray(loadLS(SK.watch, [])) ? loadLS(SK.watch, []) : []);

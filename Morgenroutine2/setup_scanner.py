@@ -116,7 +116,27 @@ def _chart(yget, sym):
     return zeilen
 
 
-def scanne(yget, batch_quote, us_syms, de_syms, plan=None):
+def volumen_faktor(yget, sammler):
+    """Die TWS meldet das Volumen je nach Wert und Version teils in 100er-Stück. Vergleich
+    SPY Sammler gegen Yahoo an denselben Tagen: Faktor 1 oder 100. None = nicht prüfbar."""
+    try:
+        r = sammler.kerzen_fuer("SPY", 30)
+        y = _chart(yget, "SPY") or []
+        if not (r.get("ok") and y):
+            return None
+        ms = {time.strftime("%Y-%m-%d", time.gmtime(t)): v for t, v in zip(r["times"], r["volumes"])}
+        q = sorted(yv / ms[d] for d, yv in ((time.strftime("%Y-%m-%d", time.gmtime(t)), v) for t, _, _, _, v in y) if ms.get(d))
+        if not q:
+            return None
+        median = q[len(q) // 2]
+        return 100.0 if median > 30 else 1.0
+    except Exception:
+        return None
+
+
+def scanne(yget, batch_quote, us_syms, de_syms, plan=None, sammler=None):
+    """sammler: Modul marktsammler (oder None). Dann kommen Tageskerzen zuerst aus dem
+    Marktsammler; fehlt ein Wert dort oder ist er nicht aktuell, aus Yahoo."""
     plan = plan or {}
     uni = plan.get("universum", {}) if isinstance(plan, dict) else {}
     min_umsatz = float(uni.get("liquiditaet_mio_eur", 1.0)) * 1e6
@@ -129,8 +149,21 @@ def scanne(yget, batch_quote, us_syms, de_syms, plan=None):
     benchmarks = sorted(set(sektoren.values()) | {"SPY", "^GDAXI"})
     alle = [(s, "US") for s in us_syms] + [(s, "DE") for s in de_syms]
 
+    faktor = volumen_faktor(yget, sammler) if sammler else None
+    herkunft = {}
+
     def hol(sym):
+        if sammler:
+            try:
+                r = sammler.kerzen_fuer(sym, 520)
+                if r.get("ok") and r.get("frisch") and len(r["closes"]) >= 260:
+                    f = faktor or 1.0
+                    herkunft[sym] = "Marktsammler"
+                    return sym, list(zip(r["times"], r["closes"], r["highs"], r["lows"], [v * f for v in r["volumes"]]))
+            except Exception:
+                pass
         try:
+            herkunft[sym] = "Yahoo"
             return sym, _chart(yget, sym)
         except Exception:
             return sym, None
@@ -163,7 +196,7 @@ def scanne(yget, batch_quote, us_syms, de_syms, plan=None):
         if r and r["kurs"] < mindestkurs:
             r["signal"] = False          # unter dem Mindestkurs aus dem Handelsplan
         if r:
-            r.update(symbol=sym, markt=markt, vergleich=bsym, stand=time.strftime("%Y-%m-%d", time.gmtime(ts[-1])))
+            r.update(symbol=sym, markt=markt, vergleich=bsym, stand=time.strftime("%Y-%m-%d", time.gmtime(ts[-1])), quelle=herkunft.get(sym))
             treffer.append(r)
     erg = {"US": auswahl([t for t in treffer if t["markt"] == "US"], min_umsatz, max_n),
            "DE": auswahl([t for t in treffer if t["markt"] == "DE"], min_umsatz, max_n)}
@@ -184,6 +217,11 @@ def scanne(yget, batch_quote, us_syms, de_syms, plan=None):
         et = termine.get(t["symbol"])
         t["earnings"] = et
         t["earnings_bald"] = bool(et and -43200 < et - jetzt <= 10 * 86400)
-    return {"ok": True, "ts": int(jetzt * 1000), "gescannt": len(alle), "ohne_daten": fehler,
+    qn = {}
+    for sym, _ in alle:
+        if daten.get(sym):
+            qn[herkunft.get(sym, "Yahoo")] = qn.get(herkunft.get(sym, "Yahoo"), 0) + 1
+    return {"ok": True, "ts": int(jetzt * 1000), "gescannt": len(alle), "ohne_daten": fehler, "quellen": qn,
+            "volumen_faktor": faktor, "volumen_geprueft": (faktor is not None) if sammler else None,
             "min_umsatz": min_umsatz, "max_vorschlaege": max_n, "maerkte": erg,
             "regel": "Rücksetzer in P3 + Platz bis Widerstand (Systemtest 2b); RS Sektor zur Sortierung"}
