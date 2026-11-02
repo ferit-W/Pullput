@@ -1,4 +1,4 @@
-# Marktsammler v1.2.6
+# Marktsammler v1.2.7
 
 Sammelt nur (keine Orders). Statusseite: http://127.0.0.1:8770/  ·  TWS Paper Port 7497, Client-ID 80.
 
@@ -24,7 +24,7 @@ ES und CL standen in der Watchlist als Aktie (Eversource, Colgate) und als Futur
 - Kontrakte werden gegen die TWS geprüft. Findet sie ein Kürzel nicht (Eurex-/Xetra-Kürzel, Futures an NYBOT/EUREX), steht der Wert mit Grund in der Fehlend-Liste; mit der Spalte `boerse` korrigieren und Aktualisieren drücken. Ersatzbörsen werden automatisch probiert (IBIS-SMART, NYBOT-ICEUS, EUREX-DTB).
 - Indexlisten: DAX Stand 22.09.2025, MDAX Stand 01/2023 (veraltet), SDAX Stand 12/2025 mit Kürzeln nach bestem Wissen; Nasdaq-100 und S&P 500 aktuell (29.10.2026). MDAX/SDAX bitte nach Fehlend-Liste bereinigen.
 - Xetra-Kurse brauchen eine Marktdaten-Freigabe im Paper-Konto, sonst steht "keine Daten" mit TWS-Meldung in der Liste.
-- Noch nicht enthalten (v1.3): Futures-Einzelkontrakte roh mit Kontraktmonat und Rolldatum, Implied-Volatility-Historie, COT, Futures-Optionsketten.
+- Noch nicht enthalten (v1.3): Futures-Einzelkontrakte roh mit Kontraktmonat und Rolldatum, COT, Futures-Optionsketten. (Implied-Volatility-Historie: seit v1.2.7 für Aktien, ETFs und Indizes.)
 - Nur in der Simulation getestet (`python sammler.py --sim`); gegen die echte TWS bitte Protokoll und Statusseite beobachten.
 
 ## Änderungen v1.2.1
@@ -36,6 +36,14 @@ ES und CL standen in der Watchlist als Aktie (Eversource, Colgate) und als Futur
 - Historie mit bis zu 4 gleichzeitigen Anfragen (`PARALLEL` oben in sammler.py, jeder Wert immer nur in einer Anfrage). Das Aktualisieren der Tageskerzen für alle Werte dauert damit grob ein Viertel. Bei Pacing-Meldungen der TWS bremst der Sammler wie bisher selbst; wenn das oft im Protokoll steht, `PARALLEL` auf 2 oder 3 senken.
 - Fehlermeldungen der TWS werden jetzt dem richtigen Wert zugeordnet (wichtig bei parallelen Anfragen).
 - Die Watchlist ist unverändert gegenüber v1.2.1 (842 Werte). Zeigt die Statusseite 844 Werte, liegt noch die alte Watchlist aus v1.2 im Ordner: die `watchlist.csv` aus diesem ZIP kopieren und Aktualisieren drücken.
+
+## Änderungen v1.2.7
+- **Implizite Volatilität als Tageswert** (neuer Ordner `daten/iv_tage`, gleiches Dateiformat wie die Tageskerzen; Wert als Dezimalzahl, 0,25 = 25 %). Quelle ist der TWS-Datentyp `OPTION_IMPLIED_VOLATILITY` (30-Tage-IV, auf ein Jahr hochgerechnet).
+- Jeder Wert mit Tageskerzen vom Typ Aktie/ETF oder Index bekommt die Stufe IV automatisch — die Watchlist muss nicht geändert werden. Futures und Devisen bekommen keine IV: Die TWS bietet diesen Datentyp dafür nicht an.
+- Erster Lauf: so weit zurück wie die TWS liefert (5 Jahre, bei Fehlermeldung 2 Jahre, 1 Jahr, 6 Monate). Danach täglich nur die Differenz, eine Abfrage je Wert, direkt nach den Tageskerzen.
+- Statusseite: Karte „IV-Tageswerte“ und Spalte IV in Vollständigkeit und Werteliste.
+- Die Morgenroutine (ab v6.19) liest daraus IV, IV-Rang und IV-Perzentil für Stillhalter-Journal, Watchlist und Positions-Monitor.
+- Getestet in der Simulation (`python sammler.py --sim --sim-hist`). Gegen die echte TWS bitte beim ersten Lauf das Protokoll ansehen: Meldet die TWS für einzelne Werte „no data“, stehen sie mit Grund in der Fehlend-Liste (Spalte IV).
 
 ## Änderungen v1.2.6
 - Watchlist: 5-Minuten-Kerzen jetzt auch für alle ETFs, alle Nasdaq-100-Aktien und alle Indizes (vorher 141 Werte). Zum Übernehmen `watchlist.csv` kopieren und auf der Statusseite Aktualisieren drücken.

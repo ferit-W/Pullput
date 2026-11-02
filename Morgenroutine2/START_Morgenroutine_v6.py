@@ -357,6 +357,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._breite()
         if self.path.startswith("/kerzen?"):
             return self._kerzen()
+        if self.path.startswith("/iv?"):   # v6.19: IV, IV-Rang, IV-Perzentil aus dem Marktsammler
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            sym = (q.get("symbol", [""])[0] or "").strip()
+            if not _SYM_RE.match(sym):
+                return self.send_error(400, "bad symbol")
+            try:
+                return self._send_json(_ms_modul().iv_fuer(sym))
+            except Exception as e:
+                return self._send_json({"ok": False, "grund": "iv: %s" % e})
         if self.path.startswith("/config/marktsammler"):
             return self._send_json(_ms_modul().status())
         if self.path.startswith("/scan"):

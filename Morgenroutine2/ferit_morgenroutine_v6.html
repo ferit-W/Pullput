@@ -4595,7 +4595,7 @@ function renderWatch(){
     const fundBlock = (w.name||w.earnings||w.marketCap!=null||w.divYield!=null) ? `
       <div class="wc-fund">
         <b>Earnings</b> ${w.earnings||'n/a'} · <b>Ex-Div</b> ${w.exDiv||'n/a'}<br>
-        <b>Div-Rend.</b> ${w.divYield!=null?w.divYield.toFixed(2)+'%':'n/a'} · <b>KGV</b> ${w.pe!=null?fmtPx(w.pe,1):'n/a'} · <b>MCap</b> ${fmtMcap(w.marketCap)}
+        <b>Div-Rend.</b> ${w.divYield!=null?w.divYield.toFixed(2)+'%':'n/a'} · <b>KGV</b> ${w.pe!=null?fmtPx(w.pe,1):'n/a'} · <b>MCap</b> ${fmtMcap(w.marketCap)}${w.ivInfo?` · <b title="Implizite Volatilität aus dem Marktsammler; IV-Rang = Lage im 52-Wochen-Band">IV</b> ${w.ivInfo.iv} % · IVR ${w.ivInfo.iv_rang??'–'}`:''}
       </div>` : (localProxyAlive===false ? `<div class="wc-fund" style="opacity:.6">Fundamentals nur mit lokalem Proxy</div>` : '');
     return `<div class="wcard p-${ph.cls}">
       <div class="wc-head"><div class="wc-tic">${w.ticker}<span class="wc-cur">${w.currency||''}</span></div><span class="wc-x" onclick="removeWatch('${w.ticker}')">✕</span></div>
@@ -4694,6 +4694,8 @@ async function refreshWatch(silent){
         }
       }catch(e){ /* Fundamentals optional — Technik bleibt erhalten */ }
     }
+    // v6.19: IV aus dem Marktsammler, falls vorhanden
+    if(STATE.sammler && STATE.sammler.ok){ try{ const j=await (await fetchOnce('http://localhost:8765/iv?symbol='+encodeURIComponent(w.ticker),5000)).json(); w.ivInfo = j.ok ? {iv:j.iv, iv_rang:j.iv_rang, datum:j.datum} : null; }catch(e){} }
   });
   // Closes nicht speichern — nur die berechneten Kennzahlen
   saveLS(SK.watch, STATE.watch.map(w=>{const {phase,...rest}=w; return {...rest, phase: phase?{code:phase.code,cls:phase.cls}:null};}));
@@ -4963,6 +4965,7 @@ async function positionsMonitor(){
       z.nz = nachziehVorschlag(t, d);
       z.abstandATR = (z.nz&&z.nz.atr) ? (long? d.price-stop : stop-d.price)/z.nz.atr : null;
       z.zahlen = earningsBald(sym);
+      if(STATE.sammler && STATE.sammler.ok){ try{ const j=await (await fetchOnce('http://localhost:8765/iv?symbol='+encodeURIComponent(sym),5000)).json(); if(j.ok) z.iv=j; }catch(e){} }
       const phaseGegen = long ? (z.phase==='P6'||z.phase==='P5') : (z.phase==='P3'||z.phase==='P2');
       z.warn = (z.abstandR!=null && z.abstandR<0.3) || !!z.zahlen || phaseGegen;
       z.phaseGegen = phaseGegen;
@@ -4975,7 +4978,7 @@ async function positionsMonitor(){
   const html = zeilen.map(z=>{
     const t=z.t, long=t.direction!=='Short';
     if(z.info) return `<div>· <b>${esc(z.sym)}</b> ${long?'Long':'Short'} — <span style="color:var(--steel)">${esc(z.info)}</span></div>`;
-    const teile=[`Kurs ${f(z.kurs)}`, `${z.r>=0?'+':''}${f(z.r,1)} R`, `Stopp ${f(+t.slPrice)} (${f(z.abstandR,1)} R / ${f(z.abstandATR,1)} ATR entfernt)`, `Phase heute ${z.phase}`];
+    const teile=[`Kurs ${f(z.kurs)}`, `${z.r>=0?'+':''}${f(z.r,1)} R`, `Stopp ${f(+t.slPrice)} (${f(z.abstandR,1)} R / ${f(z.abstandATR,1)} ATR entfernt)`, `Phase heute ${z.phase}`].concat(z.iv?[`IV ${f(z.iv.iv,1)} % · IVR ${z.iv.iv_rang==null?'–':f(z.iv.iv_rang,0)}`]:[]);
     const hinweise=[];
     if(z.abstandR!=null && z.abstandR<0.3) hinweise.push('<b style="color:var(--red)">nah am Stopp</b>');
     if(z.phaseGegen) hinweise.push(`<b style="color:var(--red)">Phase ${z.phase} gegen die Richtung</b>`);

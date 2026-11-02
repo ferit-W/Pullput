@@ -184,3 +184,67 @@ def status(root=None):
     return {"ok": True, "eingetragen": True, "ordner": root, "dateien": len(dateien),
             "spy_letzte": spy[-1][0] if spy else None,
             "frisch": bool(spy and spy[-1][0] >= letzter_handelstag().isoformat())}
+
+
+# ── v1.2.7 des Sammlers: implizite Volatilität ─────────────────────────────────
+def iv_reihe(key, root=None, n=None):
+    """[(datum, iv)] aufsteigend aus daten/iv_tage/<key>.csv (iv als Dezimalzahl)."""
+    root = root or ordner_lesen()
+    if not root or not key:
+        return []
+    p = os.path.join(root, "daten", "iv_tage", key + ".csv")
+    if not os.path.isfile(p):
+        return []
+    out = []
+    with open(p, encoding="utf-8") as f:
+        for r in csv.DictReader(f, delimiter=";"):
+            try:
+                v = float(r["close"])
+                if v > 0:
+                    out.append((r["zeit"][:10], v))
+            except (KeyError, ValueError, TypeError):
+                continue
+    out.sort()
+    return out[-n:] if n else out
+
+
+def iv_kennzahlen(iv, hv_closes=None):
+    """IV-Rang = (IV − 52W-Tief) / (52W-Hoch − 52W-Tief) · 100
+    IV-Perzentil = Anteil der letzten 252 Tage mit niedrigerer IV · 100
+    HV20 = annualisierte Schwankung der letzten 20 Tagesrenditen (zum Vergleich: IV über HV = Optionen „teuer“)."""
+    import math
+    if len(iv) < 20:
+        return None
+    jahr = [v for _, v in iv[-252:]]
+    akt = jahr[-1]
+    lo, hi = min(jahr), max(jahr)
+    rang = (akt - lo) / (hi - lo) * 100 if hi > lo else None
+    perz = sum(1 for v in jahr[:-1] if v < akt) / max(1, len(jahr) - 1) * 100
+    hv = None
+    if hv_closes and len(hv_closes) >= 21:
+        r = [math.log(hv_closes[i] / hv_closes[i - 1]) for i in range(len(hv_closes) - 20, len(hv_closes)) if hv_closes[i - 1] > 0]
+        if len(r) >= 10:
+            m = sum(r) / len(r)
+            hv = math.sqrt(sum((x - m) ** 2 for x in r) / (len(r) - 1)) * math.sqrt(252)
+    return {"iv": round(akt * 100, 2), "iv_rang": round(rang, 1) if rang is not None else None, "iv_perzentil": round(perz, 1),
+            "iv_hoch52": round(hi * 100, 2), "iv_tief52": round(lo * 100, 2), "hv20": round(hv * 100, 2) if hv else None,
+            "tage": len(jahr), "datum": iv[-1][0]}
+
+
+def iv_fuer(yahoo_sym, root=None):
+    root = root or ordner_lesen()
+    if not root:
+        return {"ok": False, "grund": "kein Sammler-Ordner eingetragen"}
+    s = (yahoo_sym or "").strip().upper()
+    # Stillhalter-Underlyings heißen oft wie der Index (SPX, NDX, RUT) — die stehen im Sammler unter demselben Kürzel
+    key = aufloesen(s, root) or (s if s in ("SPX", "NDX", "RUT", "VIX", "XSP") else None)
+    if not key:
+        return {"ok": False, "grund": "Symbol nicht im Sammler"}
+    iv = iv_reihe(key, root)
+    if not iv:
+        return {"ok": False, "grund": "keine IV-Daten (Sammler ab v1.2.7, nur Aktien/ETFs/Indizes)", "key": key}
+    k = iv_kennzahlen(iv, [x[4] for x in tageskerzen(key, root, 40)])
+    if not k:
+        return {"ok": False, "grund": "zu wenige IV-Tage", "key": key}
+    k.update(ok=True, key=key, frisch=iv[-1][0] >= letzter_handelstag().isoformat(), quelle="Marktsammler")
+    return k

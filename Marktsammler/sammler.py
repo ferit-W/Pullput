@@ -1,4 +1,4 @@
-"""Marktsammler v1.2.6: eigenständiges Programm nur zum Sammeln, mit Statusseite im Browser (http://127.0.0.1:8770/).
+"""Marktsammler v1.2.7: eigenständiges Programm nur zum Sammeln, mit Statusseite im Browser (http://127.0.0.1:8770/).
 
 Tagesplan (Rechnerzeit, Deutschland):
   außerhalb 15:25-22:10 (und am Wochenende): Historie holen = Tageskerzen für alle Werte der watchlist.csv, danach Stundenkerzen.
@@ -39,8 +39,12 @@ BLOCK_TAGE = {"1 Y": 365, "6 M": 180, "3 M": 90, "1 M": 30, "2 W": 14, "1 W": 7,
 BLOCK_STUFE = {"H": 0, "M5": 0}
 FUT_LEITER = {"H": ["3 M", "1 M", "2 W", "1 W"], "M5": ["1 M", "2 W", "1 W", "3 D"]}   # Dauer-Futures: ein Stück ab jetzt (kein Enddatum erlaubt), größte Stückgröße zuerst
 FUT_STUFE = {"H": 0, "M5": 0}
-STUFEN = {"D": ("Tageskerzen", "tageskerzen"), "H": ("Stundenkerzen", "stundenkerzen"), "M5": ("5-Minuten-Kerzen", "fuenfminuten")}
-REIHENFOLGE = ("D", "H", "M5")
+STUFEN = {"D": ("Tageskerzen", "tageskerzen"), "IV": ("IV-Tageswerte", "iv_tage"), "H": ("Stundenkerzen", "stundenkerzen"), "M5": ("5-Minuten-Kerzen", "fuenfminuten")}
+REIHENFOLGE = ("D", "IV", "H", "M5")
+# v1.2.7: Implizite Volatilität als Tageswert (TWS-Datentyp OPTION_IMPLIED_VOLATILITY, 30 Tage, auf ein Jahr hochgerechnet).
+# Die TWS bietet ihn für Aktien/ETFs und Indizes an, nicht für Futures und Devisen. Jeder Wert mit Tageskerzen
+# (Stufe D) vom Typ STK oder IND bekommt die Stufe IV automatisch - die Watchlist muss nicht geändert werden.
+IV_LEITER = ["5 Y", "2 Y", "1 Y", "6 M"]   # erster Lauf: so weit zurück wie möglich, bei Fehlermeldung kürzer
 DATEN = os.path.join(HERE, "daten")
 WATCHLIST = os.path.join(HERE, "watchlist.csv")
 SIM = "--sim" in sys.argv
@@ -50,7 +54,7 @@ KERZ_SPALTEN = ["zeit", "open", "high", "low", "close", "volume"]
 
 # ------------------------------------------------------------ Zustand für die Statusseite
 LOCK = threading.Lock()
-ST = dict(verbunden=False, phase="Start", pause=False, stopp=False, datentyp=None, job="", hist=dict(D=[0, 0], H=[0, 0], M5=[0, 0]), aktualisieren=False, laufzeit={}, opt=dict(durchlauf=0, kontrakte=[0, 0], zeilen_heute=0, letzte="", leitungen=0),
+ST = dict(verbunden=False, phase="Start", pause=False, stopp=False, datentyp=None, job="", hist=dict(D=[0, 0], IV=[0, 0], H=[0, 0], M5=[0, 0]), aktualisieren=False, laufzeit={}, opt=dict(durchlauf=0, kontrakte=[0, 0], zeilen_heute=0, letzte="", leitungen=0),
           letzter_wert=None, fehler="", symbole={}, pausensek=HIST_PAUSE, start=time.time(), naechste_phase="")
 LOGZ = []
 
@@ -120,6 +124,7 @@ def watchlist_lesen():
             z["gruppe"] = g or {"STK": "Aktie", "IND": "Index", "FUT": "Future", "CASH": "Währung"}.get(z["typ"], "Aktie"); z["sub"] = sub
             z["rth"] = z.get("rth") or ("0" if z["typ"] in ("FUT", "CASH") else "1")
             z["stufen"] = [x for x in re.split(r"[,|\s]+", z.get("stufen") or "D,H") if x in STUFEN]
+            if "D" in z["stufen"] and z["typ"] in ("STK", "IND") and "IV" not in z["stufen"]: z["stufen"].insert(1, "IV")   # v1.2.7
             plan.append(z)
     zaehl = {}
     for z in plan: zaehl[z["symbol"]] = zaehl.get(z["symbol"], 0) + 1
@@ -327,9 +332,10 @@ class IBQuelle:
         """Liefert Ergebnis (dict zeit -> [open, high, low, close, volume]; UTC-ISO bei Stunden/Minuten, Datum bei Tagen) samt Fehlermeldung dieser Anfrage."""
         if z["typ"] == "FUT" and ende:   # Dauer-Futures erlauben kein Enddatum: die TWS meldet 10339 und trennt die Verbindung
             d = Ergebnis(); d.fehler = (10339, "Enddatum bei Dauer-Futures nicht erlaubt"); return d
-        c = await s.vertrag(z); s.fehler_con.pop(c.conId, None); tag = art == "D"; t0 = time.time()
-        bars = await s.ib.reqHistoricalDataAsync(c, endDateTime=ende, durationStr=dauer, barSizeSetting={"D": "1 day", "H": "1 hour", "M5": "5 mins"}[art],
-                                                 whatToShow="MIDPOINT" if z["typ"] == "CASH" else "TRADES", useRTH=bool(rth), formatDate=1 if tag else 2, keepUpToDate=False, timeout=90)
+        c = await s.vertrag(z); s.fehler_con.pop(c.conId, None); tag = art in ("D", "IV"); t0 = time.time()
+        zeige = "OPTION_IMPLIED_VOLATILITY" if art == "IV" else ("MIDPOINT" if z["typ"] == "CASH" else "TRADES")   # v1.2.7
+        bars = await s.ib.reqHistoricalDataAsync(c, endDateTime=ende, durationStr=dauer, barSizeSetting={"D": "1 day", "IV": "1 day", "H": "1 hour", "M5": "5 mins"}[art],
+                                                 whatToShow=zeige, useRTH=bool(rth), formatDate=1 if tag else 2, keepUpToDate=False, timeout=90)
         d = Ergebnis()
         for b in bars or []:
             k = b.date.isoformat() if tag else b.date.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
@@ -368,6 +374,10 @@ class SimQuelle:
         if z["typ"] == "FUT" and ende: d = Ergebnis(); d.fehler = (10339, "Enddatum bei Dauer-Futures nicht erlaubt"); return d
         if z["symbol"].startswith("XXX"): raise KontraktFehler("Kontrakt nicht gefunden: " + z["symbol"])
         d = Ergebnis(); p = 100.0
+        if art == "IV":   # v1.2.7: implizite Volatilität als Dezimalzahl (0,25 = 25 %)
+            t0 = dt.date.today(); v = 0.25
+            for i in range(300): v = min(0.9, max(0.08, v * (1 + s.rng.gauss(0, .04)))); d[(t0 - dt.timedelta(days=300 - i)).isoformat()] = [round(v, 4)] * 4 + [0]
+            return d
         if art == "D":
             t0 = dt.date.today()
             for i in range(40): p *= 1 + s.rng.gauss(0, .01); d[(t0 - dt.timedelta(days=40 - i)).isoformat()] = [round(p, 2), round(p * 1.01, 2), round(p * .99, 2), round(p, 2), 1000]
@@ -468,6 +478,17 @@ async def hist_job(q, z, st):
             r = await q.hist(z, "D", "", dauer_text((heute - ld).days + 3, TAGES_JAHRE), rth)
         else: r = await q.hist(z, "D", "", "%d Y" % TAGES_JAHRE, rth)
         neu = dict(r); f = r.fehler; anf = 1
+    elif st == "IV":   # v1.2.7: wie Tageskerzen; beim ersten Mal die längste Strecke, die die TWS liefert
+        if alt:
+            ld = dt.date.fromisoformat(max(alt)[:10])
+            if ld >= letzter_handelstag(heute): return 0, 0, None
+            r = await q.hist(z, "IV", "", dauer_text((heute - ld).days + 3, 5), rth); neu = dict(r); f = r.fehler; anf = 1
+        else:
+            for dauer in IV_LEITER:
+                r = await q.hist(z, "IV", "", dauer, rth); anf += 1; f = r.fehler
+                if r: neu = dict(r); break
+                if not groessenfehler(r.fehler): break
+                await q.apause(ST["pausensek"])
     else:
         if alt:
             letzt = dt.datetime.fromisoformat(max(alt))
@@ -684,7 +705,7 @@ def arbeiter():
                 if hasattr(q, "basis_stoppen"): q.basis_stoppen()
                 with LOCK: ST["opt"]["leitungen"] = 0
                 if fertig: setze(phase="Warte auf Optionszeit (%s)" % OPT_FENSTER[0], job=""); q.pause(15); continue
-                setze(phase="Historie (Tages-, Stunden-, 5-Minuten-Kerzen)"); fertig = historie_phase(q, plan)
+                setze(phase="Historie (Tageskerzen, IV, Stunden-, 5-Minuten-Kerzen)"); fertig = historie_phase(q, plan)
                 if SIM and fertig and "--sim-bleib" not in sys.argv: break
         except KeyboardInterrupt: break
         except Exception as e:
@@ -696,7 +717,7 @@ def arbeiter():
     setze(phase="Beendet", verbunden=False)
 
 # ------------------------------------------------------------ Statusseite
-HTML = """<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Marktsammler v1.2.6</title>
+HTML = """<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Marktsammler v1.2.7</title>
 <style>
 :root{--bg:#fff;--fg:#1d2330;--mut:#667085;--line:#e3e7ee;--card:#f6f8fb;--ok:#1a7f4b;--bad:#c0332b;--acc:#2b5fd9;--warn:#b7791f}
 @media(prefers-color-scheme:dark){:root{--bg:#12151c;--fg:#e8ebf2;--mut:#9aa3b5;--line:#2a3040;--card:#1a1f2b;--ok:#4cc38a;--bad:#ff7a70;--acc:#7da3ff;--warn:#e6b450}}
@@ -711,7 +732,7 @@ td.klick{cursor:pointer}td.klick:hover{background:var(--card)}tr.sel td{backgrou
 .tw{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:10px}pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;max-height:220px;overflow:auto;font-size:12px;margin:0}
 input{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg);width:160px}h2{font-size:15px;margin:16px 0 6px}
 </style></head><body>
-<h1>Marktsammler v1.2.6</h1><div class="sub" id="sub">lädt ...</div>
+<h1>Marktsammler v1.2.7</h1><div class="sub" id="sub">lädt ...</div>
 <div class="err" id="err"></div>
 <div style="margin-bottom:12px"><button class="main" onclick="cmd('aktualisieren')">Aktualisieren</button><button onclick="cmd('pause')" id="bp">Pause</button><button onclick="cmd('stopp')">Beenden</button></div>
 <div class="grid">
@@ -722,6 +743,7 @@ input{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8p
 </div>
 <div class="grid">
 <div class="card"><div class="k">Tageskerzen</div><div class="v" id="hd">-</div><div class="bar"><i id="hdb"></i></div></div>
+<div class="card"><div class="k">IV-Tageswerte</div><div class="v" id="hi">-</div><div class="bar"><i id="hib"></i></div></div>
 <div class="card"><div class="k">Stundenkerzen</div><div class="v" id="hh">-</div><div class="bar"><i id="hhb"></i></div></div>
 <div class="card"><div class="k">5-Minuten-Kerzen</div><div class="v" id="hm">-</div><div class="bar"><i id="hmb"></i></div></div>
 <div class="card"><div class="k">Optionskette heute</div><div class="v" id="op">-</div><div class="bar"><i id="opb"></i></div><div class="k" id="op2"></div></div>
@@ -731,19 +753,19 @@ input{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8p
 <div class="tw"><table id="ue"></table></div>
 <div id="fe"></div>
 <h2>Werte</h2><div><input id="f" placeholder="Filter (z. B. AAPL, DAX)" oninput="rend()"></div>
-<div class="tw"><table><thead><tr><th>Wert</th><th>Name</th><th>Gruppe</th><th>Tage bis</th><th>Anzahl</th><th>Stunden bis</th><th>Anzahl</th><th>5 Min bis</th><th>Anzahl</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="tw"><table><thead><tr><th>Wert</th><th>Name</th><th>Gruppe</th><th>Tage bis</th><th>Anzahl</th><th>IV bis</th><th>Stunden bis</th><th>Anzahl</th><th>5 Min bis</th><th>Anzahl</th></tr></thead><tbody id="tb"></tbody></table></div>
 <h2>Protokoll</h2><pre id="log"></pre>
 <script>
 let S=null,SEL=null;const $=i=>document.getElementById(i);
-const SN={D:'Tageskerzen',H:'Stundenkerzen',M5:'5-Minuten'};
+const SN={D:'Tageskerzen',IV:'IV-Tageswerte',H:'Stundenkerzen',M5:'5-Minuten'};
 function esc(x){return String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function ago(t){if(!t)return "-";let s=Math.round(Date.now()/1000-t);return s<90?("vor "+s+" s"):s<5400?("vor "+Math.round(s/60)+" min"):("vor "+(s/3600).toFixed(1)+" h")}
 function pct(a,b){return b?Math.min(100,100*a/b):0}
 async function cmd(c){await fetch('/api/'+c,{method:'POST'});poll()}
-function ue(){if(!S)return;let h='<thead><tr><th>Gruppe / Index</th><th>Werte</th><th>Tageskerzen</th><th>Stundenkerzen</th><th>5-Minuten</th></tr></thead><tbody>',kat='';
-for(const r of S.uebersicht){if(r.kat!==kat){kat=r.kat;h+=`<tr class="kopf"><td colspan="5">${kat=='g'?'Nach Gruppe':'Nach Index / Untergruppe'}</td></tr>`}
+function ue(){if(!S)return;let h='<thead><tr><th>Gruppe / Index</th><th>Werte</th><th>Tageskerzen</th><th>IV</th><th>Stundenkerzen</th><th>5-Minuten</th></tr></thead><tbody>',kat='';
+for(const r of S.uebersicht){if(r.kat!==kat){kat=r.kat;h+=`<tr class="kopf"><td colspan="6">${kat=='g'?'Nach Gruppe':'Nach Index / Untergruppe'}</td></tr>`}
 h+=`<tr><td>${esc(r.name)}</td><td>${r.werte}</td>`;
-for(const st of ['D','H','M5']){const v=r.stufen[st];if(!v){h+='<td class="mut">-</td>';continue}const f=v[0]-v[1];const cls=f==0?'ok':(v[1]==0?'bad':'warn');const sel=SEL&&SEL.k==r.kat&&SEL.n==r.name&&SEL.s==st?' sel':'';
+for(const st of ['D','IV','H','M5']){const v=r.stufen[st];if(!v){h+='<td class="mut">-</td>';continue}const f=v[0]-v[1];const cls=f==0?'ok':(v[1]==0?'bad':'warn');const sel=SEL&&SEL.k==r.kat&&SEL.n==r.name&&SEL.s==st?' sel':'';
 h+=`<td class="klick ${cls}${sel}" data-k="${r.kat}" data-n="${esc(r.name)}" data-s="${st}">${v[1]} von ${v[0]}${f?' ('+f+' fehlen)':' fertig'}</td>`}h+='</tr>'}
 $('ue').innerHTML=h+'</tbody>'}
 document.addEventListener('click',e=>{const t=e.target.closest('td.klick');if(!t)return;SEL={k:t.dataset.k,n:t.dataset.n,s:t.dataset.s};fehl()});
@@ -754,14 +776,14 @@ if(!L.length)h+='<div class="ok">Nichts fehlt.</div>';else{h+='<div class="tw"><
 for(const x of L)h+=`<tr><td>${esc(x.symbol)}</td><td>${esc(x.name)}</td><td>${esc(x.typ)}</td><td class="${x.status=='fehler'?'bad':'warn'}">${x.status=='alt'?'veraltet':x.status=='fehler'?'Problem':'fehlt'}</td><td>${esc(x.letzte)||'-'}</td><td>${esc(x.grund)}</td></tr>`;h+='</tbody></table></div>'}
 $('fe').innerHTML=h}catch(e){}}
 function rend(){if(!S)return;const f=$('f').value.toUpperCase();let h='';const ks=Object.keys(S.symbole).filter(k=>{const s=S.symbole[k];return !f||k.includes(f)||(s.name||'').toUpperCase().includes(f)||(s.sub||[]).join(' ').toUpperCase().includes(f)}).sort();
-for(const k of ks.slice(0,2500)){const s=S.symbole[k],d=s.D||[],o=s.H||[],m=s.M5||[];h+=`<tr><td>${esc(s.symbol||k)}</td><td>${esc(s.name)}</td><td>${esc(s.gruppe)}</td><td>${d[1]||'-'}</td><td>${d[2]||0}</td><td>${(o[1]||'-').slice(0,10)}</td><td>${o[2]||0}</td><td>${(m[1]||'-').slice(0,10)}</td><td>${m[2]||0}</td></tr>`}$('tb').innerHTML=h}
+for(const k of ks.slice(0,2500)){const s=S.symbole[k],d=s.D||[],iv=s.IV||[],o=s.H||[],m=s.M5||[];h+=`<tr><td>${esc(s.symbol||k)}</td><td>${esc(s.name)}</td><td>${esc(s.gruppe)}</td><td>${d[1]||'-'}</td><td>${d[2]||0}</td><td>${iv[1]||'-'}</td><td>${(o[1]||'-').slice(0,10)}</td><td>${o[2]||0}</td><td>${(m[1]||'-').slice(0,10)}</td><td>${m[2]||0}</td></tr>`}$('tb').innerHTML=h}
 async function poll(){try{const r=await fetch('/api/status');S=await r.json()}catch(e){$('sub').textContent='Statusseite nicht erreichbar (läuft der Sammler?)';$('sub').className='sub bad';return}
 $('sub').textContent='Läuft seit '+(S.laufzeit_min)+' min, aktualisiert '+S.uhr;$('sub').className='sub';
 $('verb').textContent=S.verbunden?'verbunden':'getrennt';$('verb').className='v '+(S.verbunden?'ok':'bad');$('dtyp').textContent=S.datentyp==1?'Echtzeitdaten':S.datentyp==3?'verzögerte Daten':S.datentyp?('Datentyp '+S.datentyp):'';
 $('phase').textContent=S.phase+(S.pause?' (pausiert)':'');$('job').textContent=S.job||'';$('bp').textContent=S.pause?'Fortsetzen':'Pause';
 $('last').textContent=ago(S.letzter_wert);const stale=S.letzter_wert&&(Date.now()/1000-S.letzter_wert>900)&&!S.pause&&S.phase.startsWith('Optionen');$('last').className='v '+(stale?'bad':'');
 const L=S.opt.leitungen;$('lein').textContent=L+' von '+S.max_leitungen;$('leinb').style.width=pct(L,S.max_leitungen)+'%';
-for(const [st,a,b] of [['D','hd','hdb'],['H','hh','hhb'],['M5','hm','hmb']]){const v=S.hist[st];$(a).textContent=v[0]+' von '+v[1]+' Werten';$(b).style.width=pct(v[0],v[1])+'%'}
+for(const [st,a,b] of [['D','hd','hdb'],['IV','hi','hib'],['H','hh','hhb'],['M5','hm','hmb']]){const v=S.hist[st];$(a).textContent=v[0]+' von '+v[1]+' Werten';$(b).style.width=pct(v[0],v[1])+'%'}
 const K=S.opt.kontrakte;$('op').textContent=S.opt.zeilen_heute+' Zeilen';$('opb').style.width=pct(K[0],K[1])+'%';$('op2').textContent=S.opt.durchlauf?('Durchlauf '+S.opt.durchlauf+': '+K[0]+'/'+K[1]+' Kontrakte, zuletzt '+(S.opt.letzte||'-')):'noch kein Durchlauf heute';
 $('ps').textContent=S.pausensek.toFixed(1)+' s';$('lz').textContent=Object.keys(S.laufzeit).map(k=>SN[k]+': '+S.laufzeit[k].anfragen+' Abfragen in '+S.laufzeit[k].sekunden+' s').join(' | ');
 const e=$('err');if(S.fehler){e.style.display='block';e.textContent='Fehler: '+S.fehler}else e.style.display='none';
