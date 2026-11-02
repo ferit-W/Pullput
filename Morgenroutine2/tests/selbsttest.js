@@ -62,7 +62,7 @@ ctx.window = ctx; ctx.self = ctx; ctx.globalThis = ctx;
 vm.createContext(ctx);
 // Top-Level-const/let sind im vm nicht als Eigenschaften sichtbar — deshalb am Ende exportieren.
 const exporte = ['luedePhase','computeAmpel','ampelRegel','voreinstiegPruefung','trendUndRisiko','usBoersenStatus','xetraStatus','etNachBerlin','makroStufe','makroRegion',
-  'korrigiereZeit','wochenTermine','kreditAusCsv','isoLokal','mrSyncWert','STATE','SK'];
+  'korrigiereZeit','wochenTermine','kreditAusCsv','folgeRenditen','datumAus','isoLokal','mrSyncWert','STATE','SK'];
 vm.runInContext(code + '\n;globalThis.__T={' + exporte.map(n => `${n}:(typeof ${n}!=='undefined'?${n}:undefined)`).join(',') + '};',
   ctx, { filename: 'ferit_morgenroutine_v6.html' });
 const T = ctx.__T;
@@ -209,6 +209,21 @@ abschnitt('Kreditspread');
   pruefe('letzter gültiger Wert, Lücke übersprungen', k && k.wert, 3.69);
   pruefe('Veränderung über 63 Beobachtungen', k && +k.chg63.toFixed(2), 0.63);
   pruefe('leere Antwort → null', T.kreditAusCsv(''), null);
+}
+
+// ── Archiv: Folgerenditen wie in der Rückrechnung (A1c) ───────────────────────
+abschnitt('Archiv-Folgerenditen');
+{
+  const times = [], closes = [];
+  for (let i = 0; i < 100; i++) { times.push(Date.UTC(2026, 0, 2 + i, 20) / 1000); closes.push(100 + i); }
+  const tag = T.datumAus(times[10]);
+  const u = T.folgeRenditen({ [tag]: {} }, closes, times)[tag];
+  // Signal t = Index 10 (Kurs 110), Umsetzung t+1 = 111, fwd5 = Kurs 116 / 111 − 1
+  pruefe('fwd5 ab Schluss t+1', u.spy_fwd5, +(116 / 111 - 1).toFixed(5));
+  pruefe('fwd60 ab Schluss t+1', u.spy_fwd60, +(171 / 111 - 1).toFixed(5));
+  pruefe('vorhandene Werte bleiben unangetastet', Object.keys(T.folgeRenditen({ [tag]: { spy_fwd5: 1, spy_fwd20: 1, spy_fwd60: 1, spy_maxdd20: 1 } }, closes, times)).length, 0);
+  const letzter = T.datumAus(times[98]);
+  pruefe('zu junger Tag bekommt noch nichts', T.folgeRenditen({ [letzter]: {} }, closes, times)[letzter], undefined);
 }
 
 // ── Ergebnis ─────────────────────────────────────────────────────────────────

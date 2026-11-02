@@ -875,6 +875,24 @@ footer strong{color:var(--ink2)}
     </div>
     <div class="sp-body"><div class="hist-wrap" id="hist-body"></div></div>
   </section>
+  <!-- v6.19 (A2, A1d, A3): Archiv auf dem Laufwerk — Rückblick, Bericht, Rückrechnung -->
+  <section class="subpanel collapsed" id="sp-archiv">
+    <div class="sp-head" onclick="toggleSub('sp-archiv',event)">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="sp-t">📚 Archiv &amp; Rückblick</span><span class="sp-meta">jeder Handelstag auf dem Laufwerk</span><span class="info-i" onclick="event.stopPropagation();infoPop('archiv')" title="Wozu das Archiv?">i</span></div>
+    </div>
+    <div class="sp-body">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.72rem">
+        <button class="cp-btn" onclick="rueckblickSchritt(-1)" title="voriger Archivtag">◀</button>
+        <input type="date" id="rb-datum" style="font-family:var(--mono);font-size:.72rem;padding:3px 6px;border:1px solid var(--rule);background:transparent;color:var(--ink)">
+        <button class="cp-btn" onclick="rueckblickSchritt(1)" title="nächster Archivtag">▶</button>
+        <button class="cp-btn" onclick="rueckblick()">anzeigen</button>
+        <span style="margin-left:auto"></span>
+        <button class="cp-btn" onclick="archivBericht()" title="Auswertung über alle Archivtage, dazu ein Paket für eine KI">📊 Bericht erstellen</button>
+        <button class="cp-btn" onclick="archivBefuellen()" title="Rückrechnung 2007–2026 einmalig einspielen; vorhandene Live-Tage bleiben unverändert">⏪ Rückrechnung einspielen</button>
+      </div>
+      <div id="rb-ausgabe" style="margin-top:8px;font-size:.74rem;line-height:1.55"></div>
+    </div>
+  </section>
   <section class="subpanel collapsed" id="sp-diag">
     <div class="sp-head" onclick="toggleSub('sp-diag',event)">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="sp-t">🩺 Datenstatus &amp; Diagnose</span><span class="sp-meta">Frische je Quelle · Proxy-Statistik</span></div>
@@ -3790,6 +3808,11 @@ const INFO_TEXTE = {
     warum:'Gezählt werden die 11 Sektor-ETFs, die über ihrer EMA200 stehen. Vorher war es die EMA50 — die schwankt stark und löste oft STOP aus, kurz bevor sich der Markt fing. Mit EMA200 wurden in der Rückrechnung 272 STOP-Tage zu CAUTION; die Ampel war in beiden Zeiträumen besser (0,39/0,75 statt 0,24/0,71).',
     lesen:'6 oder mehr: breit getragen. Unter 6: Warnzeichen (CAUTION). Unter 3 bei schwachem Trend: STOP. Die EMA50-Zahl steht klein daneben als Frühindikator.',
     bsp:'Typischer Fall (ausgedacht zur Veranschaulichung): 8/11 über EMA200, aber nur 4/11 über EMA50: Der lange Trend steht, kurzfristig gibt es einen Rücksetzer — typischer Fall für „Bewegung–Korrektur–Bewegung“.'},
+  archiv: {t:'Archiv & Rückblick (Phase 3)',
+    ziel:'Jeden Handelstag mit allen Werten aufbewahren, damit du nach Monaten oder Jahren prüfen kannst — selbst oder mit einer KI —, ob die Ampel funktioniert hat und wo ihre Lücken lagen.',
+    warum:'Die Morgenroutine schreibt bei jedem Lauf den Tag in daten/archiv_JJJJ.json: Zustand, Regelversion, Gründe, Konsequenz, alle Index- und Sektorwerte, Sentiment-Rohwerte. Später werden automatisch die Folgerenditen des S&P 500 nachgetragen, genau wie in der Rückrechnung gerechnet. Mit den Rohwerten lassen sich auch künftige Regeln rückwirkend auf dieselben Tage rechnen.',
+    lesen:'Datum wählen → „anzeigen“ zeigt den Tag und was danach geschah; ◀ ▶ blättern. „Bericht erstellen“ fasst alle Tage je Ampelzustand zusammen und listet die Lücken (grün vor Einbruch, rot vor Erholung); dazu entstehen archiv_ki_paket.csv und archiv_ki_frage.txt für eine KI. „Rückrechnung einspielen“ trägt einmalig die Jahre 2007–2026 als „nachgerechnet“ ein, Live-Tage bleiben unberührt.',
+    bsp:'Aus der Rückrechnung: Am 20.02.2020 stand die Ampel auf GO — VIX 15,6, 9 Sektoren über EMA200, Contango. In den 20 Tagen danach fiel der S&P 500 um 31 %. Solche Tage zeigt der Bericht als „Lücke 1“: Mit diesen Eingangswerten war der Einbruch nicht zu sehen.'},
   kredit: {t:'Kreditspread High Yield (AM5) — nur Anzeige',
     ziel:'Zeigt, ob Kreditgeber für riskante Firmenanleihen mehr Aufschlag verlangen — ein Stressmaß außerhalb des Aktienmarkts.',
     warum:'Der Kreditmarkt fehlte bisher völlig. In der Rückrechnung half eine Spread-Warnung 2007–2016, schadete aber 2017–2026 (0,43/0,68). Deshalb fließt er nicht in die Ampel, sondern wird beobachtet und archiviert.',
@@ -4543,17 +4566,19 @@ async function archivSchreiben(){
   }catch(err){ return false; }
 }
 // A1c: Folgerenditen nachtragen, sobald genug Handelstage vergangen sind.
-// Gleiche Definition wie die Rückrechnung: SPY-Schluss t+n / Schluss t − 1,
-// dazu der tiefste Stand der nächsten 20 Tage (größter Rückschlag).
+// EXAKT die Definition der Rückrechnung (ampel_rueckrechnung.py), damit Live-Tage
+// und rückgerechnete Tage vergleichbar sind: Signal zum Schluss t, Umsetzung zum
+// Schluss t+1. fwd_n = Schluss(t+1+n) / Schluss(t+1) − 1; maxdd20 = tiefster
+// Schluss von t+2 bis t+21 gegenüber Schluss(t+1).
 function folgeRenditen(tage, closes, times){
   const pos={}; times.forEach((t,i)=>{ const d=datumAus(t); if(d) pos[d]=i; });
   const upd={};
   Object.keys(tage).forEach(d=>{
     const e=tage[d]; const i=pos[d]; if(i==null) return;
-    const c0=closes[i]; if(!isFinite(c0)) return;
+    const c1=closes[i+1]; if(!isFinite(c1)) return;
     const neu={};
-    [5,20,60].forEach(n=>{ const k='spy_fwd'+n; if(e[k]==null && i+n<closes.length) neu[k]=+(closes[i+n]/c0-1).toFixed(5); });
-    if(e.spy_maxdd20==null && i+20<closes.length){ const m=Math.min(...closes.slice(i+1,i+21)); neu.spy_maxdd20=+(m/c0-1).toFixed(5); }
+    [5,20,60].forEach(n=>{ const k='spy_fwd'+n; if(e[k]==null && i+1+n<closes.length) neu[k]=+(closes[i+1+n]/c1-1).toFixed(5); });
+    if(e.spy_maxdd20==null && i+21<closes.length){ const m=Math.min(...closes.slice(i+2,i+22)); neu.spy_maxdd20=+(m/c1-1).toFixed(5); }
     if(Object.keys(neu).length) upd[d]=neu;
   });
   return upd;
@@ -4575,6 +4600,76 @@ async function archivNachtragen(){
     }catch(e){}
   }
   return n;
+}
+
+// ═══ v6.19 (A2): RÜCKBLICK — wie sah es an Tag X aus, und was geschah danach? ═══
+const ARCHIV_CACHE = {};
+async function archivJahr(j){
+  if(ARCHIV_CACHE[j]) return ARCHIV_CACHE[j];
+  const r = await fetchOnce('http://localhost:8765/data/load?name=archiv_'+j, 8000);
+  if(!r.ok) return null;
+  const a = await r.json(); ARCHIV_CACHE[j] = a && a.tage ? a.tage : {}; return ARCHIV_CACHE[j];
+}
+async function rueckblick(datum){
+  const out=$('rb-ausgabe'), inp=$('rb-datum'); if(!out||!inp) return;
+  datum = datum || inp.value; if(!datum){ out.textContent='Datum wählen.'; return; }
+  inp.value = datum;
+  out.innerHTML='<span style="color:var(--steel)">lädt …</span>';
+  let tage; try{ tage = await archivJahr(datum.slice(0,4)); }catch(e){ tage=null; }
+  if(!tage){ out.innerHTML='<span style="color:var(--gold)">Kein Archiv für '+esc(datum.slice(0,4))+' (Server aus oder noch nichts gespeichert).</span>'; return; }
+  let e = tage[datum], d = datum;
+  if(!e){ // nächster früherer Archivtag (Wochenende, Feiertag)
+    const vor = Object.keys(tage).filter(x=>x<=datum).sort().pop();
+    if(vor){ e=tage[vor]; d=vor; }
+  }
+  if(!e){ out.innerHTML='Für diesen Tag gibt es keinen Eintrag.'; return; }
+  const p=x=>x==null?'–':(x>=0?'+':'')+(x*100).toFixed(1).replace('.',',')+' %';
+  const w=(x,n=1)=>x==null?'–':(+x).toFixed(n).replace('.',',');
+  const farbe={GO:'var(--green)',VOREINSTIEG:'#4a7212',CAUTION:'var(--amber)',STOP:'var(--red)',REVERSE:'var(--violet)'}[e.label]||'var(--steel)';
+  const phasen = Array.isArray(e.phasen) ? e.phasen.map(x=>esc(x.s)+' '+esc(x.p||'–')).join(' · ') : '–';
+  out.innerHTML = `<div style="border-left:3px solid ${farbe};padding-left:9px">`
+    + `<div><b style="color:${farbe};font-size:.9rem">${esc(e.label||'–')}</b> · ${esc(d)}${d!==datum?' (letzter Handelstag davor)':''} · `
+    + `<span style="color:var(--steel)">${e.quelle==='rueckrechnung'?'nachgerechnet':'live angezeigt'} · Regelwerk ${esc(e.version||'–')}${e.label_alt&&e.label_alt!==e.label?' · alte Regel: '+esc(e.label_alt):''}</span></div>`
+    + `<div>Phasen: ${phasen} · VIX ${w(e.vix)} · Termstruktur ${esc(e.term||'–')} · Breite EMA200 ${w(e.breite200,0)} · Panik ${w(e.panik,0)} · F&amp;G ${w(e.fg,0)}${e.kreditHY!=null?' · Kredit HY '+w(e.kreditHY,2)+' %':''}${e.aktien_p3_anteil!=null?' · Aktien in P3 '+w(e.aktien_p3_anteil,0)+' %':''}</div>`
+    + (Array.isArray(e.gruende)&&e.gruende.length ? `<div style="color:var(--steel)">Gründe: ${e.gruende.map(esc).join(' · ')}</div>` : '')
+    + (e.konsequenz ? `<div>Konsequenz: <b>${esc(e.konsequenz.richtung||'')}</b> · ${esc(e.konsequenz.groesse||'')}</div>` : '')
+    + `<div style="margin-top:4px"><b>Danach (S&amp;P 500 ab Folgetag):</b> 5 Tage ${p(e.spy_fwd5)} · 20 Tage ${p(e.spy_fwd20)} · 60 Tage ${p(e.spy_fwd60)} · tiefster Stand in 20 Tagen ${p(e.spy_maxdd20)}`
+    + `${e.spy_fwd20==null?' <span style="color:var(--steel)">(wird nachgetragen, sobald genug Tage vergangen sind)</span>':''}</div></div>`;
+}
+async function rueckblickSchritt(richtung){
+  const inp=$('rb-datum'); if(!inp) return;
+  let datum = inp.value || isoLokal(new Date());
+  let j = +datum.slice(0,4);
+  for(let versuch=0; versuch<3; versuch++){
+    const tage = await archivJahr(String(j)).catch(()=>null) || {};
+    const ks = Object.keys(tage).sort();
+    const z = richtung<0 ? ks.filter(x=>x<datum).pop() : ks.find(x=>x>datum);
+    if(z) return rueckblick(z);
+    j += richtung<0 ? -1 : 1; datum = richtung<0 ? (j+'-12-31~') : (j+'-01-00');
+  }
+  $('rb-ausgabe').textContent = 'Kein weiterer Archivtag.';
+}
+async function archivBericht(){
+  const out=$('rb-ausgabe'); if(!out) return;
+  out.innerHTML='<span style="color:var(--steel)">Bericht wird erstellt …</span>';
+  try{
+    const r = await fetchOnce('http://localhost:8765/archiv/bericht', 60000);
+    const j = await r.json();
+    if(!j.ok){ out.innerHTML='<span style="color:var(--gold)">'+esc(j.fehler||'Fehler')+'</span>'; return; }
+    out.innerHTML = `<div style="color:var(--green)">✓ ${j.tage} Tage ausgewertet (${j.live} live, ${j.rueckrechnung} nachgerechnet). Im Datenordner liegen jetzt: ${j.dateien.map(esc).join(', ')}. Für die KI: <b>archiv_ki_paket.csv</b> hochladen und den Text aus <b>archiv_ki_frage.txt</b> dazu.</div>`
+      + `<pre style="white-space:pre-wrap;max-height:420px;overflow:auto;margin-top:6px;font-size:.68rem;border:1px solid var(--rule);padding:8px">${esc(j.bericht||'')}</pre>`;
+  }catch(e){ out.innerHTML='<span style="color:var(--gold)">Server nicht erreichbar.</span>'; }
+}
+async function archivBefuellen(){
+  if(!confirm('Rückrechnung 2007–2026 ins Archiv einspielen?\n\nRund 4.800 Handelstage werden als „nachgerechnet“ eingetragen. Tage, die schon im Archiv stehen (deine Live-Tage), bleiben unverändert. Vorher wird je Jahresdatei eine .bak angelegt.')) return;
+  const out=$('rb-ausgabe'); out.innerHTML='<span style="color:var(--steel)">wird eingespielt …</span>';
+  try{
+    const r = await fetchOnce('http://localhost:8765/archiv/befuellen', 120000, {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+    const j = await r.json();
+    Object.keys(ARCHIV_CACHE).forEach(k=>delete ARCHIV_CACHE[k]);
+    out.innerHTML = j.ok ? `<span style="color:var(--green)">✓ ${j.neu} Tage neu eingetragen, ${j.unberuehrt} vorhandene unverändert, ${j.ergaenzt} um Folgerenditen ergänzt (${j.jahre[0]}–${j.jahre[j.jahre.length-1]}).</span>`
+                         : '<span style="color:var(--gold)">'+esc(j.fehler||'Fehler')+'</span>';
+  }catch(e){ out.innerHTML='<span style="color:var(--gold)">Server nicht erreichbar.</span>'; }
 }
 
 function saveSnapshot(auto){

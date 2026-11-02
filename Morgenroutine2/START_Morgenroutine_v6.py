@@ -283,6 +283,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._data_list()
         if self.path.startswith("/regelcheck"):
             return self._regelcheck()
+        if self.path.startswith("/archiv/bericht"):
+            return self._archiv_werkzeug("bericht")
         # v6.19 (W1): Handelsplan als Datei - alle Werkzeuge lesen dieselben Regeln
         if self.path == "/handelsplan" or self.path.startswith("/handelsplan?"):
             fp = os.path.join(DIRECTORY, "handelsplan.json")
@@ -351,6 +353,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._data_save()
         if self.path.startswith("/archiv/tage"):
             return self._archiv_tage()
+        if self.path.startswith("/archiv/befuellen"):
+            return self._archiv_werkzeug("befuellen")
         if self.path.startswith("/config/datadir"):
             return self._set_datadir()
         self.send_error(404, "unknown POST endpoint")
@@ -674,6 +678,26 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             try:
                 self._send_json({"ok": False, "fehler": "regelcheck: %s" % e}, 500)
+            except Exception:
+                pass
+
+    def _archiv_werkzeug(self, was):
+        """v6.19 (A3/A1d): auswertung/archiv_werkzeug.py mit dem AKTUELLEN Datenordner.
+        was = "befuellen" (Rueckrechnung einspielen, Live-Tage bleiben) oder "bericht"."""
+        try:
+            import importlib.util
+            pfad = os.path.join(DIRECTORY, "auswertung", "archiv_werkzeug.py")
+            if not os.path.isfile(pfad):
+                return self._send_json({"ok": False, "fehler": "auswertung/archiv_werkzeug.py fehlt"}, 404)
+            spec = importlib.util.spec_from_file_location("archiv_werkzeug_mod", pfad)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            with _lock_fuer("archiv_werkzeug"):
+                erg = mod.befuellen(DATA_DIR) if was == "befuellen" else mod.bericht(DATA_DIR)
+            return self._send_json(erg)
+        except Exception as e:
+            try:
+                self._send_json({"ok": False, "fehler": "archiv: %s" % e}, 500)
             except Exception:
                 pass
 
