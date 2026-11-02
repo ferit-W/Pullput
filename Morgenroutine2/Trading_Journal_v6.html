@@ -2199,7 +2199,11 @@ function calculatePosition() {
   const sizeFx = (isFinite(fxIn) && fxIn > 0) ? fxIn : 1;
   const lossUnitEUR = lossUnit / sizeFx;   // Verlust je Einheit in ECHTEN EUR
   let finalSize = 0;
-  const isManualInput = document.activeElement === requiredSizeInput && manSize > 0;
+  // v6.5 FIX (J1): Beim Bearbeiten eines bestehenden Trades gilt die GESPEICHERTE
+  // Stückzahl. Vorher wurde sie aus der heutigen Kontogröße neu berechnet und
+  // überschrieb beim Speichern still Größe, Risiko und Kapitalbindung.
+  const bearbeitet = !!(document.getElementById('currentTradeId') || {}).value;
+  const isManualInput = (document.activeElement === requiredSizeInput || bearbeitet) && manSize > 0;
   if (isManualInput) finalSize = manSize;
   else if (riskPInput > 0 && lossUnit > 0) finalSize = Math.floor((allowedRiskEUR * sizeFx) / lossUnit); 
 
@@ -3406,6 +3410,10 @@ function loadTradeForManagement(tId) {
   document.getElementById('riskPerTrade').value = t.riskPerTrade;
   document.getElementById('targetCRV').value = t.targetCRV;
   document.getElementById('requiredSize').value = t.size;
+  // v6.5 FIX (J1): Sizing-FX wiederherstellen — fehlte, dadurch wurde beim Speichern
+  // sizeFx auf 1 gesetzt und maxRiskEuro in Dollar statt Euro neu gerechnet.
+  const _sfx = document.getElementById('sizeFx');
+  if (_sfx) _sfx.value = (isFinite(+t.sizeFx) && +t.sizeFx > 0 && +t.sizeFx !== 1) ? t.sizeFx : '';
   document.getElementById('fees').value = t.fees || 0;
   document.getElementById('entryNotes').value = t.entryNotes || '';
   document.getElementById('entryScreenshotLink1').value = (t.entryScreenshotLinks||[])[0]||'';
