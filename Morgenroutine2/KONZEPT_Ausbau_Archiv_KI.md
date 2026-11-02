@@ -7,9 +7,11 @@ Stand: 02.11.2026. Ergänzt `PRUEFBERICHT_Morgenroutine_v6.17.md`. Am Programm i
 - **Trading Journal:** Es hat einen ernsten Fehler, den ich im Browser nachgestellt habe. Wer einen offenen Trade nur öffnet und speichert, etwa um die Marktphase nachzutragen, ändert dabei unbemerkt Stückzahl, Risiko und Kapitalbindung. Im Test wurden aus 7 Stück 5. Dazu kommen ein fehlerhafter IB-Import, Kontobewegungen, die nie auf dem Laufwerk landen, und ein Auto-Backup, das gar nicht läuft.
 - **Depot-Cockpit:** Euro-Positionen rechnet es rund 8 % zu niedrig.
 - **Stillhalter-Journal:** Es liegt nicht im Repository und konnte deshalb nicht geprüft werden.
-- **Archiv:** Für den Langzeit-Rückblick schlage ich ein Tagesarchiv auf dem Laufwerk vor, das nie gekürzt wird, mit einer Rückblick-Ansicht dazu. Damit lässt sich zum Beispiel beantworten: „Was stand heute vor einem Jahr in der Morgenroutine?“
-- **Trendhandel:** Dafür gibt es neue Bausteine, darunter Marktbreite aus dem S&P 500, einen Positions-Monitor für offene Trades, einen Setup-Scanner sowie Tagesplan und Tagesrückblick.
-- **KI:** Sie kann deutlich mehr übernehmen: ein strukturiertes Tagesbriefing, einen Wochenausblick, Fragen an das Archiv und Coaching aus der Verbindung von Journal und Archiv. Ob ein Tag „gut zum Handeln“ ist, entscheiden aber weiter deine Regeln. Die KI erklärt die Lage und fasst zusammen.
+- **Archiv:** Ein Tagesarchiv auf dem Laufwerk, das nie gekürzt wird. Es speichert alle Rohwerte, die Regelversion und automatisch, was danach am Markt passiert ist. Daraus entsteht auf Knopfdruck ein Bericht „Hat die Ampel funktioniert, wo waren Lücken?“. Der kursbasierte Teil lässt sich sogar sofort rückwirkend über rund 15 Jahre prüfen.
+- **Trendhandel:** Neue Bausteine, darunter Marktbreite aus dem S&P 500, ein Positions-Monitor für offene Trades, ein Setup-Scanner sowie Tagesplan und Tagesrückblick.
+- **KI als Trading-Partner:** Die KI gibt oben auf der Seite Lage, Ausblick, anstehende Termine (zum Beispiel US-Wahlen) und eine begründete Neigung wie „eher long“, gekennzeichnet als Meinung, mit Gegenargument und Rückfragemöglichkeit. Ihre Einschätzungen werden archiviert und später auf Treffsicherheit geprüft. Die Entscheidung bleibt bei dir.
+- **Oberfläche:** Eine Startzeile, die alles in 5 Sekunden sagt, Reiter statt einer langen Seite, ein einheitliches Erscheinungsbild für alle Werkzeuge, Mini-Verläufe und eine Handy-Ansicht.
+- **Weitere Vorschläge:** Handelsplan als eine Datei, vollständige Termine, „Trade vorbereiten“ direkt ins Journal, Broker-Abgleich, Monatsbericht, Update mit einem Klick.
 
 ---
 
@@ -90,7 +92,13 @@ Im Kopf steht „v3.4“, im Titel „v6.1“. Der Stillhalter-Link läuft ins L
 
 ---
 
-## Teil B · Langfrist-Archiv: „Was war vor einem Jahr?“
+## Teil B · Langfrist-Archiv als Grundlage für eine spätere Auswertung
+
+**Ziel:** Nach einigen Jahren sollen die gesammelten Daten ausgewertet werden, mit Programm und KI: Hat die Ampel funktioniert? Wo lag sie daneben, wo kam sie zu spät? War die Konsequenz-Zeile sinnvoll? Dafür muss das Archiv mehr enthalten als ein Tagebuch. Es braucht drei Dinge, die heute fehlen:
+
+1. **Die Eingaben vollständig:** alle Rohwerte, aus denen die Ampel entsteht, nicht nur ihr Ergebnis.
+2. **Die Regelversion:** Schwellen und Gewichte ändern sich über die Jahre. Ohne Versionsangabe vergleicht eine spätere Auswertung Äpfel mit Birnen.
+3. **Was danach passiert ist:** Ob „GO“ richtig war, zeigt erst die Marktentwicklung der Folgetage.
 
 **Heute** bewahrt die Morgenroutine wenig auf:
 
@@ -117,6 +125,40 @@ Ein Eintrag je Tag. Läuft die Routine mehrmals am Tag, bleibt der erste Stand e
 - **Was es bringt:** Jeder Morgen ist dauerhaft nachlesbar, auch in Jahren noch.
 - **Vorteil gegenüber heute:** Statt 60 Karten mit wenigen Zahlen gibt es ein vollständiges Protokoll ohne Ablaufdatum, das auf dem Laufwerk liegt und nicht im Browser.
 
+**A1b · Regelversion und Rohwerte mitschreiben**
+Jeder Tagesdatensatz enthält die Version der Ampel- und Konsequenzregeln (Schwellen, Gewichte) und alle Rohwerte. So lässt sich die Ampel später mit alten *und* neuen Regeln für jeden Tag neu berechnen.
+
+- **Was es bringt:** Eine spätere Auswertung kann Regelvarianten fair vergleichen, etwa „hätte VIX 22 statt 20 als CAUTION-Grenze besser funktioniert?“.
+- **Vorteil gegenüber heute:** Heute ist nach einer Regeländerung nicht mehr nachvollziehbar, welche Regel an welchem Tag galt.
+
+**A1c · Nachlauf: Was ist danach passiert?**
+Der Server ergänzt jeden Tag automatisch, sobald die Daten vorliegen:
+
+- Veränderung von SPY, QQQ, IWM und DAX nach 1, 5, 20 und 60 Handelstagen
+- größter Rücksetzer im selben Zeitraum
+- VIX-Veränderung
+- ob die Indexphase gewechselt hat
+
+Gerechnet wird ausschließlich aus Kursen, ohne KI.
+
+- **Was es bringt:** Jeder Ampeltag hat sein Ergebnis direkt daneben. Die spätere Auswertung muss nichts mehr nachträglich zusammensuchen.
+- **Vorteil gegenüber heute:** Die Frage „War die Ampel richtig?“ wird überhaupt erst beantwortbar.
+
+**A1d · Auswertungsbericht „Hat die Ampel funktioniert?“**
+Ein Auswertungsskript rechnet die Zahlen, die KI schreibt daraus den Bericht. Die Zahlen kommen nie von der KI selbst. Ausgewertet wird:
+
+- Ergebnis der Folgetage je Ampelzustand und je Konsequenz-Zeile
+- **Lücken:** GO-Tage, nach denen der Markt deutlich fiel (Fehlalarme), und STOP-Tage, nach denen er stark stieg (verpasste Chancen)
+- **Verzögerung:** Wie viele Tage nach einem Hoch bzw. Tief hat die Ampel gewechselt?
+- welche Einzelsignale (VIX, Breite, Panik-Score, Phasen) am meisten beigetragen haben und welche nichts gebracht haben
+- Vergleich mit einfachen Regeln, etwa „immer long“ oder „nur SPY über EMA200“: Bringt die Ampel mehr als eine simple Regel?
+- deine echten Trades je Ampelzustand (aus dem Journal, siehe T6)
+
+Was ehrlich dazugehört: Folgetage überlappen sich. Die Zahl unabhängiger Marktphasen ist auch nach Jahren klein, denn es gibt nur wenige echte Abwärtsphasen. Der Bericht nennt deshalb immer die Stichprobengröße und unterscheidet „deutlich“ von „Zufall nicht ausgeschlossen“.
+
+- **Was es bringt:** Genau die Prüfung, die du beschreibst, auf Knopfdruck und wiederholbar.
+- **Vorteil gegenüber heute:** Heute gibt es keine Möglichkeit, die Ampel gegen die Wirklichkeit zu prüfen.
+
 **A2 · Rückblick-Ansicht**
 Ein neuer Bereich „06 Rückblick“ bietet:
 
@@ -134,8 +176,9 @@ Alles, was aus Kursen berechnet wird, lässt sich für vergangene Jahre aus Yaho
 
 Nicht rekonstruierbar sind deine manuellen Sentimentwerte, die KI-Texte und Watchlist-Stände. Ob CNN eine Fear-&-Greed-Historie mitliefert, prüfe ich beim Umsetzen. Ich sage es dann, statt etwas zu erfinden.
 
-- **Was es bringt:** Der Rückblick funktioniert ab dem ersten Tag, nicht erst in einem Jahr.
+- **Was es bringt:** Die Auswertung aus A1d muss nicht Jahre warten. Der kursbasierte Teil der Ampel (Phasen, VIX, Termstruktur, Breite der Sektoren) lässt sich sofort über rund 15 Jahre prüfen, inklusive 2018, 2020 und 2022.
 - **Vorteil gegenüber heute:** Es gibt keine Lücke bis zum Start des Archivs, und die Kennzeichnung trennt gemessene von nachgerechneten Daten.
+- **Grenze:** Ohne historische Sentimentwerte ist das eine vereinfachte Ampel. Das sage ich im Bericht auch so.
 
 **A4 · Journal nicht mehr löschen, sondern archivieren**
 Das bisherige „Archivieren“ (J5) wird durch eine Jahresdatei auf dem Laufwerk ersetzt. Alte Trades bleiben für alle Auswertungen erreichbar und werden nur aus der Tabellenansicht ausgeblendet.
@@ -256,9 +299,32 @@ Wenn die Seite offen ist, meldet eine Desktop-Mitteilung des Browsers einen Alar
 
 Die Aufrufe laufen jeder für sich: Keiner kennt die anderen, keiner kennt deine offenen Positionen, nichts wird dauerhaft gespeichert.
 
-### Grundsatz für den Ausbau
+### Grundsatz: ein Trading-Partner mit eigener Meinung
 
-Ob ein Tag „gut zum Handeln“ ist, entscheiden weiter deine Regeln: Ampel und Konsequenz-Zeile. Ein Sprachmodell kann den Markt nicht vorhersagen und klingt dabei überzeugend. Deshalb bekommt die KI die berechneten Zahlen als Eingabe und darf sie erklären, zusammenfassen, recherchieren und vergleichen, aber keine Zahl erfinden und keine Regel überstimmen. Jeder KI-Text wird archiviert, damit du später prüfen kannst, wie oft die Einschätzungen gestimmt haben.
+Die KI soll wie ein erfahrener Kollege am Nebentisch arbeiten. Er sagt dir, wie die Lage ist, was in nächster Zeit ansteht und wohin er tendieren würde. Zum Beispiel: „Ich würde eher long bleiben, Trend intakt, saisonal ist ab Oktober Rückenwind“, oder „Vorsicht, nächste Woche sind US-Wahlen, das kann den Markt in beide Richtungen bewegen“. Entscheiden tust du.
+
+Damit das ein guter Partner wird und kein überzeugend klingender Ratgeber, gelten vier Regeln:
+
+1. **Meinung ja, aber als Meinung gekennzeichnet.** Jede Neigung kommt mit Begründung und einer ehrlichen Sicherheit (hoch, mittel, gering), dazu dem Gegenargument: „Was spräche dagegen?“
+2. **Zahlen nur aus deinen Daten.** Kurse, Phasen und Ampel kommen aus der Routine. Recherchierte Fakten wie Termine oder Nachrichten kommen mit Quelle. Nichts wird erfunden.
+3. **Widerspruch zu deinen Regeln wird offen angesagt.** Sieht die KI etwas anders als Ampel oder Konsequenz-Zeile, sagt sie das ausdrücklich, zum Beispiel: „Die Ampel sagt CAUTION, ich sehe aber …“. Sie stellt es nicht stillschweigend um.
+4. **Jede Einschätzung wird archiviert und später bewertet** (K6, A1d). Nach einigen Monaten weißt du, ob der Partner etwas taugt oder ob die Ampel allein besser ist.
+
+**K0 · Trading-Partner als eigenes Feld ganz oben**
+Ganz oben auf der Seite steht ein kurzer Absatz im Gesprächston:
+
+- Lage in zwei Sätzen
+- Meine Neigung: eher long, eher abwarten oder eher short, mit Sicherheit und Begründung
+- Was in den nächsten Tagen und Wochen ansteht: FOMC, Arbeitsmarktdaten, Wahlen, Großer Verfall, Quartalszahlen deiner Positionen
+- Saisonale Lage aus den Lüddemann-Fenstern und der Saisonalität der Sektoren, die schon in der Routine stehen
+- Was spräche dagegen?
+
+Darunter gibt es ein Eingabefeld für Rückfragen, etwa „Und was heißt das für meine NVDA-Position?“. Die KI antwortet im Kontext aller Daten des Tages.
+
+Der Partner kennt deinen Handelsplan (P3/P6, Risiko je Trade, Slots) und deine Statistik aus dem Journal. Seine Hinweise passen deshalb zu deiner Art zu handeln, etwa: „Du hast an CAUTION-Tagen bisher meist verloren.“
+
+- **Was es bringt:** Genau der Partner, den du beschreibst: Lage, Ausblick und eine begründete Neigung in einer Minute Lesezeit.
+- **Vorteil gegenüber heute:** Das heutige Briefing hat 560 Zeichen, keine Meinung, keinen Ausblick und keine Rückfragen, und es kennt weder deine Positionen noch deine Regeln.
 
 **K1 · Strukturiertes Tagesbriefing statt Kurztext**
 Die KI bekommt in einem einzigen Aufruf:
@@ -326,14 +392,130 @@ Wiederkehrende Teile der Anfrage (Regeln, Erklärung der Kennzahlen) lassen sich
 
 ---
 
+## Teil E · Oberfläche: übersichtlicher und ruhiger
+
+**Ausgangslage:** Die Morgenroutine ist eine lange Seite mit fünf Abschnitten, vielen Erklärtexten und mehreren Schaltern pro Block. Journal, Cockpit und Hub haben drei verschiedene Gestaltungen: Papier mit Serifenschrift, Tailwind-Weiß und Dunkelblau. Wichtige Antworten wie „Darf ich heute?“, „Was steht an?“ und „Wo muss ich handeln?“ verteilen sich über die ganze Seite.
+
+**U1 · Eine Startzeile, die in 5 Sekunden alles sagt**
+Oben steht fest eine schmale Zeile mit:
+
+- Ampel und Konsequenz-Zeile
+- Neigung des Trading-Partners
+- Termine heute
+- Anzahl Positionen mit Handlungsbedarf
+- Börsenstatus
+
+Jedes Element ist anklickbar und springt zum Detail.
+
+- **Vorteil gegenüber heute:** Die Antwort steht oben, die Belege darunter. Heute muss man scrollen und zusammensetzen.
+
+**U2 · Reiter statt einer langen Seite**
+Die Inhalte verteilen sich auf: Heute · Markt · Kandidaten · Positionen · Kalender · Rückblick · Einstellungen. Der Reiter „Heute“ enthält nur das Tägliche, alles andere ist einen Klick entfernt.
+
+- **Vorteil gegenüber heute:** Weniger Scrollen. Die Seite zeigt, was man braucht, und nicht alles auf einmal.
+
+**U3 · Details eingeklappt, Erklärungen als kleines „?“**
+Die langen Erklärtexte, etwa im Treasury-Block oder bei der Konsequenz-Zeile, öffnen sich nur bei Bedarf. In der Normalansicht stehen Zahl und Farbe.
+
+- **Vorteil gegenüber heute:** Ruhigeres Bild. Die Erklärungen bleiben erhalten, stören aber nicht mehr.
+
+**U4 · Ein Erscheinungsbild für alle Werkzeuge**
+Morgenroutine, Journal, Cockpit und Hub bekommen dieselben Farben, Schriften und Bausteine, mit Hell- und Dunkelmodus überall gleich. Die Farbsprache ist fest: Grün für Long/gut, Rot für Short/Gefahr, Gelb für Vorsicht. Dazu eine gemeinsame Kopfzeile, über die man zwischen den Werkzeugen wechselt.
+
+- **Vorteil gegenüber heute:** Man findet sich überall sofort zurecht, statt zwischen drei Stilen zu springen. Die Bibliothek für Tailwind vom CDN (F19) entfällt dabei.
+
+**U5 · Mini-Verläufe statt nur Zahlen**
+Bei VIX, Panik-Score, Marktbreite und jedem Index gibt es eine kleine Linie der letzten 20 Tage direkt neben der Zahl.
+
+- **Vorteil gegenüber heute:** Man sieht auf einen Blick, ob ein Wert steigt oder fällt. Heute gibt es nur den Wert und das Delta zum Vortag.
+
+**U6 · Handy- und Tablet-Ansicht**
+Eine schlanke Ansicht mit Startzeile, Trading-Partner und Positionen, im Heimnetz über den lokalen Server erreichbar.
+
+- **Vorteil gegenüber heute:** Die Lage morgens am Handy prüfen, ohne den PC hochzufahren.
+- **Hinweis:** Der Server lauscht heute bewusst nur auf dem eigenen Rechner. Für das Handy müsste er ins Heimnetz geöffnet werden, mit Passwortschutz. Das würde ich nur auf deinen Wunsch hin umsetzen.
+
+**U7 · Einstellungen als eigene Seite mit Pflegebereich**
+Gemini-Schlüssel, Datenordner, FOMC-Termine, Alarme, Handelsplan-Werte und Pflegehinweise (V13) stehen zusammen auf einer Seite statt in einer ausklappbaren Leiste.
+
+- **Vorteil gegenüber heute:** Alle Einstellungen sind an einem Ort und nicht in Leisten, eigenen Terminfeldern und Code verteilt.
+
+**U8 · Schnellsuche für Ticker**
+Ein Ticker in die Suche getippt zeigt auf einer Karte: Chart mit Phase, deine Trades in diesem Wert aus dem Journal, Quartalszahlen, Watchlist-Status und den Knopf „Trade vorbereiten“.
+
+- **Vorteil gegenüber heute:** Alles zu einem Wert an einer Stelle, statt Journal, Watchlist und Chart einzeln zu öffnen.
+
+Wenn du möchtest, baue ich vor der Umsetzung eine anklickbare Vorschau der neuen Oberfläche mit Beispieldaten. Dann kannst du das Aussehen beurteilen, bevor ich am echten Programm etwas ändere.
+
+---
+
+## Teil F · Weitere Vorschläge
+
+**W1 · Handelsplan als eine Datei**
+Alle Regeln stehen an einer Stelle:
+
+- Risiko je Trade
+- Slots
+- Ampelschwellen
+- Panik-Gewichte
+- Mindestkurs
+- DTE-Grenze
+
+Morgenroutine, Journal, REGELCHECK und KI lesen alle diese eine Datei, und jede Änderung bekommt automatisch eine neue Versionsnummer (A1b).
+
+- **Vorteil gegenüber heute:** Heute stehen die Regeln an mehreren Stellen und widersprechen sich, zum Beispiel 1,0 % Risiko im Journal gegen 0,25 % im REGELCHECK (J8).
+
+**W2 · Termine regelbasiert vervollständigen**
+Ergänzt werden alle Termine, die nach festen Regeln entstehen:
+
+- großer Verfall (dritter Freitag), Quartalsverfall (Hexensabbat)
+- US-Wahltermine
+- Index-Neugewichtungen
+- verkürzte Handelstage
+
+Wahltermine pflegst du einmal im Jahr in eine Liste, so wie bisher die FOMC-Termine.
+
+- **Vorteil gegenüber heute:** Solche Termine fehlen heute. Ob die KI sie im Wochenkalender erwähnt, ist Zufall.
+
+**W3 · „Trade vorbereiten“ von der Morgenroutine ins Journal**
+Aus einem Kandidaten, einem Gap oder der Ticker-Suche öffnet ein Knopf das Journal mit vorausgefülltem Formular: Symbol, Richtung, Stopp nach ATR, Größe nach Risiko, Marktphase, Setup. Das Marktbild des Tages wird automatisch übernommen (A5).
+
+- **Vorteil gegenüber heute:** Weniger Abtippen, weniger Tippfehler, und Marktphase und Kontext sind immer erfasst.
+
+**W4 · Täglicher Abgleich mit dem Broker**
+IB bietet einen Flex-Web-Service, über den sich Positionen und Ausführungen automatisch abholen lassen. Ob CapTrader diesen Zugang für dein Konto freigibt, prüfe ich vor der Umsetzung. Falls ja, vergleicht die Routine jeden Morgen die offenen Positionen im Journal mit denen beim Broker.
+
+- **Vorteil gegenüber heute:** Der monatliche Abgleich von Hand entfällt, und fehlende oder doppelte Positionen fallen am selben Tag auf.
+
+**W5 · Monatsbericht automatisch**
+Zum Monatsende entsteht ein Bericht mit:
+
+- Ampelverlauf
+- deine Trades und Regeltreue
+- Treffsicherheit des Trading-Partners
+- Auffälligkeiten
+
+Gespeichert wird er im Archiv als lesbare Datei.
+
+- **Vorteil gegenüber heute:** Eine regelmäßige Rückschau, ohne sie selbst zusammenzustellen.
+
+**W6 · Update mit einem Klick und Versionsprüfung**
+Neue Programmversionen lassen sich aus dem Repository einspielen. Der Server prüft dabei, ob alle Dateien zusammenpassen (V15), und legt vorher eine Sicherung an.
+
+- **Vorteil gegenüber heute:** Laut Änderungsprotokoll werden heute vier Dateien von Hand kopiert, und eine vergessene Datei fällt nicht auf.
+
+---
+
 ## Freigabe
 
 Zur Auswahl stehen:
 
 - **Fehler:** J1 bis J8 und C1 bis C3, zusätzlich zu F1 bis F20 und V1 bis V16 aus dem ersten Bericht
-- **Archiv:** A1 bis A5
+- **Archiv:** A1 bis A5, inklusive A1b bis A1d für die spätere Auswertung der Ampel
 - **Trendhandel:** T1 bis T8
-- **KI:** K1 bis K6, dazu die Frage, ob Gemini bleibt, Claude dazukommt oder beides wählbar wird
+- **KI:** K0 (Trading-Partner) bis K6, dazu die Frage, ob Gemini bleibt, Claude dazukommt oder beides wählbar wird
+- **Oberfläche:** U1 bis U8, auf Wunsch zuerst als anklickbare Vorschau
+- **Weitere:** W1 bis W6
 
 Mein Vorschlag für die Reihenfolge, falls du eine willst:
 
