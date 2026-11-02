@@ -179,7 +179,15 @@ Wird nach jeder Phase hier fortgeschrieben.
   - Tagesstand speichert jetzt Regelversion, Grundzustand, Trend, Risiko, Breite, Termstruktur, Voreinstieg, Panik-Wende und Kreditspread (Vorarbeit für das Archiv A1b)
   - **AM7** (Short-Seite mit Journal-Daten) wandert zu T6 in Phase 4: Die Journal-Trades speichern die Phase beim Einstieg noch nicht, das kommt mit A5 in Phase 3
   - **Offen bei dir:** Live-Probelauf: Erscheinen Kreditspread (FRED) und „Handelsplan 2026.11.1“ in der Zeile unter der Ampel? Steht im Journal 0,25 % als Vorgabe?
-- [ ] Phase 3
+- [x] Phase 2b — Systemtest S1–S4 erledigt (02.11.2026), Ergebnisse in `auswertung/SYSTEM_TEST.md`. Kurz: Der Rücksetzer-Einstieg war in beiden Zeiträumen positiv. „Platz bis zum Widerstand“ half klar, „RS gegen Sektor“ gemischt, „Nähe zum 52-Wochen-Hoch“ (Näherung) schadete. Nachziehende Stopps waren besser als feste Ziele, der 52-Wochen-Ausbruch schwächer. Größter Rückgang 104,6 R (2021–2023). Kein Handelsstopp, nur Information. Folge: N2 Platz-Check bleibt im Plan, RS gegen Sektor nur als Anzeige.
+- [x] Phase 3 — erledigt und in der Prüfumgebung getestet (02.11.2026):
+  - **A1/A1b/A1c** Tagesarchiv `daten/archiv_JJJJ.json`: je Handelstag Zustand, Regelversion, Gründe, Konsequenz, alle Index-, Sektor- und Sentimentwerte. Der Server führt Einträge zusammen, statt sie zu ersetzen. Folgerenditen werden automatisch nachgetragen, exakt wie in der Rückrechnung (ab Schluss t+1)
+  - **A2** Rückblick in der Morgenroutine: Datum wählen, blättern, sehen was danach geschah
+  - **A3** Rückrechnung 2007–2026 per Knopf ins Archiv (4.827 Tage, gekennzeichnet als „nachgerechnet“, Live-Tage bleiben unberührt)
+  - **A1d** Archiv-Bericht je Ampelzustand mit Lücken (grün vor Einbruch, rot vor Erholung) plus `archiv_ki_paket.csv` und `archiv_ki_frage.txt` für die Auswertung mit einer KI
+  - **A4** Journal v6.6: „Archivieren“ verschiebt alte Trades nach `daten/trading_journal_archiv.json` statt sie zu löschen. Scheitert das Speichern, wird nichts entfernt. Dazu „📚 Langzeit“: Auswertung über Journal und Archiv je Jahr, Setup, Marktphase, Ampel beim Einstieg und Richtung
+  - **A5** Jeder neue Trade speichert das Marktbild des Einstiegstags (Morgenroutine oder Archiv). Fehlt es, bleibt das Feld leer
+  - **Offen bei dir:** einmal „⏪ Rückrechnung einspielen“ drücken. Nach ein paar Läufen prüfen, ob im Rückblick Live-Tage erscheinen
 - [ ] Phase 4
 - [ ] Phase 5
 - [ ] Phase 6

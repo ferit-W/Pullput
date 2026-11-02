@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ferit's Trading Dashboard+Journal v6.5</title>
+<title>Ferit's Trading Dashboard+Journal v6.6</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- v6.4: auf 4.4.0 gepinnt wie Cockpit/Stillhalter — ohne Version kaeme automatisch die naechste Major (5.x) und die Charts braechen ungefragt -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -994,7 +994,8 @@ body.dark-mode .ampel-bg-green { background-color: #14532d; color: #86efac; }
         <button onclick="loadFromServer()" class="px-4 py-2 bg-teal-600 text-white rounded-md text-sm" title="Liest daten/trading_journal.json vom lokalen Server (Port 8765) zurück — Desaster-Recovery / PC-Umzug">⬇ Vom Laufwerk laden</button>
         <input type="file" id="restoreInput" accept=".json" class="hidden" onchange="restoreLocalData(event)">
         <button onclick="document.getElementById('restoreInput').click()" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm">📥 Restore (JSON)</button>
-        <button onclick="archiveOldTrades()" class="px-3 py-2 bg-gray-500 text-white rounded-md text-sm" title="Trades >1 Jahr als JSON exportieren und löschen">📂 Archivieren</button>
+        <button onclick="archiveOldTrades()" class="px-3 py-2 bg-gray-500 text-white rounded-md text-sm" title="Trades älter als 1 Jahr ins Laufwerks-Archiv verschieben (bleiben auswertbar)">📂 Archivieren</button>
+        <button onclick="langzeitAuswertung()" class="px-3 py-2 bg-gray-600 text-white rounded-md text-sm" title="Auswertung über Journal und Archiv: je Jahr, Setup, Marktphase, Ampel beim Einstieg">📚 Langzeit</button>
         <button onclick="restoreAutoBackup()" class="px-3 py-2 bg-purple-600 text-white rounded-md text-sm" title="Letztes Auto-Backup wiederherstellen">🔄 Auto-Restore</button>
         
         <!-- v5.1: VERBESSERTES AMPELSYSTEM mit Storage-Monitor -->
@@ -2352,6 +2353,8 @@ async function openTrade() {
       showToast(`⚠ AKJ-Limit erreicht (${maxAn} offen) — Position wird trotzdem angelegt.`, true);
     const num = allTrades.length > 0 ? Math.max(...allTrades.map(t => t.tradeNumber || 0)) + 1 : 1;
     const newTrade = { ...data, id: 'local_' + Date.now(), tradeNumber: num, positionId: num, status: 'Open', timestamp: new Date().toISOString() };
+    // v6.6 (A5): Marktbild des Einstiegstags automatisch mitspeichern
+    try { newTrade.markt = await marktbildZum(String(newTrade.dateOpened || '').slice(0, 10)); } catch (e) { newTrade.markt = null; }
     allTrades.push(newTrade);
     saveAndRefresh(`Trade #${num} eröffnet!`);
   } else { 
@@ -3360,6 +3363,7 @@ function openTradeDetailModal(tradeId) {
       <p><span class="font-semibold">Ausstiegssetup:</span> ${escapeHtml(t.exitSetup) || '-'}</p>
       <p><span class="font-semibold">Kategorie:</span> ${escapeHtml(t.category||'Trading')}</p>
       <p><span class="font-semibold">Marktphase (Einstieg):</span> ${escapeHtml(t.marketPhase) || 'nicht erfasst'}</p>
+      <p class="col-span-2"><span class="font-semibold">Marktbild beim Einstieg:</span> ${marktbildText(t.markt)}</p>
       <p><span class="font-semibold">Gebühren:</span> ${(t.fees||0).toFixed(2)} €</p>
       <p><span class="font-semibold">G/V (€):</span> <span class="${t.profitEuro>0?'text-green-600 font-bold':(t.profitEuro<0?'text-red-600 font-bold':'font-bold')}">${(t.profitEuro||0).toFixed(2)} €</span></p>
       <p><span class="font-semibold">G/V (R):</span> <span class="${t.profitR>0?'text-green-600 font-bold':(t.profitR<0?'text-red-600 font-bold':'font-bold')}">${(t.profitR||0).toFixed(2)} R</span></p>
@@ -4644,6 +4648,107 @@ document.addEventListener('keydown', function(e) {
 
 
 
+// ═══ v6.6 (A5): MARKTBILD AM TRADE ═══════════════════════════════════════════
+// Beim Eröffnen wird der Stand der Morgenroutine des Einstiegstags mitgespeichert:
+// Ampel, Trend, Risiko, VIX, Breite, Termstruktur, Indexphasen, Regelversion.
+// Quelle 1: Tages-Snapshot der Morgenroutine im Browser (gleicher Server, gleicher Speicher).
+// Quelle 2: Tagesarchiv auf dem Laufwerk (anderer Rechner, oder die Routine lief dort).
+// Gibt es für den Tag (bzw. die 4 Tage davor) nichts, bleibt das Feld leer — nichts wird geraten.
+function _marktKurz(e, quelle, datum) {
+  if (!e || !e.label) return null;
+  return { datum: datum || e.tag || null, quelle, label: e.label, basis: e.basis || null, trend: e.trend || null,
+    risiko: e.risiko || null, version: e.version || null, vix: e.vix ?? null, breite200: e.breite200 ?? e.breite ?? null,
+    term: e.term || null, panik: e.panik ?? null, richtung: e.richtung || null, groesse: e.groesse || null,
+    phasen: Array.isArray(e.phasen) ? e.phasen : null };
+}
+async function marktbildZum(datum) {
+  datum = datum || jetztLokal().slice(0, 10);
+  const grenze = new Date(new Date(datum + 'T12:00:00').getTime() - 4 * 864e5).toISOString().slice(0, 10);
+  try {
+    const h = JSON.parse(localStorage.getItem('ferit_mr13_hist') || '[]');
+    const treffer = (Array.isArray(h) ? h : []).filter(x => x && x.tag && x.tag <= datum && x.tag >= grenze).sort((a, b) => b.tag.localeCompare(a.tag))[0];
+    if (treffer) return _marktKurz(treffer, 'Morgenroutine', treffer.tag);
+  } catch (e) {}
+  try {
+    const r = await fetch('http://localhost:8765/data/load?name=archiv_' + datum.slice(0, 4), { cache: 'no-store' });
+    if (r.ok) {
+      const a = await r.json();
+      const tage = Object.keys((a && a.tage) || {}).filter(d => d <= datum && d >= grenze).sort();
+      const d = tage[tage.length - 1];
+      if (d) return _marktKurz(a.tage[d], a.tage[d].quelle === 'live' ? 'Archiv' : 'Archiv (nachgerechnet)', d);
+    }
+  } catch (e) {}
+  return null;
+}
+function marktbildText(m) {
+  if (!m) return '<span class="text-gray-400">nicht erfasst (an diesem Tag lief die Morgenroutine nicht)</span>';
+  const teile = [m.label, m.trend ? 'Trend ' + m.trend : null, m.risiko ? 'Risiko ' + m.risiko : null,
+    m.vix != null ? 'VIX ' + (+m.vix).toFixed(1) : null, m.breite200 != null ? 'Breite ' + m.breite200 : null, m.term].filter(Boolean);
+  return escapeHtml(teile.join(' · ')) + ` <span class="text-gray-400 text-xs">(${escapeHtml(m.quelle || '')} ${escapeHtml(m.datum || '')}${m.version ? ', Regelwerk ' + escapeHtml(m.version) : ''})</span>`;
+}
+
+// ═══ v6.6 (A4): ARCHIVIEREN STATT LÖSCHEN ════════════════════════════════════
+// Vorher: Trades älter als ein Jahr wurden heruntergeladen und aus Journal UND
+// Laufwerk entfernt; übrig blieb nur eine Summe. Phasen-, Setup- und Langzeit-
+// Auswertungen verloren genau die Historie, die für den Rückblick gebraucht wird.
+// Jetzt: Die Trades wandern in daten/trading_journal_archiv.json (zusammengeführt,
+// keine Dubletten). Erst wenn das Speichern bestätigt ist, verlassen sie das Journal.
+// Kontostand und Equity laufen wie bisher über archivedStats weiter.
+async function archivLaden() {
+  const r = await fetch('http://localhost:8765/data/load?name=trading_journal_archiv', { cache: 'no-store' });
+  if (r.status === 404) return { trades: [] };
+  if (!r.ok) throw new Error('Archiv nicht lesbar (' + r.status + ')');
+  const a = await r.json();
+  return { trades: Array.isArray(a.trades) ? a.trades : [] };
+}
+async function archivAufLaufwerk(trades) {
+  const a = await archivLaden();
+  const ids = new Set(a.trades.map(t => t.id));
+  trades.forEach(t => { if (!ids.has(t.id)) a.trades.push(t); });
+  const w = await fetch('http://localhost:8765/data/save?name=trading_journal_archiv', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: '6.6', typ: 'journal-archiv', ts: Date.now(), trades: a.trades }) });
+  if (!w.ok) throw new Error('Speichern fehlgeschlagen (' + w.status + ')');
+  return a.trades.length;
+}
+
+// Langzeit-Auswertung über Journal UND Archiv (nur geschlossene Trades, aktuelles Konto)
+async function langzeitAuswertung() {
+  let archiv = [];
+  let hinweis = '';
+  try { archiv = (await archivLaden()).trades; } catch (e) { hinweis = 'Archiv auf dem Laufwerk nicht erreichbar — nur Journal-Trades.'; }
+  const ids = new Set();
+  const alle = allTrades.concat(archiv).filter(t => t && t.status === 'Closed' && t.accountId === currentAccountId && !ids.has(t.id) && ids.add(t.id));
+  const gruppe = (titel, fn) => {
+    const g = {};
+    alle.forEach(t => { const k = fn(t) || '— nicht erfasst —'; (g[k] = g[k] || []).push(t); });
+    const zeilen = Object.keys(g).sort().map(k => {
+      const v = g[k], n = v.length, R = v.map(t => +t.profitR || 0);
+      const sum = R.reduce((a, b) => a + b, 0), win = R.filter(r => r > 0).length;
+      return `<tr><td class="px-2 py-1">${escapeHtml(k)}</td><td class="px-2 py-1 text-right">${n}</td><td class="px-2 py-1 text-right">${(win / n * 100).toFixed(0)} %</td>`
+        + `<td class="px-2 py-1 text-right">${(sum / n).toFixed(2)} R</td><td class="px-2 py-1 text-right ${sum >= 0 ? 'text-green-700' : 'text-red-700'}">${sum.toFixed(1)} R</td></tr>`;
+    }).join('');
+    return `<h4 class="font-bold mt-3">${titel}</h4><table class="w-full text-sm"><tr class="text-gray-500"><th class="text-left px-2">Gruppe</th><th class="text-right px-2">Trades</th><th class="text-right px-2">Treffer</th><th class="text-right px-2">Ø je Trade</th><th class="text-right px-2">Summe</th></tr>${zeilen}</table>`;
+  };
+  const html = `<p class="text-sm text-gray-600">${alle.length} geschlossene Trades (Journal ${alle.length - archiv.filter(t => t.accountId === currentAccountId && t.status === 'Closed').length}, Archiv ${archiv.filter(t => t.accountId === currentAccountId && t.status === 'Closed').length}). Kleine Gruppen (unter 20 Trades) sind kein Beleg.${hinweis ? ' ' + hinweis : ''}</p>`
+    + gruppe('Je Jahr', t => String(t.dateClosed || t.dateOpened || '').slice(0, 4))
+    + gruppe('Je Setup', t => t.setup)
+    + gruppe('Je Marktphase (eigene Angabe)', t => t.marketPhase)
+    + gruppe('Je Ampel beim Einstieg (Marktbild)', t => t.markt && t.markt.label)
+    + gruppe('Je Richtung', t => t.direction);
+  let m = document.getElementById('langzeitModal');
+  if (!m) {
+    m = document.createElement('div');
+    m.id = 'langzeitModal';
+    m.className = 'fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4';
+    m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+    document.body.appendChild(m);
+  }
+  m.innerHTML = `<div class="bg-white p-6 rounded-xl max-w-3xl w-full shadow-2xl overflow-auto" style="max-height:85vh">`
+    + `<div class="flex justify-between items-center"><h3 class="text-xl font-bold">📚 Langzeit-Auswertung inkl. Archiv</h3>`
+    + `<button onclick="document.getElementById('langzeitModal').remove()" class="px-3 py-1 bg-gray-300 rounded-md">Schließen</button></div>${html}</div>`;
+}
+
 // === v5.1 FIX D: ARCHIV-FUNKTION ===
 function archiveOldTrades() {
   const oneYearAgo = new Date();
@@ -4660,8 +4765,11 @@ function archiveOldTrades() {
   }
   
   showConfirmationModal(
-    `${oldTrades.length} geschlossene Trades (älter als 1 Jahr) archivieren?\n\nDie G/V-Werte werden in den Archiv-Statistiken gespeichert, damit Kontostand und Equity-Kurve korrekt bleiben.`,
-    () => {
+    `${oldTrades.length} geschlossene Trades (älter als 1 Jahr) archivieren?\n\nSie werden in daten/trading_journal_archiv.json auf dem Laufwerk gespeichert und bleiben für die Langzeit-Auswertung erreichbar. Kontostand und Equity-Kurve bleiben korrekt. Zusätzlich gibt es eine Sicherungsdatei zum Herunterladen.`,
+    async () => {
+      // v6.6 (A4): ERST auf dem Laufwerk sichern — scheitert das, wird nichts entfernt
+      try { await archivAufLaufwerk(oldTrades); }
+      catch (e) { showToast('Archivieren abgebrochen: ' + e.message + ' — es wurde nichts entfernt.', true); return; }
       // v5.1: G/V der zu archivierenden Trades pro Konto aggregieren
       oldTrades.forEach(t => {
         const accId = t.accountId || 'default';
@@ -4692,7 +4800,7 @@ function archiveOldTrades() {
       // Aus Hauptarray entfernen
       const oldIds = new Set(oldTrades.map(t => t.id));
       allTrades = allTrades.filter(t => !oldIds.has(t.id));
-      saveAndRefresh(`${oldTrades.length} Trades archiviert. Statistiken bleiben erhalten.`);
+      saveAndRefresh(`${oldTrades.length} Trades ins Laufwerks-Archiv verschoben. Langzeit-Auswertung: Knopf „📚 Langzeit“.`);
     }
   );
 }
