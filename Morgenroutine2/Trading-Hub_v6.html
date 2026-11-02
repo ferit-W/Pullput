@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading-Hub v6.2</title>
+<style>
+  :root{--bg:#0b0f14;--card:#121923;--rule:#1e2a38;--t1:#e8eef5;--t2:#9fb0c3;--t3:#687990;
+        --gold:#d4a44c;--green:#3fb96a;--red:#e05252;--blue:#4a90d9;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;
+       display:flex;flex-direction:column;align-items:center;padding:40px 16px}
+  .mono{font-family:'Consolas','IBM Plex Mono',monospace}
+  h1{font-size:1.6rem;font-weight:800;letter-spacing:.5px}
+  .sub{color:var(--t3);font-size:.72rem;margin-top:4px}
+  /* Status-Leiste */
+  #status{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin:26px 0 8px;
+          background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 20px;font-size:.78rem}
+  .st-item{display:flex;flex-direction:column;align-items:center;min-width:110px}
+  .st-l{color:var(--t3);font-size:.6rem;text-transform:uppercase;letter-spacing:.8px}
+  .st-v{font-weight:700;margin-top:3px}
+  .ok{color:var(--green)} .warn{color:var(--gold)} .err{color:var(--red)}
+  /* Kacheln */
+  #grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;max-width:1020px;width:100%;margin-top:22px}
+  a.tile{display:block;background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:22px 20px;
+         text-decoration:none;color:var(--t1);transition:transform .12s,border-color .12s}
+  a.tile:hover{transform:translateY(-3px);border-color:var(--gold)}
+  .tile .ico{font-size:1.7rem}
+  .tile .tt{font-weight:700;margin-top:10px;font-size:1rem}
+  .tile .td{color:var(--t2);font-size:.72rem;margin-top:5px;line-height:1.45}
+  .foot{color:var(--t3);font-size:.62rem;margin-top:34px;text-align:center;line-height:1.7}
+</style>
+</head>
+<body>
+  <h1>⬡ TRADING-HUB</h1>
+  <div class="sub mono">Zentrale · Szenario 4 · P3/P6 + GAP · läuft über START_Morgenroutine (Port 8765)</div>
+
+  <div id="status">
+    <div class="st-item"><span class="st-l">Server</span><span class="st-v mono" id="s-srv">…</span></div>
+    <div class="st-item"><span class="st-l">Offene Positionen</span><span class="st-v mono" id="s-open">…</span></div>
+    <div class="st-item"><span class="st-l">Offene Optionen</span><span class="st-v mono" id="s-opt">…</span></div>
+    <div class="st-item"><span class="st-l">Journal-Sicherung</span><span class="st-v mono" id="s-save">…</span></div>
+  </div>
+
+  <div id="grid">
+    <a class="tile" href="/" target="_blank" rel="noopener"><span class="ico">🌅</span>
+      <div class="tt">Morgenroutine</div>
+      <div class="td">Ampel · Konsequenz-Zeile · Wochentermine · Panik-Score · 6-Phasen · Gap-Scanner</div></a>
+    <a class="tile" href="/Trading_Journal_v6.html" target="_blank" rel="noopener"><span class="ico">📈</span>
+      <div class="tt">Trading Journal</div>
+      <div class="td">P3/P6 · GAP · AKJ · Langfrist — Trades, Marktphasen, Teilverkäufe</div></a>
+    <a class="tile" href="/stillhalter_journal_v6.html" target="_blank" rel="noopener"><span class="ico">🛡️</span>
+      <div class="tt">Stillhalter Journal</div>
+      <div class="td">Optionen · Wheel-Tracker · Prämien-KPIs · Depot-Bewirtschaftung (Silber &amp; Co.)</div></a>
+    <a class="tile" href="/depot_cockpit_v6.html" target="_blank" rel="noopener"><span class="ico">🎛️</span>
+      <div class="tt">Depot-Cockpit</div>
+      <div class="td">Gesamtbild · Steuerjahr · Portfolio-Drawdown · Risiko-Ampel · FX-Fix · liest beide Journale</div></a>
+  </div>
+
+  <div class="foot mono">
+    Trading-Hub v6.2 · Alle Tools same-origin über localhost:8765 · Daten: ./daten/*.json (+ .bak) · Backups: ./backups/ (1×/Woche, 26 Wochen)<br>
+    Diese Seite aufrufen als: <b>http://localhost:8765/Trading-Hub_v6.html</b> — als Lesezeichen speichern.
+  </div>
+
+<script>
+// v1.2: Doppelklick-Schutz — wenn die Datei per file:// geoeffnet wurde, funktionieren die
+// Kachel-Links nicht (die brauchen den Server). Deutlicher Hinweis statt toter Buttons.
+if (location.protocol === 'file:') {
+  document.addEventListener('DOMContentLoaded', function(){
+    const b = document.createElement('div');
+    b.style.cssText = 'background:#e05252;color:#fff;padding:14px 18px;border-radius:10px;margin:18px 0;max-width:720px;font-size:.85rem;line-height:1.6';
+    b.innerHTML = '<b>⚠ Falsch geöffnet.</b> Diese Seite wurde per Doppelklick als Datei geöffnet — so funktionieren die Kacheln nicht.<br>'
+      + 'Richtig: <b>START_Batch.bat</b> starten (öffnet das Hub automatisch) oder im Browser aufrufen:<br>'
+      + '<a href="http://localhost:8765/Trading-Hub_v6.html" style="color:#ffe08a;font-weight:700">http://localhost:8765/Trading-Hub_v6.html</a>';
+    document.body.insertBefore(b, document.getElementById('status'));
+    document.querySelectorAll('a.tile').forEach(a=>{ a.style.opacity=.35; a.style.pointerEvents='none'; });
+  });
+}
+// Quick-Status: bewusst simpel und fehlertolerant — Hub muss auch ohne Daten sauber aussehen.
+(async function(){
+  const $=id=>document.getElementById(id);
+  function set(id,txt,cls){const e=$(id);e.textContent=txt;if(cls)e.className='st-v mono '+cls;}
+  // 1) Server-Ping
+  try{
+    const r=await fetch('/ping',{cache:'no-store'});
+    set('s-srv', r.ok?'ONLINE':'HTTP '+r.status, r.ok?'ok':'err');
+  }catch(e){ set('s-srv','OFFLINE','err');
+    set('s-open','–');set('s-opt','–');set('s-save','–'); return; }
+  // 2) Trading Journal: offene Richtungs-Positionen
+  try{
+    const r=await fetch('/data/load?name=trading_journal',{cache:'no-store'});
+    if(r.ok){ const d=await r.json();
+      // v6.2 FIX: Hier stand ein "return". Das bricht aber die GANZE Funktion ab,
+      // nicht nur diesen Zweig — bei unlesbarem Richtungs-Journal wurde der
+      // Stillhalter-Abruf danach gar nicht mehr ausgeführt und sein Feld blieb auf
+      // dem Startwert stehen. Ausgerechnet die Anzeige, die vor unbekannten offenen
+      // Positionen warnen soll, fiel damit bei einem Defekt still aus.
+      // Ein Fehler in einem Journal darf das andere nicht mitreißen.
+      if(!Array.isArray(d.trades)){
+        set('s-open','Datei unlesbar','warn'); set('s-save','unbekannt','warn');
+      } else {
+      const T=d.trades;
+      const open=T.filter(t=>t&&t.status==='Open').length;
+      set('s-open', String(open), open>0?'ok':'');   // v6.0: feste Grenze 15 entfernt
+      const ts=d.ts?new Date(d.ts):null;
+      set('s-save', ts? ts.toLocaleDateString('de-DE')+' '+ts.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : 'vorhanden','ok');
+      }
+    } else { set('s-open','keine Daten',''); set('s-save','noch keine','warn'); }
+  }catch(e){ set('s-open','?','warn'); }
+  // 3) Stillhalter: offene Options-Trades
+  try{
+    const r=await fetch('/data/load?name=stillhalter_journal',{cache:'no-store'});
+    if(r.ok){ const d=await r.json();
+      // v6.1 FIX: Fehlte das trades-Feld (beschaedigte Datei, abgebrochener Schreibvorgang),
+      // wurde daraus ein leeres Array und die Anzeige meldete "0" — also "alles glattgestellt".
+      // Das ist die gefaehrlichere Falschaussage: Sie beruhigt, obwohl nichts bekannt ist.
+      if(!Array.isArray(d.trades)){ set('s-opt','Datei unlesbar','warn'); }
+      else { const open=d.trades.filter(t=>t&&t.status==='OPEN').length;
+             set('s-opt', String(open), open>0?'ok':''); }
+    } else set('s-opt','keine Daten','');
+  }catch(e){ set('s-opt','?','warn'); }
+})();
+</script>
+</body>
+</html>

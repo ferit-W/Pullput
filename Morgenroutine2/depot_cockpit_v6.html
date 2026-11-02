@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Depot-Cockpit v6.1</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0e1119;--bg2:#141927;--card:#1b2133;--elev:#232a3d;--brd:rgba(255,255,255,.06);--brd2:rgba(255,255,255,.12);--t1:#eef1f5;--t2:#8d9aad;--t3:#687990;--acc:#20b2aa;--accg:rgba(32,178,170,.15);--grn:#84cc16;--red:#f43f5e;--amb:#f59e0b;--vio:#8b5cf6;--r:10px;--rs:6px;--tr:.18s cubic-bezier(.4,0,.2,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;-webkit-font-smoothing:antialiased}
+.mono{font-family:'IBM Plex Mono',monospace}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);transition:border-color var(--tr)}.card:hover{border-color:var(--brd2)}
+.inp{font-family:'IBM Plex Mono',monospace;font-size:.78rem;background:var(--bg);border:1px solid var(--brd);border-radius:var(--rs);padding:7px 11px;color:var(--t1);width:100%;outline:none;transition:border-color var(--tr),box-shadow var(--tr)}.inp:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--accg)}.inp::placeholder{color:var(--t3)}
+.lbl{display:block;font-size:.65rem;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:var(--rs);font-size:.8rem;font-weight:600;border:none;cursor:pointer;transition:all var(--tr);outline:none;font-family:inherit;text-decoration:none}
+.btn-p{background:var(--acc);color:#0e1119}.btn-p:hover{background:#36d2cf;transform:translateY(-1px);box-shadow:0 4px 14px var(--accg)}
+.btn-g{background:transparent;color:var(--t2);border:1px solid var(--brd)}.btn-g:hover{background:var(--elev);color:var(--t1);border-color:var(--brd2)}
+.btn-s{padding:3px 9px;font-size:.7rem}
+.badge{display:inline-flex;align-items:center;font-size:.58rem;font-weight:600;padding:2px 7px;border-radius:100px;text-transform:uppercase;letter-spacing:.05em}
+.nav-t{padding:9px 15px;font-size:.8rem;font-weight:500;color:var(--t3);border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all var(--tr);white-space:nowrap;background:none}
+.nav-t:hover{color:var(--t2)}.nav-t.on{color:var(--acc);border-bottom-color:var(--acc)}
+.rg{height:6px;border-radius:3px;background:rgba(255,255,255,.05);overflow:hidden}.rg-f{height:100%;border-radius:3px;transition:width .5s ease}
+.fu{animation:fu .3s cubic-bezier(.4,0,.2,1)}@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.empty{text-align:center;padding:44px 20px;color:var(--t3)}.empty h3{font-size:1rem;font-weight:600;color:var(--t2);margin-bottom:6px}.empty p{font-size:.82rem;max-width:420px;margin:0 auto 14px;line-height:1.5}
+.toast-c{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:var(--rs);font-size:.76rem;font-weight:500;animation:ti .3s ease,to .3s ease 2.7s forwards;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+@keyframes ti{from{transform:translateX(30px);opacity:0}}@keyframes to{to{transform:translateX(30px);opacity:0}}
+.t-ok{background:var(--grn);color:#0e1119}.t-err{background:var(--red);color:#fff}.t-info{background:var(--acc);color:#0e1119}
+.frm{width:100%;height:calc(100vh - 130px);border:1px solid var(--brd);border-radius:var(--r);background:var(--bg2)}
+@media(max-width:768px){.hm{display:none!important}.nav-t{padding:7px 9px;font-size:.73rem}}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.012;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+</style>
+</head>
+<body>
+<header style="background:var(--bg2);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)">
+  <div style="max-width:1480px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--vio));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.88rem">Σ</div>
+      <div><div style="font-size:.92rem;font-weight:700;line-height:1.2">Depot-Cockpit</div><div class="mono" style="font-size:.57rem;color:var(--t3)">v3.4 · Server-Lesen · Live-Lesen · Steuerjahr · Portfolio-DD · Pro-Trade-FX</div></div>
+    </div>
+    <div class="mono" style="font-size:.6rem;color:var(--t3)" id="dataAge"></div>
+  </div>
+  <nav style="max-width:1480px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto" id="nav"></nav>
+</header>
+<main style="max-width:1480px;margin:0 auto;padding:18px 20px" id="main"></main>
+<div class="toast-c" id="toasts"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// KONFIGURATION — Dateinamen der beiden Journals (gleicher Ordner!)
+// ════════════════════════════════════════════════════════════════
+const J_DIR='Trading_Journal_v6.html';        // v6.0 FIX: zeigte auf Trading_Journal_v4_9.html — Datei existiert nicht mehr
+const J_SH ='stillhalter_journal_v6.html';  // v6.0 FIX: zeigte auf stillhalter-journal-v4_2_22.html — Datei existiert nicht mehr
+const LSK='depotCockpit_v1';
+const MUL=100;
+
+// State
+let S={dir:null,sh:null,rate:1.0850,dirCcy:'USD',depot:null,qbase:'http://localhost:8765',quotes:{},riskLimit:6,taxYear:'all'};
+try{const raw=JSON.parse(localStorage.getItem(LSK));if(raw)S={...S,...raw};}catch(e){}
+
+const $=id=>document.getElementById(id);
+const persist=()=>{try{localStorage.setItem(LSK,JSON.stringify(S));}catch(e){toast('Speicher voll – Cockpit speichert die Backups nicht.','t-err');}};
+const fE=(v,d=0)=>(Number(v)||0).toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d})+' €';
+const f$=(v,d=0)=>'$'+(Number(v)||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pnlC=v=>v>=0?'color:var(--grn)':'color:var(--red)';
+function toast(msg,cls='t-ok'){const e=document.createElement('div');e.className='toast '+cls;e.textContent=msg;$('toasts').appendChild(e);setTimeout(()=>e.remove(),3200);}
+// v3.1: Journal-Strings (Ticker etc.) nie ungefiltert in innerHTML
+const escH=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ════════════════════════════════════════════════════════════════
+// WÄHRUNGS-UMRECHNUNG (Snapshot-Modell)
+//  - alles wird mit EINEM aktuellen Kurs nach EUR gemarkt (kein Pro-Trade-Kurs)
+//  - USD-Betrag / Kurs = EUR  (z.B. 1000$ / 1.085 = 921€)
+// ════════════════════════════════════════════════════════════════
+// v3.3 (Opt ④): Pro-Trade-Kurs (fxClose) wenn vorhanden, sonst Snapshot-Kurs
+const fxOf=fx=>(+fx>0?+fx:(S.rate||1.085));
+const eur=(v,ccy,fx)=>(!ccy||ccy==='EUR')?(+v||0):((+v||0)/fxOf(fx));
+// ── v3.4.2 FIX (FX-DOPPELUMRECHNUNG) ────────────────────────────────────────
+// profitEuro und maxRiskEuro kommen aus dem Richtungs-Journal v5.3 BEREITS in EUR,
+// sobald dort ein Close-FX erfasst wurde:  pEuro = roh * fxClose,  fxClose = EUR je USD
+// (Feld-Platzhalter dort: 0.9250).  Das Cockpit hat den Wert danach ein ZWEITES Mal
+// umgerechnet — und zusaetzlich mit der UMGEKEHRTEN Konvention (v / 1.085 statt v * 0.925).
+// Folge: realisierte G/V und offenes Risiko lagen je nach Fall ~8 % zu hoch bzw. zu niedrig,
+// und der Fehler wechselte das Vorzeichen, je nachdem ob ein Kurs erfasst war oder nicht.
+//   fxClose vorhanden und != 1 -> Journal hat schon in EUR gerechnet -> NICHT nochmal rechnen.
+//   fxClose fehlt oder == 1    -> Journal hat nicht umgerechnet -> bisherige Logik greift.
+const eurDir=(v,fx)=>((+fx>0 && +fx!==1) ? (+v||0) : eur(v,S.dirCcy,fx));
+
+// ════════════════════════════════════════════════════════════════
+// RISIKO-REPLIK Stillhalter — MUSS synchron zu v4.2 calcRisk() bleiben!
+//  (Read-only-Nachbau, damit das Cockpit offenes Risiko zeigen kann)
+// ════════════════════════════════════════════════════════════════
+function shRisk(t){
+  if(t.maxRisk) return t.maxRisk;
+  const s=t.strategy,l=t.legs||[],c=t.contracts,p=t.premium;
+  if(!l.length||!c||!p) return 0;
+  const seln=(l.find(x=>x.side==='SELL')||{}).strike;
+  if(s==='CSP'){if(!seln)return 0;const r=(seln*MUL*c)-(p*MUL*c);return r>0?r:0;}
+  if(s==='BPS'||s==='BCS'){const st=l.map(x=>x.strike).filter(Boolean);if(st.length<2)return 0;const w=Math.abs(st[0]-st[1]);if(w<=0)return 0;const r=(w*MUL*c)-(p*MUL*c);return r>0?r:0;}
+  if(s==='IC'){const pS=l.filter(x=>x.type==='PUT').map(x=>x.strike).filter(Boolean),cS=l.filter(x=>x.type==='CALL').map(x=>x.strike).filter(Boolean);const pw=pS.length>=2?Math.abs(pS[0]-pS[1]):0,cw=cS.length>=2?Math.abs(cS[0]-cS[1]):0;const mw=Math.max(pw,cw);if(mw<=0)return 0;const r=(mw*MUL*c)-(p*MUL*c);return r>0?r:0;}
+  return 0; // CC / STRANGLE / STOCK = kein definiertes Risiko
+}
+
+// ════════════════════════════════════════════════════════════════
+// AGGREGATION — liefert alle Kennzahlen (pure, getestet)
+// ════════════════════════════════════════════════════════════════
+const TYPE={
+  AKTIE :{l:'Aktien',   c:'--acc', tax:'Aktien-Verlusttopf'},
+  ETF   :{l:'ETF',      c:'--grn', tax:'mit Teilfreistellung'},
+  OPTION:{l:'Optionen', c:'--vio', tax:'Stillhalter / Termingeschäft'},
+  FUTURE:{l:'Futures',  c:'--amb', tax:'Termingeschäft'}
+};
+// Klassifizierung -> Steuer-/Asset-Topf
+const classDir=t=>(t.instrumentType==='future')?'FUTURE':(((t.sector||'')==='IndexETF')?'ETF':'AKTIE');
+const classSh =t=>(t.strategy==='STOCK')?'AKTIE':'OPTION';
+const ticker  =s=>((s||'')+'').trim().toUpperCase()||'—';
+
+function aggregate(){
+  const mkB=()=>({net:0,gain:0,loss:0,n:0});
+  const out={
+    ready:false,
+    trend:{realizedEUR:0,openRiskEUR:0,open:0,closed:0,wins:0},
+    sv:{realizedEUR:0,openRiskEUR:0,open:0,closed:0,wins:0,openPremEUR:0},
+    closedPts:[],
+    tax:{AKTIE:mkB(),ETF:mkB(),OPTION:mkB(),FUTURE:mkB()},
+    taxRows:[],
+    ul:{}
+  };
+  const ulG=k=>{if(!out.ul[k])out.ul[k]={t:k,realizedEUR:0,byType:{AKTIE:0,ETF:0,OPTION:0,FUTURE:0},types:{},openPremEUR:0,openRiskEUR:0,open:0,closed:0,openShares:0,openCostNat:0,posCcy:null};return out.ul[k];};
+  const addTax=(c,v)=>{const b=out.tax[c];b.net+=v;b.n++;if(v>=0)b.gain+=v;else b.loss+=v;};
+  // ── Richtung (v4.8): profitEuro/maxRiskEuro in DIR-Währung ──
+  if(S.dir && Array.isArray(S.dir.trades)){
+    S.dir.trades.forEach(t=>{
+      const cat=classDir(t), key=ticker(t.productName);
+      if(t.status==='Closed'){
+        const v=eurDir(t.profitEuro||0,t.fxClose);
+        out.trend.realizedEUR+=v; out.trend.closed++; if((t.profitEuro||0)>0)out.trend.wins++;
+        const dt=t.dateClosed||t.dateOpened; if(dt)out.closedPts.push({date:dt,vEUR:v});
+        addTax(cat,v); out.taxRows.push({year:String(dt||'').slice(0,4),cat,v}); const u=ulG(key); u.realizedEUR+=v; u.byType[cat]+=v; u.types[cat]=1; u.closed++;
+      } else if(t.status==='Open'){
+        // v6.1.1 FIX: eurDir wurde OHNE fx-Argument gerufen und hat maxRiskEuro
+        // dadurch immer durch den Kontokurs geteilt. Das Journal führt maxRiskEuro
+        // aber bereits in echten EUR, sobald dort ein Sizing-FX erfasst wurde
+        // (v5.4.1: "riskPerUnit/maxRiskEuro in ECHTEN EUR halten").
+        // Folge: Das offene Risiko lag rund 7,8 % ZU NIEDRIG — bei 10 Positionen
+        // à 925 EUR wurden 8.525 statt 9.250 EUR ausgewiesen, die Auslastung
+        // 8,53 % statt 9,25 %. Die Unterschätzung von Risiko ist die gefährlichere
+        // Richtung, deshalb zählt der Fehler schwerer als sein Betrag.
+        // t.sizeFx entscheidet wie bei profitEuro: gesetzt und != 1 -> schon EUR.
+        out.trend.open++; const rk=eurDir(t.maxRiskEuro||0, t.sizeFx); out.trend.openRiskEUR+=rk;
+        const u=ulG(key); u.openRiskEUR+=rk; u.open++; u.types[cat]=1;
+        // ── v6.1.1 FIX (SHORT-POSITIONEN MIT VERKEHRTEM VORZEICHEN) ──────────
+        // Das Cockpit hat t.direction nie geprüft. Eine Short-Position erhöhte
+        // openShares wie eine Long-Position, und das Mark-to-Market kam mit
+        // exakt umgekehrtem Vorzeichen heraus: Short 10 Stück zu 100, Kurs bei
+        // 110 → angezeigt +100 statt −100. Ein laufender Verlust sah aus wie
+        // ein Gewinn. Das wiegt seit der P6-Regel schwerer, weil Short-Positionen
+        // damit zum Normalfall gehören und nicht mehr die Ausnahme sind.
+        // Negative Stückzahl trägt das Vorzeichen sauber durch die ganze Rechnung:
+        // 110·(−10) − (−1000) = −100.
+        if(cat==='AKTIE'||cat==='ETF'){
+          const sh=(+t.size||0)*(t.direction==='Short'?-1:1);
+          u.openShares+=sh; u.openCostNat+=sh*(+t.entryPrice||0); u.posCcy=S.dirCcy;
+        }
+      }
+    });
+  }
+  // ── Stillhalter (v4.2): pnl pro Trade-Währung; Risiko via shRisk() ──
+  if(S.sh && Array.isArray(S.sh.trades)){
+    S.sh.trades.forEach(t=>{
+      const ccy=t.currency||'USD', cat=classSh(t), key=ticker(t.underlying);
+      if(t.status && t.status!=='OPEN'){
+        const v=eur(t.pnl||0,ccy,t.fxClose);
+        out.sv.realizedEUR+=v; out.sv.closed++; if((t.pnl||0)>0)out.sv.wins++;
+        const dt=t.closeDate||t.entryDate; if(dt)out.closedPts.push({date:dt,vEUR:v});
+        addTax(cat,v); out.taxRows.push({year:String(dt||'').slice(0,4),cat,v}); const u=ulG(key); u.realizedEUR+=v; u.byType[cat]+=v; u.types[cat]=1; u.closed++;
+      } else {
+        out.sv.open++; const rk=eur(shRisk(t),ccy); out.sv.openRiskEUR+=rk;
+        const pr=eur((t.premium||0)*(t.contracts||0)*MUL,ccy); out.sv.openPremEUR+=pr;
+        const u=ulG(key); u.openRiskEUR+=rk; u.openPremEUR+=pr; u.open++; u.types[cat]=1;
+        if(t.strategy==='STOCK'){const sh=+t.contracts||0; u.openShares+=sh; u.openCostNat+=sh*(+t.underlyingPrice||0); u.posCcy=ccy;}
+      }
+    });
+  }
+  out.closedPts.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  out.realizedEUR=out.trend.realizedEUR+out.sv.realizedEUR;
+  out.openRiskEUR=out.trend.openRiskEUR+out.sv.openRiskEUR;
+  out.ready=!!(S.dir||S.sh);
+  return out;
+}
+
+// ════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════════
+const TABS=[{id:'depot',l:'Σ Depot-Gesamt'},{id:'underlying',l:'Pro Underlying'},{id:'tax',l:'Steuer-Töpfe'},{id:'dir',l:'Richtung'},{id:'sh',l:'Stillhalter'}];
+let tab='depot';
+function go(t){tab=t;$('nav').innerHTML=TABS.map(x=>`<button class="nav-t ${x.id===t?'on':''}" onclick="go('${x.id}')">${x.l}</button>`).join('');render();}
+function render(){
+  const m=$('main');
+  if(tab==='depot'){m.innerHTML=rDepot();setTimeout(initChart,60);}
+  else if(tab==='underlying')m.innerHTML=rUnderlying();
+  else if(tab==='tax')m.innerHTML=rTax();
+  else if(tab==='dir')m.innerHTML=rFrame('Richtungs-Journal (v6.0)',J_DIR);
+  else if(tab==='sh')m.innerHTML=rFrame('Stillhalter-Journal (v6.0)',J_SH);
+  updDataAge();
+}
+function updDataAge(){
+  const parts=[];
+  if(S.dir)parts.push('Richtung: '+(S.dir.timestamp?S.dir.timestamp.slice(0,16).replace('T',' '):'?'));
+  if(S.sh)parts.push('Stillhalter: '+(S.sh.timestamp?S.sh.timestamp.slice(0,16).replace('T',' '):(S.sh.date?S.sh.date.slice(0,16).replace('T',' '):'?')));
+  $('dataAge').textContent=parts.length?('Backup-Stand · '+parts.join('  ·  ')):'';
+}
+
+// ════════════════════════════════════════════════════════════════
+// JOURNAL-TABS (iframe + Fallback "in neuem Tab")
+// ════════════════════════════════════════════════════════════════
+function rFrame(title,file){
+  return `<div class="fu">
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">
+      <span style="font-weight:700;font-size:.95rem">${title}</span>
+      <a class="btn btn-p btn-s" href="${file}" target="_blank" rel="noopener">▶ In neuem Tab öffnen</a>
+      <span style="font-size:.66rem;color:var(--t3)">Falls die Vorschau leer bleibt (lokale Datei-Beschränkung deines Browsers), nutze den Button — das Journal läuft dann eigenständig mit allen Daten.</span>
+    </div>
+    <iframe class="frm" src="${file}" title="${title}"></iframe>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════════════
+// DEPOT-TAB
+// ════════════════════════════════════════════════════════════════
+function rDepot(){
+  const a=aggregate();
+  let h='<div class="fu">';
+
+  // ── Steuerleiste ──
+  h+=`<div class="card" style="padding:14px;margin-bottom:14px">
+    ${S._live?`<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;margin-bottom:10px;padding:6px 10px;background:var(--accg);border-radius:6px"><span style="font-size:.68rem;color:var(--acc);font-weight:600">● Live-Modus — liest direkt aus den Journals, kein Export nötig</span><button class="btn btn-p btn-s" onclick="loadLive(false)">⟳ Live aktualisieren</button></div>`:(liveAvailable()?`<div style="margin-bottom:10px"><button class="btn btn-g btn-s" onclick="loadLive(false)">● Live aus den Journals lesen (kein Export nötig)</button></div>`:'')}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;align-items:end">
+      <div><label class="lbl">Richtungs-Backup (v6 JSON)</label>
+        <label class="btn btn-g btn-s" style="cursor:pointer;width:100%;justify-content:center">${S.dir?'✓ geladen — neu wählen':'📂 Datei wählen'}<input type="file" accept=".json" onchange="loadDir(event)" style="display:none"></label></div>
+      <div><label class="lbl">Stillhalter-Backup (v6 JSON)</label>
+        <label class="btn btn-g btn-s" style="cursor:pointer;width:100%;justify-content:center">${S.sh?'✓ geladen — neu wählen':'📂 Datei wählen'}<input type="file" accept=".json" onchange="loadSh(event)" style="display:none"></label></div>
+      <div><label class="lbl">EUR/USD Snapshot-Kurs</label><input type="number" step="0.0001" value="${S.rate}" class="inp" onchange="S.rate=parseFloat(this.value)||1.085;persist();render()"></div>
+      <div><label class="lbl">Richtungs-Journal Währung</label><select class="inp" onchange="S.dirCcy=this.value;persist();render()"><option value="USD" ${S.dirCcy==='USD'?'selected':''}>USD</option><option value="EUR" ${S.dirCcy==='EUR'?'selected':''}>EUR</option></select></div>
+      <div><label class="lbl">Aktuelles Depot (EUR, optional)</label><input type="number" step="100" value="${S.depot||''}" placeholder="z.B. 800000" class="inp" onchange="const v=parseFloat(this.value); S.depot=isNaN(v)?null:v; persist(); render()"></div>
+    </div>
+    <div style="font-size:.64rem;color:var(--t3);margin-top:9px;line-height:1.5">
+      Snapshot-Modell: alle USD-Werte werden mit dem <strong>aktuellen</strong> Kurs nach EUR gemarkt – die EUR-Historie ist also eine Momentaufnahme, kein exakter Pro-Trade-Kurs.
+      „Aktuelles Depot" wird <strong>nicht</strong> aus den Backups summiert (Doppelzählung bei einem gemeinsamen IB-Konto vermeiden) – trag deinen echten Kontowert ein.
+      v4.8 hat kein Pro-Trade-Währungsfeld → ganze Richtungs-Seite über die Auswahl oben (Default USD).
+    </div>
+  </div>`;
+
+  if(!a.ready){
+    h+=`<div class="empty"><div style="font-size:2.2rem;opacity:.5;margin-bottom:10px">Σ</div><h3>Beide Backups laden</h3><p>Exportiere in jedem Journal ein JSON-Backup (💾) und lade beide oben. Das Cockpit rechnet nichts an deinen Journals – es liest nur.</p></div></div>`;
+    return h;
+  }
+
+  // ── KPI-Zeile ──
+  const depotPct=S.depot? (a.openRiskEUR/S.depot*100):null;
+  h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px">`;
+  h+=kpi('Realisiert P&L gesamt',fE(Math.round(a.realizedEUR)),(a.trend.closed+a.sv.closed)+' geschl. Trades',a.realizedEUR>=0?'--grn':'--red');
+  h+=kpi('Offenes Risiko gesamt',fE(Math.round(a.openRiskEUR)),depotPct!==null?depotPct.toFixed(1)+'% vom Depot':'Depot setzen für %',depotPct!==null&&depotPct>100?'--red':'--amb');
+  h+=kpi('Offene Positionen',(a.trend.open+a.sv.open),`${a.trend.open} Trend · ${a.sv.open} Short-Vol`,'--acc');
+  h+=kpi('Offene Prämie (Short-Vol)',fE(Math.round(a.sv.openPremEUR)),'unrealisiert','--vio');
+  if(S.depot)h+=kpi('Depot + realisiert',fE(Math.round(S.depot+a.realizedEUR)),'Snapshot','--acc');
+  h+='</div>';
+
+  // ── Tail-Korrelations-Split: Trend vs Short-Vol ──
+  h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:16px">`;
+  h+=splitCard('Trend (Richtung)','var(--acc)',a.trend,null);
+  h+=splitCard('Short-Vol (Stillhalter)','var(--vio)',a.sv,a.sv.openPremEUR);
+  // Risiko-Konzentration der OFFENEN Seite (deine Tail-These)
+  const tot=a.openRiskEUR||1, tShare=a.trend.openRiskEUR/tot*100, sShare=a.sv.openRiskEUR/tot*100;
+  h+=`<div class="card" style="padding:14px">
+    <div class="lbl" style="margin-bottom:8px">Offenes Risiko – Verteilung</div>
+    <div style="font-size:.72rem;color:var(--t2);margin-bottom:6px">Trend-Long & Short-Vol korrelieren im Crash verdeckt – hier siehst du die Schieflage.</div>
+    <div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:3px"><span style="color:var(--acc)">Trend ${tShare.toFixed(0)}%</span><span style="color:var(--vio)">Short-Vol ${sShare.toFixed(0)}%</span></div>
+    <div class="rg" style="height:10px;background:var(--vio)"><div class="rg-f" style="width:${tShare}%;background:var(--acc)"></div></div>
+    <div style="font-size:.66rem;color:var(--t3);margin-top:8px">Trend ${fE(Math.round(a.trend.openRiskEUR))} · Short-Vol ${fE(Math.round(a.sv.openRiskEUR))}</div>
+  </div>`;
+  h+='</div>';
+
+  // ── Opt③: Portfolio-Drawdown (auf der realisierten Kurve) + Risiko-Ampel ──
+  const base=(S.depot!=null)?(S.depot-a.realizedEUR):0;
+  let eq=base,peak=base,maxDD=0;
+  a.closedPts.forEach(p=>{eq+=p.vEUR; if(eq>peak)peak=eq; const dd=peak-eq; if(dd>maxDD)maxDD=dd;});
+  const curDD=peak-eq;
+  const ddRef=peak>0?peak:0;
+  const maxDDpct=ddRef>0?(maxDD/ddRef*100):null, curDDpct=ddRef>0?(curDD/ddRef*100):null;
+  const lim=S.riskLimit||6, rp=depotPct;
+  let ampCol='--t3',ampTxt='Depot setzen für Ampel';
+  if(rp!=null){if(rp>lim){ampCol='--red';ampTxt='ÜBER Limit';}else if(rp>lim*0.66){ampCol='--amb';ampTxt='nahe Limit';}else{ampCol='--grn';ampTxt='im Limit';}}
+  h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:16px">
+    <div class="card" style="padding:14px">
+      <div class="lbl" style="margin-bottom:8px">Portfolio-Drawdown · realisierte Kurve${S.depot!=null?' (Depot-verankert)':''}</div>
+      <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px"><span style="color:var(--t3)">Max Drawdown</span><span class="mono" style="color:var(--red)">${fE(Math.round(maxDD))}${maxDDpct!=null?' · '+maxDDpct.toFixed(1)+'%':''}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.78rem"><span style="color:var(--t3)">Aktuell vom Hoch</span><span class="mono" style="${curDD>0.5?'color:var(--amb)':'color:var(--grn)'}">${fE(Math.round(curDD))}${curDDpct!=null?' · '+curDDpct.toFixed(1)+'%':''}</span></div>
+      <div style="font-size:.6rem;color:var(--t3);margin-top:8px">${S.depot!=null?'Kurve auf dein „Aktuelles Depot" verankert.':'Ohne „Aktuelles Depot": relativ zum Hoch der kumulierten realisierten P&L.'}</div>
+    </div>
+    <div class="card" style="padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="lbl" style="margin:0">Risiko-Ampel · offenes Risiko</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:var(${ampCol})"></span><span style="font-size:.66rem;font-weight:600;color:var(${ampCol})">${ampTxt}</span></span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:6px"><span style="color:var(--t3)">Aktuell</span><span class="mono" style="color:var(${rp!=null&&rp>lim?'--red':'--t1'})">${rp!=null?rp.toFixed(1)+'% vom Depot':'—'}</span></div>
+      <div class="rg" style="height:10px;background:rgba(255,255,255,.05)"><div class="rg-f" style="width:${rp!=null?Math.min(100,rp/lim*100):0}%;background:var(${ampCol})"></div></div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:9px"><span style="font-size:.62rem;color:var(--t3)">Limit %</span><input type="number" step="0.5" value="${lim}" class="inp" style="width:80px;padding:4px 8px" onchange="S.riskLimit=parseFloat(this.value)||6;persist();render()"></div>
+    </div>
+  </div>`;
+
+  // ── Kombinierte Equity-Kurve (realisiert, EUR Snapshot) ──
+  h+=`<div class="card" style="padding:14px;margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div class="lbl" style="margin:0">Kombinierte Equity-Kurve · realisierte P&L (EUR, Snapshot)</div>
+      <div style="font-size:.62rem;color:var(--t3)">${a.closedPts.length} geschlossene Trades, nach Datum</div>
+    </div>
+    <div style="position:relative;height:300px"><canvas id="eqCh"></canvas></div>
+  </div>`;
+
+  h+='</div>';
+  return h;
+}
+
+function kpi(l,v,sub,cv){return`<div class="card" style="padding:12px"><div style="font-size:.58rem;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${l}</div><div class="mono" style="font-size:1.05rem;font-weight:700;color:var(${cv});line-height:1.2">${v}</div>${sub?`<div style="font-size:.56rem;color:var(--t3);margin-top:3px">${sub}</div>`:''}</div>`;}
+
+function splitCard(name,col,d,openPrem){
+  const wr=d.closed?d.wins/d.closed*100:0;
+  return`<div class="card" style="padding:14px;border-left:3px solid ${col}">
+    <div style="font-weight:700;font-size:.86rem;margin-bottom:10px;color:${col}">${name}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.74rem">
+      <div><span style="color:var(--t3)">Realisiert</span><div class="mono" style="font-weight:700;${pnlC(d.realizedEUR)}">${fE(Math.round(d.realizedEUR))}</div></div>
+      <div><span style="color:var(--t3)">Offenes Risiko</span><div class="mono" style="color:var(--amb)">${fE(Math.round(d.openRiskEUR))}</div></div>
+      <div><span style="color:var(--t3)">Geschlossen</span><div class="mono">${d.closed} (${wr.toFixed(0)}% Win)</div></div>
+      <div><span style="color:var(--t3)">Offen</span><div class="mono">${d.open}</div></div>
+    </div>
+  </div>`;
+}
+
+let eqChart=null;
+function initChart(){
+  const el=$('eqCh');if(!el)return;
+  const a=aggregate();
+  if(eqChart){try{eqChart.destroy()}catch(e){}}
+  let run=0;
+  const labels=a.closedPts.map(p=>String(p.date).slice(0,10));
+  const data=a.closedPts.map(p=>{run+=p.vEUR;return Math.round(run);});
+  const cf={family:"'IBM Plex Mono',monospace",size:9},gc='rgba(255,255,255,.04)',tc='#687990';
+  eqChart=new Chart(el,{type:'line',data:{labels,datasets:[{label:'Kum. realisiert (EUR)',data,borderColor:'#20b2aa',backgroundColor:'rgba(32,178,170,.08)',fill:true,tension:.2,pointRadius:2,pointBackgroundColor:'#20b2aa'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc,font:cf}},tooltip:{callbacks:{label:c=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(c.parsed.y)}}},
+    scales:{x:{ticks:{color:tc,font:{...cf,size:7},maxRotation:45,autoSkip:true,maxTicksLimit:12},grid:{display:false}},y:{ticks:{color:tc,font:cf,callback:v=>new Intl.NumberFormat('de-DE',{maximumFractionDigits:0}).format(v)+' €'},grid:{color:gc}}}}});
+}
+
+// ════════════════════════════════════════════════════════════════
+// PRO-UNDERLYING-TAB + STEUER-TAB
+// ════════════════════════════════════════════════════════════════
+function promptLoad(){
+  return `<div class="empty fu"><div style="font-size:2rem;opacity:.5;margin-bottom:8px">Σ</div><h3>Noch keine Backups geladen</h3><p>Lade beide JSON-Backups im Tab „Depot-Gesamt" – dann füllen sich auch diese Auswertungen.</p><button class="btn btn-p" onclick="go('depot')">→ Zu Depot-Gesamt</button></div>`;
+}
+
+// ── Kurse über den Morgenroutine-Proxy (/quote?symbol=) ──
+const rawN=x=>(x&&typeof x==='object')?x.raw:x;
+async function fetchQuote(base,sym){
+  const r=await fetch(base+'/quote?symbol='+encodeURIComponent(sym),{cache:'no-store'});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const d=await r.json();
+  const p=d&&d.quoteSummary&&d.quoteSummary.result&&d.quoteSummary.result[0]&&d.quoteSummary.result[0].price;
+  if(!p||rawN(p.regularMarketPrice)==null) throw new Error('kein Kurs');
+  return {price:rawN(p.regularMarketPrice),ccy:p.currency||'USD',chg:rawN(p.regularMarketChangePercent),time:rawN(p.regularMarketTime),state:p.marketState||''};
+}
+async function loadQuotes(){
+  const a=aggregate(); const syms=Object.keys(a.ul).filter(k=>k&&k!=='—');
+  if(!syms.length){toast('Keine Underlyings vorhanden.','t-info');return;}
+  const base=(S.qbase||'').replace(/\/+$/,'');
+  try{const pr=await fetch(base+'/ping',{cache:'no-store'});if(!pr.ok)throw 0;}
+  catch(e){toast('Proxy nicht erreichbar ('+base+'). Läuft die Morgenroutine-.bat?','t-err');return;}
+  toast('Lade Kurse über Proxy …','t-info');
+  const res=await Promise.allSettled(syms.map(s=>fetchQuote(base,s)));
+  const q={}; let ok=0; const fail=[];
+  res.forEach((r,i)=>{if(r.status==='fulfilled'&&r.value){q[syms[i]]=r.value;ok++;}else fail.push(syms[i]);});
+  q._at=new Date().toISOString();
+  S.quotes=q; persist(); render();
+  toast('Kurse: '+ok+' geladen'+(fail.length?(' · ohne Kurs: '+fail.slice(0,4).join(', ')+(fail.length>4?'…':'')):''), ok?'t-ok':'t-err');
+}
+
+function rUnderlying(){
+  const a=aggregate();
+  if(!a.ready) return promptLoad();
+  const rows=Object.values(a.ul).sort((x,y)=>y.realizedEUR-x.realizedEUR);
+  const Q=S.quotes||{};
+  // Unrealisiert gesamt — v3.1: NUR wenn Kurswährung == Positionswährung (sonst stiller Rechenfehler)
+  let unrealTot=0, hasMtm=false;
+  // v6.1.1: Math.abs — sonst fiele jede Short-Position (negative Stückzahl) aus dem MtM.
+  rows.forEach(u=>{const q=Q[u.t]; if(q&&Math.abs(u.openShares)>0&&u.posCcy&&q.ccy===u.posCcy){unrealTot+=eur(q.price*u.openShares-u.openCostNat,u.posCcy);hasMtm=true;}});
+  const qAt=Q._at?new Date(Q._at):null;
+  // v3.1: gestrige Kurse ehrlich kennzeichnen (Datum zeigen, wenn nicht von heute)
+  let qAtTxt='noch keine Kurse';
+  if(qAt){const isToday=qAt.toDateString()===new Date().toDateString();qAtTxt='Stand '+(isToday?'':qAt.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+' ')+qAt.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' · verzögert'+(isToday?'':' · ⚠ nicht von heute');}
+  let h=`<div class="fu">
+    <div class="card" style="padding:11px 13px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
+      <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">
+        <div><label class="lbl" style="margin-bottom:2px">Kurs-Proxy (Morgenroutine)</label>
+          <input class="inp mono" style="width:230px;font-size:.72rem;padding:5px 9px" value="${S.qbase||''}" oninput="S.qbase=this.value;persist()"></div>
+        <button class="btn btn-p btn-s" style="align-self:end" onclick="loadQuotes()">⟳ Kurse laden</button>
+        <span style="font-size:.62rem;color:var(--t3);align-self:end">${qAtTxt}</span>
+      </div>
+      ${hasMtm?`<div style="text-align:right"><div style="font-size:.55rem;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">Unrealisiert (Bestand, EUR)</div><div class="mono" style="font-weight:700;font-size:1rem;${pnlC(unrealTot)}">${fE(Math.round(unrealTot))}</div></div>`:''}
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div style="font-size:.62rem;color:var(--t3)">Gleicher Ticker in beiden Journals → wird zusammengeführt. Bestand bitte nur in EINEM Journal führen (sonst zählt er doppelt). Kurse: Aktien/ETF via Yahoo (delayed); Futures nur mit Yahoo-Symbol (z.B. MES=F); Options-Mark wird nicht abgefragt.</div>
+    </div>`;
+  if(!rows.length){h+=`<div class="empty"><p>Keine Trades in den Backups.</p></div></div>`;return h;}
+  h+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-top:4px">`;
+  rows.forEach(u=>{
+    const badges=Object.keys(u.types).map(t=>`<span class="badge" style="background:var(${TYPE[t].c});color:#0e1119">${TYPE[t].l}</span>`).join(' ');
+    const bt=Object.entries(u.byType).filter(([_,v])=>Math.abs(v)>0.005)
+      .map(([t,v])=>`<div style="display:flex;justify-content:space-between;font-size:.7rem"><span style="color:var(${TYPE[t].c})">${TYPE[t].l}</span><span class="mono" style="${pnlC(v)}">${fE(Math.round(v))}</span></div>`).join('');
+    // v6.1.1: Ein Wheel setzt einen POSITIVEN Aktienbestand voraus. Bei einem
+  // Leerverkauf plus Option war die Kennzeichnung schlicht falsch.
+  const isWheel=u.types.AKTIE&&u.types.OPTION&&u.openShares>0;
+    const q=Q[u.t];
+    let qBlock='';
+    if(q){
+      const chg=(q.chg!=null)?((q.chg*100>=0?'+':'')+(q.chg*100).toFixed(2)+'%'):'';
+      const t=q.time?new Date(q.time*1000).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):'';
+      let mtm='';
+      const ccyMismatch=Math.abs(u.openShares)>0&&u.posCcy&&q.ccy&&q.ccy!==u.posCcy;   // v6.1.1
+      if(ccyMismatch){
+        // v3.1: NICHT rechnen, wenn Yahoo in anderer Währung quotiert als der Einstand erfasst ist
+        mtm=`<div style="font-size:.62rem;color:var(--amb);margin-top:3px">⚠ Kurswährung ${q.ccy} ≠ Positionswährung ${u.posCcy} — MtM nicht berechnet (Einstand in ${u.posCcy} erfasst).</div>`;
+      } else if(Math.abs(u.openShares)>0&&u.posCcy){
+        // v6.1.1: Bei Netto-Null (gleich viel Long wie Short im selben Wert) wäre
+        // die Division undefiniert — dieser Fall fällt oben schon durch Math.abs raus.
+        const avg=u.openCostNat/u.openShares;
+        const valEUR=eur(q.price*u.openShares,u.posCcy);
+        const mtmEUR=eur(q.price*u.openShares-u.openCostNat,u.posCcy);
+        mtm=`<div style="display:flex;justify-content:space-between;font-size:.66rem;margin-top:3px"><span style="color:var(--t3)">Bestand</span><span class="mono">${u.openShares} @ ${avg.toLocaleString('de-DE',{maximumFractionDigits:2})}</span></div>
+             <div style="display:flex;justify-content:space-between;font-size:.66rem"><span style="color:var(--t3)">Wert</span><span class="mono">${fE(Math.round(valEUR))}</span></div>
+             <div style="display:flex;justify-content:space-between;font-size:.72rem;font-weight:700"><span style="color:var(--t3)">Unreal. G/V</span><span class="mono" style="${pnlC(mtmEUR)}">${fE(Math.round(mtmEUR))}</span></div>`;
+      } else {
+        mtm=`<div style="font-size:.6rem;color:var(--t3);margin-top:3px">kein Aktien-/ETF-Bestand erfasst — Kurs dient als Underlying-Referenz</div>`;
+      }
+      qBlock=`<div style="border-top:1px solid var(--brd);padding-top:7px;margin-top:7px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">Kurs ${t?'· '+t:''} ${q.state&&q.state!=='REGULAR'?'· '+q.state:''}</span>
+        <span class="mono" style="font-weight:600">${q.price.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} ${q.ccy} <span style="${chg&&q.chg>=0?'color:var(--grn)':'color:var(--red)'};font-size:.7rem">${chg}</span></span></div>
+        ${mtm}</div>`;
+    } else {
+      qBlock=`<div style="border-top:1px solid var(--brd);padding-top:6px;margin-top:7px;font-size:.6rem;color:var(--t3)">Kurs: — (⟳ Kurse laden)</div>`;
+    }
+    h+=`<div class="card" style="padding:13px">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
+        <div><div class="mono" style="font-weight:700;font-size:.95rem">${escH(u.t)}</div><div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">${badges}</div></div>
+        <div style="text-align:right"><div style="font-size:.55rem;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">Realisiert</div><div class="mono" style="font-weight:700;font-size:.95rem;${pnlC(u.realizedEUR)}">${fE(Math.round(u.realizedEUR))}</div></div>
+      </div>
+      ${bt?`<div style="border-top:1px solid var(--brd);padding-top:7px;margin-bottom:7px;display:flex;flex-direction:column;gap:2px">${bt}</div>`:''}
+      <div style="display:flex;justify-content:space-between;font-size:.64rem;color:var(--t3);gap:6px">
+        <span>Offen <span class="mono" style="color:var(--t1)">${u.open}</span></span>
+        <span>Prämie <span class="mono" style="color:var(--vio)">${fE(Math.round(u.openPremEUR))}</span></span>
+        <span>Risiko <span class="mono" style="color:var(--amb)">${fE(Math.round(u.openRiskEUR))}</span></span>
+      </div>
+      ${qBlock}
+      ${isWheel?`<div style="margin-top:8px;font-size:.6rem;color:var(--acc)">⟳ Wheel-Kandidat — effektiven Einkaufspreis im Stillhalter-Journal (Tab „Wheel") ansehen.</div>`:''}
+    </div>`;
+  });
+  h+=`</div></div>`;
+  return h;
+}
+
+function rTax(){
+  const a=aggregate();
+  if(!a.ready) return promptLoad();
+  // Opt① — Jahre aus den Abschlussdaten; Töpfe nach gewähltem Steuerjahr filtern
+  const years=[...new Set(a.taxRows.map(r=>r.year).filter(y=>y&&y.length===4))].sort().reverse();
+  if(S.taxYear&&S.taxYear!=='all'&&!years.includes(S.taxYear))S.taxYear='all';
+  const yr=S.taxYear||'all';
+  const mkB=()=>({net:0,gain:0,loss:0,n:0});
+  const buckets={AKTIE:mkB(),ETF:mkB(),OPTION:mkB(),FUTURE:mkB()};
+  a.taxRows.forEach(r=>{ if(yr!=='all'&&r.year!==yr)return; const b=buckets[r.cat]; if(!b)return; b.net+=r.v; b.n++; if(r.v>=0)b.gain+=r.v; else b.loss+=r.v; });
+  const opts=`<option value="all"${yr==='all'?' selected':''}>Alle Jahre</option>`+years.map(y=>`<option value="${y}"${yr===y?' selected':''}>${y}</option>`).join('');
+  let h=`<div class="fu">
+    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:end;margin-bottom:12px">
+      <div><div style="font-weight:700;font-size:1rem;margin-bottom:2px">Steuer-Töpfe · realisierte P&L (EUR)</div>
+        <div style="font-size:.66rem;color:var(--t3)">Aktien, ETF, Optionen/Stillhalter und Futures laufen steuerlich getrennt.</div></div>
+      <div><label class="lbl">Steuerjahr</label><select class="inp" style="width:140px" onchange="S.taxYear=this.value;persist();render()">${opts}</select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">`;
+  ['AKTIE','ETF','OPTION','FUTURE'].forEach(t=>{
+    const b=buckets[t],M=TYPE[t];
+    h+=`<div class="card" style="padding:14px;border-top:3px solid var(${M.c})">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-weight:700;font-size:.9rem;color:var(${M.c})">${M.l}</div>
+        <span class="badge" style="background:var(--elev);color:var(--t2)">${M.tax}</span>
+      </div>
+      <div class="mono" style="font-size:1.25rem;font-weight:700;${pnlC(b.net)};line-height:1.1">${fE(Math.round(b.net))}</div>
+      <div style="font-size:.58rem;color:var(--t3);margin-bottom:9px">Netto realisiert · ${b.n} Trades</div>
+      <div style="display:flex;justify-content:space-between;font-size:.72rem;border-top:1px solid var(--brd);padding-top:7px"><span style="color:var(--t3)">Gewinne</span><span class="mono" style="color:var(--grn)">${fE(Math.round(b.gain))}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.72rem;margin-top:3px"><span style="color:var(--t3)">Verluste</span><span class="mono" style="color:var(--red)">${fE(Math.round(b.loss))}</span></div>
+    </div>`;
+  });
+  h+=`</div>
+    <div class="card" style="padding:13px;margin-top:14px;border-left:3px solid var(--amb)">
+      <div style="font-weight:600;font-size:.78rem;margin-bottom:5px;color:var(--amb)">⚠ Organisationshilfe, keine Steuerberatung</div>
+      <div style="font-size:.68rem;color:var(--t2);line-height:1.55">
+        Maßgeblich ist die Jahressteuerbescheinigung deines Brokers bzw. dein Steuerberater. Zu beachten:
+        <ul style="margin:6px 0 0 16px;padding:0">
+          <li>ETF-Gewinne sind hier <strong>brutto</strong> – die Teilfreistellung ist nicht eingerechnet.</li>
+          <li>Aktienverluste sind weiterhin nur mit Aktiengewinnen verrechenbar (§ 20 Abs. 6 S. 4 EStG). <strong>Der frühere Sonder-Verrechnungskreis für Termingeschäfte inkl. 20.000-€-Grenze wurde durch das JStG 2024 rückwirkend abgeschafft</strong> — Termingeschäftsverluste sind wieder voll mit allen Kapitaleinkünften verrechenbar (Broker-Umsetzung im Steuerabzug seit 1.1.2026 verpflichtend).</li>
+          <li>Bei <strong>Ausbuchung/Zuteilung (Wheel)</strong> sitzt der P&L auf der Option (ASSIGNED), nicht als separater Aktienverkauf – die exakte Trennung Prämie ↔ Aktiengewinn macht erst der Steuerreport.</li>
+          <li>Klassifizierung: v4.8-Sektor „IndexETF" → ETF, sonst Aktie; Futures via Instrumententyp; v4.2-Strategien → Optionen (außer „Aktien (Bestand)").</li>
+        </ul>
+      </div>
+    </div>
+  </div>`;
+  return h;
+}
+
+// ════════════════════════════════════════════════════════════════
+// BACKUP-LADEN
+// ════════════════════════════════════════════════════════════════
+function loadDir(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!Array.isArray(d.trades)||!Array.isArray(d.accounts)){toast('Das sieht nicht nach einem Richtungs-Backup (v4.8) aus.','t-err');return;}S.dir=d;persist();toast('Richtungs-Backup geladen ('+d.trades.length+' Trades)');render();}catch(err){toast('JSON-Fehler: '+err.message,'t-err');}};r.readAsText(f);e.target.value='';}
+function loadSh(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!Array.isArray(d.trades)){toast('Das sieht nicht nach einem Stillhalter-Backup (v4.2) aus.','t-err');return;}S.sh=d;if(d.settings&&d.settings.eurusd)S.rate=d.settings.eurusd;persist();toast('Stillhalter-Backup geladen ('+d.trades.length+' Trades)');render();}catch(err){toast('JSON-Fehler: '+err.message,'t-err');}};r.readAsText(f);e.target.value='';}
+
+// Opt②: Live-Lesen aus localStorage, wenn Cockpit + Journals same-origin laufen (über den Proxy)
+function liveAvailable(){try{return location.protocol!=='file:'&&(localStorage.getItem('localTrades_v2')!==null||localStorage.getItem('soj4_t')!==null);}catch(e){return false;}}
+function loadLive(silent){
+  const got=[];
+  try{
+    const dt=localStorage.getItem('localTrades_v2');
+    if(dt){const arr=JSON.parse(dt); if(Array.isArray(arr)){S.dir={trades:arr,_live:true}; got.push('Richtung '+arr.length);}}
+    const st=localStorage.getItem('soj4_t');
+    if(st){const arr=JSON.parse(st); if(Array.isArray(arr)){let set={}; try{set=JSON.parse(localStorage.getItem('soj4_s'))||{};}catch(_){}
+      S.sh={trades:arr,settings:set,_live:true}; if(set.eurusd)S.rate=set.eurusd; got.push('Stillhalter '+arr.length);}}
+  }catch(e){if(!silent)toast('Live-Lesen fehlgeschlagen: '+e.message,'t-err'); return false;}
+  if(got.length){S._live=true; persist();}
+  if(!silent){render(); toast(got.length?('Live geladen — '+got.join(' · ')):'Keine Journal-Daten im Browser gefunden.',got.length?'t-ok':'t-info');}
+  return got.length>0;
+}
+
+// ════════════════════════════════════════════════════════════════
+// v3.4: Server-Lesen — holt daten/*.json vom lokalen Python-Server (v15.15).
+// Vorteil gegenüber localStorage: überlebt Browser-Resets/-Updates und liest die
+// Wochen-gesicherten Laufwerks-Daten. Fällt still auf Live-/localStorage-Lesen zurück.
+async function loadServer(silent){
+  const got=[];
+  async function grab(name){
+    try{const r=await fetch('http://localhost:8765/data/load?name='+name,{cache:'no-store'});
+        if(!r.ok)return null; return await r.json();}catch(e){return null;}
+  }
+  // v3.4.2 FIX: Die Journale speichern den Zeitstempel als "ts" (Millisekunden),
+  // updDataAge() liest aber "timestamp" (ISO). Beim Server-Laden ging er komplett
+  // verloren -> die Zeile "Backup-Stand" blieb dauerhaft leer bzw. zeigte "?".
+  const tsIso=d=>d&&d.timestamp?d.timestamp:(d&&d.ts?new Date(d.ts).toISOString():null);
+  const dj=await grab('trading_journal');
+  if(dj&&Array.isArray(dj.trades)){S.dir={trades:dj.trades,timestamp:tsIso(dj),_live:true,_server:true};got.push('Richtung '+dj.trades.length);}
+  const sj=await grab('stillhalter_journal');
+  if(sj&&Array.isArray(sj.trades)){S.sh={trades:sj.trades,settings:sj.settings||{},timestamp:tsIso(sj),_live:true,_server:true};
+    if(sj.settings&&sj.settings.eurusd)S.rate=sj.settings.eurusd;got.push('Stillhalter '+sj.trades.length);}
+  if(got.length){S._live=true;persist();if(!silent){render();toast('Vom Server geladen — '+got.join(' · '),'t-ok');}return true;}
+  return false;
+}
+// Opt②/v3.4: Start-Reihenfolge — 1) Server (Laufwerk), 2) localStorage-Live, 3) manuelle Backups
+(async()=>{ const ok=await loadServer(true); if(!ok && liveAvailable()) loadLive(true); render(); })();
+go('depot');
+console.log('Depot-Cockpit v6.1 geladen (FX-Fix · Server-Lesen · Steuerjahr · Live-Lesen · Portfolio-DD · Pro-Trade-FX). Journals erwartet im selben Ordner:', J_DIR, '·', J_SH);
+</script>
+</body>
+</html>
