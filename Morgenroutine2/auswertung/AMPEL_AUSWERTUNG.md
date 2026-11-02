@@ -427,3 +427,54 @@ Folgerendite des S&P 500 nach 20 Tagen:
 ### Wichtige Einschränkung zur neuen Ampel (AM1 + AM4)
 
 In diesem kürzeren Fenster zeigt sich: Von **2022 bis 2026** war die **alte** Ampel besser (0,81) als die neue (0,74). Von 2017 bis 2021 war es umgekehrt (0,47 gegenüber 0,79). Über die ganzen 19 Jahre bleibt die neue Ampel vorn. Ihr Vorsprung stammt aber vor allem aus den Jahren bis 2021. Das ist kein Grund, AM1 und AM4 zu verwerfen. Es zeigt aber, wie schnell sich die Rangfolge in kurzen Zeiträumen dreht. Mit dem Archiv (A1) und dem Prüfstand (AM8) wird das künftig laufend beobachtet.
+
+---
+
+## 10. Test B4 „Breiten-Wende“: erst Kapitulation, dann Stabilisierung (02.11.2026)
+
+Die Regel wurde vor der Auswertung festgelegt und eingecheckt (`breite_wende_test.py`).
+
+**Die Regel.** Ein Signal entsteht, wenn alle drei Bedingungen erfüllt sind:
+
+1. In den letzten 10 Tagen stand der P3-Anteil einmal unter 20 % oder die Netto-Hochs lagen unter −5.
+2. Die neuen Tiefs haben sich seit ihrem Höchststand der letzten 10 Tage mindestens halbiert.
+3. Der P3-Anteil ist höher als vor 3 Tagen.
+
+Danach gilt das Signal wie bei AM9: 15 Tage mit 33 % Investitionsgrad, Abbruch beim Bruch des Tiefs.
+
+### Ergebnis: knapp nicht bestanden
+
+Angegeben ist Sharpe 2017-11 bis 2021 / 2022 bis 2026-09.
+
+- **Neue Ampel (AM1 + AM4):** 0,79 / 0,74
+- **mit B4 Breiten-Wende:** **0,96** / 0,71. Im ersten Zeitraum deutlich besser, im zweiten leicht schlechter.
+- **zum Vergleich mit AM9** im selben Zeitraum: 0,93 / 0,69
+
+Die Vorgabe „besser in beiden Zeiträumen“ ist **nicht erfüllt**. Die Regel wird deshalb nicht fest in die Ampel eingebaut und nicht nachjustiert.
+
+### Die Signale
+
+Es gab 29 Signale.
+
+- **Nach 20 Tagen:** im Schnitt +2,9 %, 66 % positiv.
+- **Nach 60 Tagen:** im Schnitt +6,6 %.
+- **Rückschläge:** In 14 % der Fälle kam vorher ein Rückschlag über 7 %.
+- **Vergleich mit AM9:** AM9 brachte nach 20 Tagen +1,4 %, nach 60 Tagen +3,1 %. Die Breiten-Wende ist also deutlich treffsicherer.
+
+**Treffer nahe den Tiefs:**
+
+- 28.03. und 03.04.2018 (+1 % über dem Tief)
+- 27.12.2018
+- 19.03.2020 (vor dem Tief vom 23.03., danach +23 % in 20 Tagen)
+- 28.09. und 03.10.2022 (+3 bis 4 %)
+- 10.04.2025
+
+**Fehlsignale:**
+
+- 03.03.2020 (danach −29 %)
+- 07.09.2022 (−11 %)
+- Mai 2022 (−6 bis −7 %)
+
+### Verwendung
+
+Die Breiten-Wende wird Teil des Hinweises **„⚡ Panik-Wende möglich“** und steht dort neben dem VIX-basierten Signal aus AM9. Beide werden mit eigener Prüfliste und ehrlicher Bilanz angezeigt. Ist **auch** die Breiten-Wende erfüllt, also nicht nur das VIX-Signal, wird das als stärkere Lage gekennzeichnet. Ampel und Investitionsgrad ändert der Hinweis nicht. Jedes Signal wird im Archiv mitgeschrieben.

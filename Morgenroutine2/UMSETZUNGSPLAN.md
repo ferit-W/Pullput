@@ -8,6 +8,10 @@ Stand: 02.11.2026. Grundsatz laut Absprache: **Alles, was vorgeschlagen und nich
 
 Die Reihenfolge folgt einer einfachen Regel: erst das, was heute Daten verfälscht, dann das Fundament (Prüfstand, Handelsplan, Archiv), dann neue Funktionen, zuletzt die Oberfläche. Jede Phase endet mit Tests und einem eigenen Commit. Nach jeder Phase gibt es eine kurze Zusammenfassung zum Prüfen.
 
+## Grundsatz für Regeln
+
+Jede neue Regel und jede Änderung an Ampel, Konsequenz-Zeile oder Schwellen wird **vorher** getestet: Die Regel wird festgelegt und eingecheckt, dann in `auswertung/` getrennt in zwei Zeiträumen geprüft und nur bei Verbesserung in beiden fest eingebaut. Alles andere kommt höchstens als klar gekennzeichneter Hinweis. Wo Zweifel bestehen, wird getestet, nicht geschätzt.
+
 ## Phase 1 · Fehler, die Daten verfälschen
 
 - **J1** Bearbeiten überschreibt Stückzahl, FX und Risiko

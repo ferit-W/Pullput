@@ -1,0 +1,357 @@
+{
+ "regel": "(unverändert lassen, sonst ist der Test wertlos):\n  Signal am Tag t, wenn ALLE gelten:\n    1. Kapitulation: in den letzten 10 Handelstagen (inkl. t) war P3_ANTEIL < 20\n       ODER NHNL10 < -5\n    2. Neue Tiefs halbiert: NL(t) <= 0,5 * Maximum von NL der letzten 10 Tage\n    3. Breite dreht: P3_ANTEIL(t) > P3_ANTEIL(t-3)\n  Danach 15 Handelstage mit mind. 33 % Investitionsgrad (wie AM9), Abbruch, wenn\n  SPY unter den tiefsten Schluss der 10 Tage vor dem Signal fällt.\n  Basis: neue Ampel (AM1 + AM4). Zeiträume 2017-11 bis 2021-12 / 2022-01 bis 2026-09.\n  Freigabe nur bei besserer Sharpe-Kennzahl in BEIDEN Zeiträumen.",
+ "varianten": {
+  "AM1 + AM4 (neue Ampel)": {
+   "gesamt": {
+    "rendite_pa": 7.79,
+    "max_drawdown": -21.4,
+    "vola_pa": 10.5,
+    "sharpe_ohne_zins": 0.77,
+    "investiert_anteil": 69.0,
+    "wechsel_pro_jahr": 35.3
+   },
+   "2017-11 bis 2021-12": {
+    "rendite_pa": 8.69,
+    "max_drawdown": -21.4,
+    "vola_pa": 11.3,
+    "sharpe_ohne_zins": 0.79,
+    "investiert_anteil": 72.0,
+    "wechsel_pro_jahr": 30.3
+   },
+   "2022-01 bis 2026-09": {
+    "rendite_pa": 6.99,
+    "max_drawdown": -12.4,
+    "vola_pa": 9.7,
+    "sharpe_ohne_zins": 0.74,
+    "investiert_anteil": 65.0,
+    "wechsel_pro_jahr": 39.7
+   }
+  },
+  "B4 Breiten-Wende": {
+   "gesamt": {
+    "rendite_pa": 8.74,
+    "max_drawdown": -21.4,
+    "vola_pa": 10.8,
+    "sharpe_ohne_zins": 0.83,
+    "investiert_anteil": 70.0,
+    "wechsel_pro_jahr": 37.6
+   },
+   "2017-11 bis 2021-12": {
+    "rendite_pa": 10.96,
+    "max_drawdown": -21.4,
+    "vola_pa": 11.6,
+    "sharpe_ohne_zins": 0.96,
+    "investiert_anteil": 74.0,
+    "wechsel_pro_jahr": 31.2
+   },
+   "2022-01 bis 2026-09": {
+    "rendite_pa": 6.79,
+    "max_drawdown": -12.8,
+    "vola_pa": 10.0,
+    "sharpe_ohne_zins": 0.71,
+    "investiert_anteil": 67.0,
+    "wechsel_pro_jahr": 43.4
+   }
+  },
+  "zum Vergleich AM9 im selben Zeitraum": {
+   "gesamt": {
+    "rendite_pa": 8.45,
+    "max_drawdown": -21.4,
+    "vola_pa": 10.8,
+    "sharpe_ohne_zins": 0.81,
+    "investiert_anteil": 71.0,
+    "wechsel_pro_jahr": 38.2
+   },
+   "2017-11 bis 2021-12": {
+    "rendite_pa": 10.6,
+    "max_drawdown": -21.4,
+    "vola_pa": 11.6,
+    "sharpe_ohne_zins": 0.93,
+    "investiert_anteil": 75.0,
+    "wechsel_pro_jahr": 32.7
+   },
+   "2022-01 bis 2026-09": {
+    "rendite_pa": 6.55,
+    "max_drawdown": -14.0,
+    "vola_pa": 10.0,
+    "sharpe_ohne_zins": 0.69,
+    "investiert_anteil": 67.0,
+    "wechsel_pro_jahr": 43.1
+   }
+  }
+ },
+ "signale": [
+  {
+   "tag": "2018-02-13",
+   "p3_anteil": 30.6,
+   "spy_20T_pct": 2.0,
+   "spy_60T_pct": 1.2,
+   "rueckschlag_20T_pct": -0.7
+  },
+  {
+   "tag": "2018-03-28",
+   "p3_anteil": 20.0,
+   "spy_20T_pct": 1.3,
+   "spy_60T_pct": 3.0,
+   "rueckschlag_20T_pct": -2.2
+  },
+  {
+   "tag": "2018-04-03",
+   "p3_anteil": 24.8,
+   "spy_20T_pct": -0.1,
+   "spy_60T_pct": 2.8,
+   "rueckschlag_20T_pct": -1.5
+  },
+  {
+   "tag": "2018-10-16",
+   "p3_anteil": 27.1,
+   "spy_20T_pct": -3.7,
+   "spy_60T_pct": -7.2,
+   "rueckschlag_20T_pct": -5.9
+  },
+  {
+   "tag": "2018-10-30",
+   "p3_anteil": 21.3,
+   "spy_20T_pct": 1.2,
+   "spy_60T_pct": -1.1,
+   "rueckschlag_20T_pct": -2.7
+  },
+  {
+   "tag": "2018-12-27",
+   "p3_anteil": 6.6,
+   "spy_20T_pct": 6.3,
+   "spy_60T_pct": 12.9,
+   "rueckschlag_20T_pct": -1.4
+  },
+  {
+   "tag": "2020-03-03",
+   "p3_anteil": 12.1,
+   "spy_20T_pct": -21.3,
+   "spy_60T_pct": -2.7,
+   "rueckschlag_20T_pct": -28.7
+  },
+  {
+   "tag": "2020-03-19",
+   "p3_anteil": 2.5,
+   "spy_20T_pct": 23.1,
+   "spy_60T_pct": 36.8,
+   "rueckschlag_20T_pct": -2.6
+  },
+  {
+   "tag": "2020-03-26",
+   "p3_anteil": 6.5,
+   "spy_20T_pct": 13.3,
+   "spy_60T_pct": 23.1,
+   "rueckschlag_20T_pct": -2.9
+  },
+  {
+   "tag": "2020-05-15",
+   "p3_anteil": 24.7,
+   "spy_20T_pct": 6.1,
+   "spy_60T_pct": 14.4,
+   "rueckschlag_20T_pct": -1.0
+  },
+  {
+   "tag": "2022-05-04",
+   "p3_anteil": 31.1,
+   "spy_20T_pct": -0.8,
+   "spy_60T_pct": -1.4,
+   "rueckschlag_20T_pct": -5.9
+  },
+  {
+   "tag": "2022-05-13",
+   "p3_anteil": 16.6,
+   "spy_20T_pct": -6.6,
+   "spy_60T_pct": 5.0,
+   "rueckschlag_20T_pct": -6.6
+  },
+  {
+   "tag": "2022-05-23",
+   "p3_anteil": 16.0,
+   "spy_20T_pct": -4.0,
+   "spy_60T_pct": 7.2,
+   "rueckschlag_20T_pct": -7.1
+  },
+  {
+   "tag": "2022-06-21",
+   "p3_anteil": 4.4,
+   "spy_20T_pct": 6.5,
+   "spy_60T_pct": 3.0,
+   "rueckschlag_20T_pct": 0.8
+  },
+  {
+   "tag": "2022-07-15",
+   "p3_anteil": 12.7,
+   "spy_20T_pct": 12.3,
+   "spy_60T_pct": -6.3,
+   "rueckschlag_20T_pct": 2.3
+  },
+  {
+   "tag": "2022-09-07",
+   "p3_anteil": 28.2,
+   "spy_20T_pct": -6.8,
+   "spy_60T_pct": 1.6,
+   "rueckschlag_20T_pct": -10.8
+  },
+  {
+   "tag": "2022-09-28",
+   "p3_anteil": 7.9,
+   "spy_20T_pct": 4.7,
+   "spy_60T_pct": 5.5,
+   "rueckschlag_20T_pct": -1.7
+  },
+  {
+   "tag": "2022-10-03",
+   "p3_anteil": 10.4,
+   "spy_20T_pct": 1.7,
+   "spy_60T_pct": 1.4,
+   "rueckschlag_20T_pct": -5.7
+  },
+  {
+   "tag": "2022-10-17",
+   "p3_anteil": 14.9,
+   "spy_20T_pct": 7.4,
+   "spy_60T_pct": 7.4,
+   "rueckschlag_20T_pct": -1.5
+  },
+  {
+   "tag": "2023-03-16",
+   "p3_anteil": 21.1,
+   "spy_20T_pct": 6.1,
+   "spy_60T_pct": 12.0,
+   "rueckschlag_20T_pct": 0.5
+  },
+  {
+   "tag": "2023-09-29",
+   "p3_anteil": 20.7,
+   "spy_20T_pct": -2.7,
+   "spy_60T_pct": 11.5,
+   "rueckschlag_20T_pct": -3.9
+  },
+  {
+   "tag": "2023-10-09",
+   "p3_anteil": 28.0,
+   "spy_20T_pct": 0.6,
+   "spy_60T_pct": 7.7,
+   "rueckschlag_20T_pct": -5.5
+  },
+  {
+   "tag": "2023-10-31",
+   "p3_anteil": 16.9,
+   "spy_20T_pct": 8.0,
+   "spy_60T_pct": 16.1,
+   "rueckschlag_20T_pct": 1.9
+  },
+  {
+   "tag": "2024-12-23",
+   "p3_anteil": 29.4,
+   "spy_20T_pct": -0.3,
+   "spy_60T_pct": -4.3,
+   "rueckschlag_20T_pct": -3.5
+  },
+  {
+   "tag": "2025-01-15",
+   "p3_anteil": 35.9,
+   "spy_20T_pct": 3.1,
+   "spy_60T_pct": -8.9,
+   "rueckschlag_20T_pct": 1.0
+  },
+  {
+   "tag": "2025-03-14",
+   "p3_anteil": 21.7,
+   "spy_20T_pct": -4.9,
+   "spy_60T_pct": 6.0,
+   "rueckschlag_20T_pct": -12.5
+  },
+  {
+   "tag": "2025-04-10",
+   "p3_anteil": 11.1,
+   "spy_20T_pct": 9.2,
+   "spy_60T_pct": 17.2,
+   "rueckschlag_20T_pct": -3.8
+  },
+  {
+   "tag": "2026-03-26",
+   "p3_anteil": 24.3,
+   "spy_20T_pct": 12.8,
+   "spy_60T_pct": 15.6,
+   "rueckschlag_20T_pct": -0.3
+  },
+  {
+   "tag": "2026-03-31",
+   "p3_anteil": 27.4,
+   "spy_20T_pct": 9.7,
+   "spy_60T_pct": 13.1,
+   "rueckschlag_20T_pct": 0.1
+  }
+ ],
+ "zusammenfassung": {
+  "anzahl": 29,
+  "spy_20T_mittel_pct": 2.9,
+  "spy_20T_positiv_pct": 66.0,
+  "spy_60T_mittel_pct": 6.64,
+  "rueckschlag_ueber7pct_anteil": 14.0,
+  "aktive_tage": 335
+ },
+ "nach_tiefs": [
+  {
+   "tief": "2018-04-02",
+   "signale_innerhalb_45_tage": [
+    "2018-03-28",
+    "2018-04-03"
+   ],
+   "abstand_zum_tief_pct": [
+    0.9,
+    1.3
+   ]
+  },
+  {
+   "tief": "2018-12-24",
+   "signale_innerhalb_45_tage": [
+    "2018-12-27"
+   ],
+   "abstand_zum_tief_pct": [
+    5.9
+   ]
+  },
+  {
+   "tief": "2020-03-23",
+   "signale_innerhalb_45_tage": [
+    "2020-03-03",
+    "2020-03-19",
+    "2020-03-26"
+   ],
+   "abstand_zum_tief_pct": [
+    34.7,
+    7.9,
+    17.2
+   ]
+  },
+  {
+   "tief": "2022-10-12",
+   "signale_innerhalb_45_tage": [
+    "2022-09-07",
+    "2022-09-28",
+    "2022-10-03",
+    "2022-10-17"
+   ],
+   "abstand_zum_tief_pct": [
+    11.6,
+    3.9,
+    2.8,
+    2.9
+   ]
+  },
+  {
+   "tief": "2025-04-08",
+   "signale_innerhalb_45_tage": [
+    "2025-03-14",
+    "2025-04-10"
+   ],
+   "abstand_zum_tief_pct": [
+    13.4,
+    5.7
+   ]
+  }
+ ]
+}
