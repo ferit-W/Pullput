@@ -1618,6 +1618,11 @@ function initClock(){ function tick(){ const n=new Date(); $('clk-d').textConten
     } else {
       el.textContent = usOffen?'🇺🇸 US-Kernzeit':deOffen?'🇩🇪 XETRA offen':(nyMin>=240&&nyMin<570)?'🌅 US-Vorbörse':(ny>=16&&ny<20)?'🌙 Nachbörslich':'💤 Übernacht';
     }
+    // v6.18 (V3): Bleibt die Seite über Nacht offen, zeigte „Heute“ den Vortag bis zum
+    // Neuladen. Jetzt wird die Zeile beim Datumswechsel im Uhrtakt neu gezeichnet.
+    const tagJetzt = isoLokal(n);
+    if(initClock._tag && initClock._tag!==tagJetzt){ try{ renderHeute(); }catch(e){} }
+    initClock._tag = tagJetzt;
     zeigeDatenStand(); } tick(); setInterval(tick,30000); }
 
 // ═══════════════════ STATUS / PROGRESS / TOAST ═══════════════════

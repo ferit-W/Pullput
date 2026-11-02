@@ -156,7 +156,18 @@ Diese Punkte setze ich erst um, wenn du dich entschieden hast:
 
 Wird nach jeder Phase hier fortgeschrieben.
 
-- [ ] Phase 1 — erledigt und getestet: J1, J3, J4, J6 · offen: J2, J7, J8, C1, C2, F-Fehler, V3, V10, V16
+- [x] Phase 1 — erledigt und in der Prüfumgebung getestet (02.11.2026):
+  - Trading Journal v6.5: J1–J4, J6–J8 (J5 „Archivieren“ folgt als A4 in Phase 3)
+  - Stillhalter-Journal v6.3: SH1–SH7
+  - Depot-Cockpit v6.2: C1–C3
+  - Morgenroutine v6.18: F1–F20, V3, V10
+  - REGELCHECK: Rolls rückwärts erkannt, F16
+  - V16: Selbsttest `tests/selbsttest.js` (36 Prüfungen, ohne Internet: `node tests/selbsttest.js`)
+  - **Offen bei dir:** kurzer Probelauf unter Windows mit Live-Daten, vor allem:
+    - IB-Import mit einer echten Flex-Datei; Spalte `Open/CloseIndicator` mit exportieren
+    - Gap-Scanner vor 10:00 Uhr: Erscheint bei Pre-Market-Kursen „⚠ gestern“?
+    - Alte Import-Fehler meldet die Selbstkontrolle als „Fehlerhafter IB-Import aus älterer Version“
+  - Bewusst nicht geändert: Tailwind-Play-CDN im Journal (F19, zweiter Teil). Ein Umbau bräuchte einen Build-Schritt; das passt zum UI-Umbau in Phase 6.
 - [ ] Phase 2
 - [ ] Phase 3
 - [ ] Phase 4
