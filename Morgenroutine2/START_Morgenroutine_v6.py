@@ -35,7 +35,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 PORT = 8765
 INDEX_FILE = "ferit_morgenroutine_v6.html"
-SERVER_VERSION = "6.4"
+SERVER_VERSION = "6.19"
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 # Hosts, die der Proxy weiterleiten darf (Allowlist gegen Missbrauch als offener Proxy)
@@ -247,6 +247,24 @@ _BREITE_CACHE = {"ts": 0, "daten": None}
 _SCAN_CACHE = {"ts": 0, "daten": None}
 
 
+_TG = {"mod": None}
+
+
+def _tg_modul():
+    """telegram_bot.py EINMAL laden: Er haelt den letzten Stand und den Abfrage-Faden."""
+    if _TG["mod"] is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("telegram_bot_mod", os.path.join(DIRECTORY, "telegram_bot.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _TG["mod"] = mod
+        try:
+            mod.starte_abfrage()
+        except Exception:
+            pass
+    return _TG["mod"]
+
+
 def _ki_modul():
     import importlib.util
     spec = importlib.util.spec_from_file_location("ki_anbindung_mod", os.path.join(DIRECTORY, "ki_anbindung.py"))
@@ -378,6 +396,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._send_json(_ms_modul().status())
         if self.path.startswith("/config/ki"):
             return self._send_json(_ki_modul().status())
+        if self.path.startswith("/config/telegram"):
+            return self._send_json(_tg_modul().status())
         if self.path.startswith("/scan"):
             return self._scan()
         if self.path.startswith("/gapdetail"):
@@ -436,6 +456,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._ms_setzen()
         if self.path.startswith("/config/ki"):
             return self._ki_setzen()
+        if self.path.startswith("/config/telegram") or self.path.startswith("/telegram/"):
+            return self._telegram()
         if self.path == "/ki" or self.path.startswith("/ki?"):
             return self._ki_frage()
         if self.path.startswith("/config/datadir"):
@@ -972,6 +994,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             raise ValueError("zu gross")
         return json.loads(self.rfile.read(length).decode("utf-8")) if length else {}
 
+    def _telegram(self):
+        """v6.19 (Phase 6): /config/telegram (Token, Chat-ID, auto), /telegram/test, /telegram/stand."""
+        try:
+            tg = _tg_modul()
+            b = self._json_body()
+            if self.path.startswith("/config/telegram"):
+                return self._send_json(tg.speichere(b))
+            if self.path.startswith("/telegram/test"):
+                tg.senden("✅ Morgenroutine: Verbindung steht. Befehle: /lage /positionen /hilfe")
+                return self._send_json({"ok": True})
+            if self.path.startswith("/telegram/stand"):
+                lage = str(b.get("lage") or "")[:12000]
+                pos = str(b.get("positionen") or "")[:12000]
+                return self._send_json({"ok": True, "ergebnis": tg.stand_setzen(lage, pos, bool(b.get("senden", True)))})
+            return self.send_error(404, "unbekannt")
+        except Exception as e:
+            return self._send_json({"ok": False, "fehler": str(e)})
+
     def _ki_setzen(self):
         """v6.19 (Phase 5): KI-Schluessel in ki_schluessel.json (nur auf diesem PC). Antwort ohne Schluessel."""
         try:
@@ -1348,6 +1388,11 @@ def main():
     except FileNotFoundError:
         html_status = "NICHT GEFUNDEN [!] %s liegt nicht in diesem Ordner" % INDEX_FILE
 
+    # v6.19 (Phase 6): Telegram-Abfrage starten, falls ein Bot eingetragen ist
+    try:
+        _tg_modul()
+    except Exception as _e:
+        print(" Telegram: nicht gestartet (%s)" % _e)
     print("=" * 64)
     print(" Morgenroutine - Server laeuft   >>> SERVER-VERSION %s (ROOT-MODUS) <<<" % SERVER_VERSION)
     print("=" * 64)

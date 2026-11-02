@@ -630,6 +630,18 @@ footer strong{color:var(--ink2)}
           </div>
           <span class="hint" id="cfg-datadir-info">wird geladen …</span>
         </div>
+        <!-- v6.19 (Phase 6): Telegram — Tagesnachricht und Abfrage unterwegs -->
+        <div class="field" style="grid-column:1/-1">
+          <label>Telegram (Handy: Tagesnachricht, /lage, /positionen)</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <input id="tg-token" type="password" placeholder="Bot-Token von @BotFather (leer = unverändert)" style="flex:1 1 260px">
+            <input id="tg-chat" type="text" placeholder="Chat-ID (Bot antwortet auf /start damit)" style="flex:0 1 200px">
+            <label class="chk-inline" style="font-size:.72rem"><input type="checkbox" id="tg-auto" checked> nach jedem Lauf senden (1× täglich)</label>
+            <button class="cp-btn" onclick="tgSpeichern()">speichern</button>
+            <button class="cp-btn" onclick="tgTest()">Test senden</button>
+          </div>
+          <span class="hint" id="tg-info">1. In Telegram @BotFather → /newbot → Token hier eintragen · 2. Deinem Bot /start schicken → er nennt deine Chat-ID · 3. eintragen, Test senden. Token bleibt auf diesem PC.</span>
+        </div>
         <!-- v6.19 (N4): Marktsammler (CapTrader/TWS) als erste Kursquelle -->
         <div class="field" style="grid-column:1/-1">
           <label>Marktsammler-Ordner (CapTrader-Kerzen, erste Kursquelle)</label>
@@ -1140,6 +1152,51 @@ function resetFomc(){
 }
 
 // ── v6.12: Datenordner aus der Oberfläche setzen ───────────────────────────
+// ═══ v6.19 (Phase 6): TELEGRAM ═══════════════════════════════════════════════
+async function tgStatus(){
+  try{ const j=await (await fetchOnce('http://localhost:8765/config/telegram',4000)).json(); STATE.tg=j;
+       const i=$('tg-info'); if(i && j.ok) i.innerHTML = `Bot ${j.token?'✓':'—'} · Chat-ID ${j.chat_id?esc(j.chat_id):'—'} · Abfrage ${j.abfrage_laeuft?'läuft':'aus'}${j.zuletzt_gesendet?' · zuletzt gesendet '+esc(j.zuletzt_gesendet):''}`;
+       if($('tg-chat') && j.chat_id && !$('tg-chat').value) $('tg-chat').value=j.chat_id; if($('tg-auto')) $('tg-auto').checked = j.auto!==false;
+  }catch(e){ STATE.tg=null; }
+}
+async function tgSpeichern(){
+  const b={chat_id:($('tg-chat')||{}).value||'', auto:!!($('tg-auto')||{}).checked}; const t=($('tg-token')||{}).value.trim(); if(t) b.token=t;
+  try{ const j=await (await fetchOnce('http://localhost:8765/config/telegram',6000,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})).json();
+       if($('tg-token')) $('tg-token').value=''; toast(j.ok?'Telegram gespeichert':'Fehler: '+(j.fehler||''), j.ok?'ok':'err'); tgStatus(); }
+  catch(e){ toast('Server nicht erreichbar','err'); }
+}
+async function tgTest(){
+  try{ const j=await (await fetchOnce('http://localhost:8765/telegram/test',15000,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).json();
+       toast(j.ok?'Testnachricht gesendet':'Telegram: '+(j.fehler||'Fehler'), j.ok?'ok':'err'); }
+  catch(e){ toast('Server nicht erreichbar','err'); }
+}
+function telegramTexte(){
+  const v=STATE.ampel||{}; let K=null; try{ K=tagesKonsequenz(v); }catch(e){}
+  let W=null; try{ W=wochenTermine(); }catch(e){}
+  const f=(x,n=1)=>x==null||!isFinite(x)?'–':(+x).toFixed(n).replace('.',',');
+  const icon={GO:'🟢',CAUTION:'🟡',STOP:'🔴',REVERSE:'🟣',VOREINSTIEG:'🌱'}[v.label]||'⏸';
+  const z=[`🌅 Morgenroutine ${new Date().toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'})}`,
+    `${icon} Ampel ${v.label||'–'} · Trend ${v.trend||'–'} · Risiko ${v.risiko||'–'}`,
+    K?`Neue Positionen: ${K.kurz}`:null,
+    `VIX ${f(v.vix)} · Term ${(STATE.vixTerm&&STATE.vixTerm.regime)||'–'} · Breite ${v.part??'–'}/${v.partTot||11}${STATE.aktienBreite&&STATE.aktienBreite.US?` · Aktien in P3 ${f(STATE.aktienBreite.US.p3,0)} %`:''}`];
+  if(v.voreinstieg&&v.voreinstieg.aktiv) z.push('🌱 Voreinstieg erfüllt');
+  if(v.panikWende&&v.panikWende.aktiv) z.push('⚡ Panik-Wende möglich (Hinweis)');
+  if(v.breitenWende&&v.breitenWende.aktiv) z.push('⚡ Breiten-Wende möglich (Hinweis)');
+  if(v.wechsel) z.push(`🆕 Wechsel: ${v.wechsel.von} → ${v.label}`);
+  if(W&&W.eintraege.length) z.push(`📅 Woche ${W.stufe}: ${W.eintraege.slice(0,6).map(e=>e.d.slice(8,10)+'.'+e.d.slice(5,7)+'. '+e.was).join(' · ')}`);
+  if(STATE.partnerHeute) z.push(`🧭 KI-Partner (Meinung): ${STATE.partnerHeute.neigung}, Sicherheit ${STATE.partnerHeute.sicherheit||'–'}${STATE.partnerHeute.gegenRegel?' — widerspricht der Ampel':''}`);
+  const P=STATE.positionenKurz||[];
+  if(P.length){ const h=P.filter(x=>x.hinweis||x.nachziehen); z.push(`📈 ${P.length} Positionen${h.length?`, ${h.length} mit Hinweis — /positionen`:''}`); }
+  if(STATE.alertsFired&&STATE.alertsFired.length) z.push('⚠ '+STATE.alertsFired.join(' · '));
+  const pos = P.length ? ['📈 Offene Positionen'].concat(P.map(x=>`${x.s} ${x.richtung==='Short'?'Short':'Long'}: ${x.r!=null?(x.r>0?'+':'')+f(x.r)+' R':'–'} · Stopp ${x.stoppAbstandR!=null?f(x.stoppAbstandR)+' R entfernt':'–'} · ${x.phase||'–'}${x.zahlen?' · Zahlen '+x.zahlen.slice(8,10)+'.'+x.zahlen.slice(5,7)+'.':''}${x.nachziehen?' · Stopp nachziehen möglich':''}`)).join('\n') : 'Keine offenen Trading-Positionen.';
+  return {lage:z.filter(Boolean).join('\n'), positionen:pos};
+}
+async function telegramStand(senden){
+  if(!STATE.ampel || STATE.ampel.label==='WARTE') return;
+  try{ const t=telegramTexte();
+       await fetchOnce('http://localhost:8765/telegram/stand',15000,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lage:t.lage, positionen:t.positionen, senden:senden!==false})}); }catch(e){}
+}
+
 async function saveSammler(){
   const pfad=($('cfg-sammler')||{}).value||''; const info=$('cfg-sammler-info');
   try{ const r=await fetchOnce('http://localhost:8765/config/marktsammler', 6000, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pfad})});
@@ -5217,6 +5274,7 @@ async function tradingPartner(mitSuche){
   STATE.partnerHeute = {anbieter:STATE.kiZuletzt?STATE.kiZuletzt.anbieter:'gemini', modell:STATE.kiZuletzt?STATE.kiZuletzt.modell:MODEL,
     neigung, sicherheit:j.sicherheit||null, gegenRegel:!!j.gegen_die_regeln, ampel:STATE.ampel.label, lage:String(j.lage||'').slice(0,600), ausblick:String(j.ausblick||'').slice(0,600), zeit:new Date().toISOString(), mitSuche:!!mitSuche};
   try{ await fetchOnce('http://localhost:8765/archiv/tage?jahr='+tag.slice(0,4), 6000, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({tage:{[tag]:{ki_partner:STATE.partnerHeute}}})}); }catch(e){}
+  telegramStand(false);   // /lage zeigt jetzt auch die Meinung des Partners
 }
 
 function saveSnapshot(auto){
@@ -5590,9 +5648,10 @@ async function runMorning(){
     const kursOk = (STATE.indices||[]).some(i=>!i.err && !i.stale);
     if(kursOk) setDatenStand(Date.now());       // v6.3
     try{ renderHeute(); ladeRegelcheck(false); }catch(e){}   // v6.17
-    try{ positionsMonitor(); }catch(e){}                      // v6.19 (T2)
+    try{ await Promise.race([positionsMonitor(), sleep(30000)]); }catch(e){}   // v6.19 (T2)
     try{ await Promise.race([ueberNacht(), sleep(15000)]); }catch(e){}   // v6.19 (T4) — vor dem Archiv-Eintrag
     try{ desktopAlarmePruefen(STATE.ampel); }catch(e){}       // v6.19 (T8)
+    try{ telegramStand(true); }catch(e){}                     // v6.19 (Phase 6): Stand für /lage, Tagesnachricht 1× täglich
     // v6.10: Tages-Snapshot automatisch anlegen — legt nichts an, wenn für heute
     // schon einer existiert. Nach dem vollständigen Lauf, damit alle Werte drin sind.
     try{ if(saveSnapshot(true)) toast('Tages-Snapshot angelegt','ok'); }catch(e){ console.warn('Snapshot',e); }
@@ -5611,6 +5670,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
   // alles wie bisher — die Funktion scheitert still.
   ladeHandelsplanMR();   // v6.19 (W1)
   kiStatusLaden();       // v6.19 (Phase 5)
+  tgStatus();            // v6.19 (Phase 6)
   sammlerStatus().then(zeigeSammler);       // v6.19 (N4)
   mrLoadSettings().then(neu=>{
     if(neu){
