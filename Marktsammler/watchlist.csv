@@ -1,0 +1,843 @@
+﻿symbol;typ;boerse;waehrung;rth;gruppe;untergruppe;name;handelsklasse;multiplikator;stufen
+SPX;IND;CBOE;USD;1;Index;US-Indizes;S&P 500 Index;;;D,H,M5
+VIX;IND;CBOE;USD;1;Index;US-Indizes;CBOE Volatilitätsindex;;;D,H,M5
+NDX;IND;NASDAQ;USD;1;Index;US-Indizes;Nasdaq-100 Index;;;D,H,M5
+RUT;IND;RUSSELL;USD;1;Index;US-Indizes;Russell 2000 Index;;;D,H,M5
+SPY;STK;SMART;USD;1;ETF;Breite Märkte;SPDR S&P 500 ETF;;;D,H,M5
+QQQ;STK;SMART;USD;1;ETF;Breite Märkte;Invesco QQQ (Nasdaq-100);;;D,H,M5
+IWM;STK;SMART;USD;1;ETF;Breite Märkte;iShares Russell 2000 ETF;;;D,H,M5
+MMM;STK;SMART;USD;1;Aktie;S&P500;3M;;;D,H
+AOS;STK;SMART;USD;1;Aktie;S&P500;A. O. Smith;;;D,H
+ABT;STK;SMART;USD;1;Aktie;S&P500;Abbott Laboratories;;;D,H
+ABBV;STK;SMART;USD;1;Aktie;S&P500;AbbVie;;;D,H,M5
+ACN;STK;SMART;USD;1;Aktie;S&P500;Accenture;;;D,H
+ADBE;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Adobe Inc.;;;D,H,M5
+AMD;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Advanced Micro Devices;;;D,H,M5
+AES;STK;SMART;USD;1;Aktie;S&P500;AES Corporation;;;D,H
+AFL;STK;SMART;USD;1;Aktie;S&P500;Aflac;;;D,H
+A;STK;SMART;USD;1;Aktie;S&P500;Agilent Technologies;;;D,H
+APD;STK;SMART;USD;1;Aktie;S&P500;Air Products;;;D,H
+ABNB;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Airbnb;;;D,H,M5
+AKAM;STK;SMART;USD;1;Aktie;S&P500;Akamai Technologies;;;D,H
+ALB;STK;SMART;USD;1;Aktie;S&P500;Albemarle Corporation;;;D,H
+ARE;STK;SMART;USD;1;Aktie;S&P500;Alexandria Real Estate Equities;;;D,H
+ALGN;STK;SMART;USD;1;Aktie;S&P500;Align Technology;;;D,H
+ALLE;STK;SMART;USD;1;Aktie;S&P500;Allegion;;;D,H
+LNT;STK;SMART;USD;1;Aktie;S&P500;Alliant Energy;;;D,H
+ALL;STK;SMART;USD;1;Aktie;S&P500;Allstate;;;D,H
+GOOGL;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Alphabet Inc. (Class A);;;D,H,M5
+GOOG;STK;SMART;USD;1;Aktie;S&P500;Alphabet Inc. (Class C);;;D,H,M5
+MO;STK;SMART;USD;1;Aktie;S&P500;Altria;;;D,H
+AMZN;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Amazon;;;D,H,M5
+AMCR;STK;SMART;USD;1;Aktie;S&P500;Amcor;;;D,H
+AEE;STK;SMART;USD;1;Aktie;S&P500;Ameren;;;D,H
+AEP;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;American Electric Power;;;D,H,M5
+AXP;STK;SMART;USD;1;Aktie;S&P500;American Express;;;D,H
+AIG;STK;SMART;USD;1;Aktie;S&P500;American International Group;;;D,H
+AMT;STK;SMART;USD;1;Aktie;S&P500;American Tower;;;D,H
+AWK;STK;SMART;USD;1;Aktie;S&P500;American Water Works;;;D,H
+AMP;STK;SMART;USD;1;Aktie;S&P500;Ameriprise Financial;;;D,H
+AME;STK;SMART;USD;1;Aktie;S&P500;Ametek;;;D,H
+AMGN;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Amgen;;;D,H,M5
+APH;STK;SMART;USD;1;Aktie;S&P500;Amphenol;;;D,H
+ADI;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Analog Devices;;;D,H,M5
+AON;STK;SMART;USD;1;Aktie;S&P500;Aon plc;;;D,H
+APA;STK;SMART;USD;1;Aktie;S&P500;APA Corporation;;;D,H
+APO;STK;SMART;USD;1;Aktie;S&P500;Apollo Global Management;;;D,H
+AAPL;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Apple Inc.;;;D,H,M5
+AMAT;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Applied Materials;;;D,H,M5
+APP;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;AppLovin;;;D,H,M5
+APTV;STK;SMART;USD;1;Aktie;S&P500;Aptiv;;;D,H
+ACGL;STK;SMART;USD;1;Aktie;S&P500;Arch Capital Group;;;D,H
+ADM;STK;SMART;USD;1;Aktie;S&P500;Archer Daniels Midland;;;D,H
+ARES;STK;SMART;USD;1;Aktie;S&P500;Ares Management;;;D,H
+ANET;STK;SMART;USD;1;Aktie;S&P500;Arista Networks;;;D,H
+AJG;STK;SMART;USD;1;Aktie;S&P500;Arthur J. Gallagher & Co.;;;D,H
+AIZ;STK;SMART;USD;1;Aktie;S&P500;Assurant;;;D,H
+T;STK;SMART;USD;1;Aktie;S&P500;AT&T;;;D,H
+ATO;STK;SMART;USD;1;Aktie;S&P500;Atmos Energy;;;D,H
+ADSK;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Autodesk;;;D,H,M5
+ADP;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Automatic Data Processing;;;D,H,M5
+AZO;STK;SMART;USD;1;Aktie;S&P500;AutoZone;;;D,H
+AVY;STK;SMART;USD;1;Aktie;S&P500;Avery Dennison;;;D,H
+AXON;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Axon Enterprise;;;D,H,M5
+BKR;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Baker Hughes;;;D,H,M5
+BALL;STK;SMART;USD;1;Aktie;S&P500;Ball Corporation;;;D,H
+BAC;STK;SMART;USD;1;Aktie;S&P500;Bank of America;;;D,H,M5
+BAX;STK;SMART;USD;1;Aktie;S&P500;Baxter International;;;D,H
+BDX;STK;SMART;USD;1;Aktie;S&P500;Becton Dickinson;;;D,H
+BRK B;STK;SMART;USD;1;Aktie;S&P500;Berkshire Hathaway;;;D,H,M5
+BBY;STK;SMART;USD;1;Aktie;S&P500;Best Buy;;;D,H
+TECH;STK;SMART;USD;1;Aktie;S&P500;Bio-Techne;;;D,H
+BIIB;STK;SMART;USD;1;Aktie;S&P500;Biogen;;;D,H
+BLK;STK;SMART;USD;1;Aktie;S&P500;BlackRock;;;D,H
+BX;STK;SMART;USD;1;Aktie;S&P500;Blackstone Inc.;;;D,H
+XYZ;STK;SMART;USD;1;Aktie;S&P500;Block, Inc.;;;D,H
+BE;STK;SMART;USD;1;Aktie;S&P500;Bloom Energy;;;D,H
+BNY;STK;SMART;USD;1;Aktie;S&P500;BNY Mellon;;;D,H
+BA;STK;SMART;USD;1;Aktie;S&P500;Boeing;;;D,H
+BKNG;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Booking Holdings;;;D,H,M5
+BSX;STK;SMART;USD;1;Aktie;S&P500;Boston Scientific;;;D,H
+BMY;STK;SMART;USD;1;Aktie;S&P500;Bristol Myers Squibb;;;D,H
+AVGO;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Broadcom;;;D,H,M5
+BR;STK;SMART;USD;1;Aktie;S&P500;Broadridge Financial Solutions;;;D,H
+BRO;STK;SMART;USD;1;Aktie;S&P500;Brown & Brown;;;D,H
+BF B;STK;SMART;USD;1;Aktie;S&P500;Brown–Forman;;;D,H
+BG;STK;SMART;USD;1;Aktie;S&P500;Bunge Global;;;D,H
+BXP;STK;SMART;USD;1;Aktie;S&P500;BXP, Inc.;;;D,H
+CHRW;STK;SMART;USD;1;Aktie;S&P500;C.H. Robinson;;;D,H
+CDNS;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Cadence Design Systems;;;D,H,M5
+CPT;STK;SMART;USD;1;Aktie;S&P500;Camden Property Trust;;;D,H
+COF;STK;SMART;USD;1;Aktie;S&P500;Capital One;;;D,H
+CAH;STK;SMART;USD;1;Aktie;S&P500;Cardinal Health;;;D,H
+CCL;STK;SMART;USD;1;Aktie;S&P500;Carnival Corporation;;;D,H
+CARR;STK;SMART;USD;1;Aktie;S&P500;Carrier Global;;;D,H
+CVNA;STK;SMART;USD;1;Aktie;S&P500;Carvana;;;D,H
+CASY;STK;SMART;USD;1;Aktie;S&P500;Casey's;;;D,H
+CAT;STK;SMART;USD;1;Aktie;S&P500;Caterpillar Inc.;;;D,H
+CBOE;STK;SMART;USD;1;Aktie;S&P500;Cboe Global Markets;;;D,H
+CBRE;STK;SMART;USD;1;Aktie;S&P500;CBRE Group;;;D,H
+CDW;STK;SMART;USD;1;Aktie;S&P500;CDW Corporation;;;D,H
+COR;STK;SMART;USD;1;Aktie;S&P500;Cencora;;;D,H
+CNC;STK;SMART;USD;1;Aktie;S&P500;Centene Corporation;;;D,H
+CNP;STK;SMART;USD;1;Aktie;S&P500;CenterPoint Energy;;;D,H
+CF;STK;SMART;USD;1;Aktie;S&P500;CF Industries;;;D,H
+CRL;STK;SMART;USD;1;Aktie;S&P500;Charles River Laboratories;;;D,H
+SCHW;STK;SMART;USD;1;Aktie;S&P500;Charles Schwab Corporation;;;D,H
+CHTR;STK;SMART;USD;1;Aktie;S&P500;Charter Communications;;;D,H
+CVX;STK;SMART;USD;1;Aktie;S&P500;Chevron Corporation;;;D,H,M5
+CMG;STK;SMART;USD;1;Aktie;S&P500;Chipotle Mexican Grill;;;D,H
+CB;STK;SMART;USD;1;Aktie;S&P500;Chubb Limited;;;D,H
+CHD;STK;SMART;USD;1;Aktie;S&P500;Church & Dwight;;;D,H
+CIEN;STK;SMART;USD;1;Aktie;S&P500;Ciena;;;D,H
+CI;STK;SMART;USD;1;Aktie;S&P500;Cigna;;;D,H
+CINF;STK;SMART;USD;1;Aktie;S&P500;Cincinnati Financial;;;D,H
+CTAS;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Cintas;;;D,H,M5
+CSCO;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Cisco;;;D,H,M5
+C;STK;SMART;USD;1;Aktie;S&P500;Citigroup;;;D,H
+CFG;STK;SMART;USD;1;Aktie;S&P500;Citizens Financial Group;;;D,H
+CLX;STK;SMART;USD;1;Aktie;S&P500;Clorox;;;D,H
+CME;STK;SMART;USD;1;Aktie;S&P500;CME Group;;;D,H
+CMS;STK;SMART;USD;1;Aktie;S&P500;CMS Energy;;;D,H
+KO;STK;SMART;USD;1;Aktie;S&P500;Coca-Cola Company (The);;;D,H,M5
+CTSH;STK;SMART;USD;1;Aktie;S&P500;Cognizant;;;D,H
+COHR;STK;SMART;USD;1;Aktie;S&P500;Coherent Corp.;;;D,H
+COIN;STK;SMART;USD;1;Aktie;S&P500;Coinbase;;;D,H
+CL;STK;SMART;USD;1;Aktie;S&P500;Colgate-Palmolive;;;D,H
+CMCSA;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Comcast;;;D,H,M5
+FIX;STK;SMART;USD;1;Aktie;S&P500;Comfort Systems USA;;;D,H
+COP;STK;SMART;USD;1;Aktie;S&P500;ConocoPhillips;;;D,H
+ED;STK;SMART;USD;1;Aktie;S&P500;Consolidated Edison;;;D,H
+STZ;STK;SMART;USD;1;Aktie;S&P500;Constellation Brands;;;D,H
+CEG;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Constellation Energy;;;D,H,M5
+COO;STK;SMART;USD;1;Aktie;S&P500;Cooper Companies (The);;;D,H
+CPRT;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Copart;;;D,H,M5
+GLW;STK;SMART;USD;1;Aktie;S&P500;Corning Inc.;;;D,H
+CPAY;STK;SMART;USD;1;Aktie;S&P500;Corpay;;;D,H
+CSGP;STK;SMART;USD;1;Aktie;S&P500;CoStar Group;;;D,H
+COST;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Costco;;;D,H,M5
+CRH;STK;SMART;USD;1;Aktie;S&P500;CRH plc;;;D,H
+CRWD;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;CrowdStrike;;;D,H,M5
+CCI;STK;SMART;USD;1;Aktie;S&P500;Crown Castle;;;D,H
+CSX;STK;SMART;USD;1;Aktie;S&P500;CSX Corporation;;;D,H
+CMI;STK;SMART;USD;1;Aktie;S&P500;Cummins;;;D,H
+CVS;STK;SMART;USD;1;Aktie;S&P500;CVS Health;;;D,H
+DHR;STK;SMART;USD;1;Aktie;S&P500;Danaher Corporation;;;D,H
+DRI;STK;SMART;USD;1;Aktie;S&P500;Darden Restaurants;;;D,H
+DDOG;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Datadog;;;D,H,M5
+DVA;STK;SMART;USD;1;Aktie;S&P500;DaVita;;;D,H
+DECK;STK;SMART;USD;1;Aktie;S&P500;Deckers Brands;;;D,H
+DE;STK;SMART;USD;1;Aktie;S&P500;Deere & Company;;;D,H
+DELL;STK;SMART;USD;1;Aktie;S&P500;Dell Technologies;;;D,H
+DAL;STK;SMART;USD;1;Aktie;S&P500;Delta Air Lines;;;D,H
+DVN;STK;SMART;USD;1;Aktie;S&P500;Devon Energy;;;D,H
+DXCM;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Dexcom;;;D,H,M5
+FANG;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Diamondback Energy;;;D,H,M5
+DLR;STK;SMART;USD;1;Aktie;S&P500;Digital Realty;;;D,H
+DG;STK;SMART;USD;1;Aktie;S&P500;Dollar General;;;D,H
+DLTR;STK;SMART;USD;1;Aktie;S&P500;Dollar Tree;;;D,H
+D;STK;SMART;USD;1;Aktie;S&P500;Dominion Energy;;;D,H
+DPZ;STK;SMART;USD;1;Aktie;S&P500;Domino's;;;D,H
+DASH;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;DoorDash;;;D,H,M5
+DOV;STK;SMART;USD;1;Aktie;S&P500;Dover Corporation;;;D,H
+DOW;STK;SMART;USD;1;Aktie;S&P500;Dow Inc.;;;D,H
+DHI;STK;SMART;USD;1;Aktie;S&P500;D. R. Horton;;;D,H
+DTE;STK;SMART;USD;1;Aktie;S&P500;DTE Energy;;;D,H
+DUK;STK;SMART;USD;1;Aktie;S&P500;Duke Energy;;;D,H
+DD;STK;SMART;USD;1;Aktie;S&P500;DuPont;;;D,H
+ETN;STK;SMART;USD;1;Aktie;S&P500;Eaton Corporation;;;D,H
+EBAY;STK;SMART;USD;1;Aktie;S&P500;eBay Inc.;;;D,H
+ECHO;STK;SMART;USD;1;Aktie;S&P500;EchoStar;;;D,H
+ECL;STK;SMART;USD;1;Aktie;S&P500;Ecolab;;;D,H
+EIX;STK;SMART;USD;1;Aktie;S&P500;Edison International;;;D,H
+EW;STK;SMART;USD;1;Aktie;S&P500;Edwards Lifesciences;;;D,H
+ELV;STK;SMART;USD;1;Aktie;S&P500;Elevance Health;;;D,H
+EME;STK;SMART;USD;1;Aktie;S&P500;Emcor;;;D,H
+EMR;STK;SMART;USD;1;Aktie;S&P500;Emerson Electric;;;D,H
+ETR;STK;SMART;USD;1;Aktie;S&P500;Entergy;;;D,H
+EOG;STK;SMART;USD;1;Aktie;S&P500;EOG Resources;;;D,H
+EQT;STK;SMART;USD;1;Aktie;S&P500;EQT Corporation;;;D,H
+EFX;STK;SMART;USD;1;Aktie;S&P500;Equifax;;;D,H
+EQIX;STK;SMART;USD;1;Aktie;S&P500;Equinix;;;D,H
+ERIE;STK;SMART;USD;1;Aktie;S&P500;Erie Indemnity;;;D,H
+ESS;STK;SMART;USD;1;Aktie;S&P500;Essex Property Trust;;;D,H
+EL;STK;SMART;USD;1;Aktie;S&P500;Estée Lauder Companies (The);;;D,H
+EG;STK;SMART;USD;1;Aktie;S&P500;Everest Group;;;D,H
+EVRG;STK;SMART;USD;1;Aktie;S&P500;Evergy;;;D,H
+P;STK;SMART;USD;1;Aktie;S&P500;Everpure;;;D,H
+ES;STK;SMART;USD;1;Aktie;S&P500;Eversource Energy;;;D,H
+EXC;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Exelon;;;D,H,M5
+EXE;STK;SMART;USD;1;Aktie;S&P500;Expand Energy;;;D,H
+EXPE;STK;SMART;USD;1;Aktie;S&P500;Expedia Group;;;D,H
+EXPD;STK;SMART;USD;1;Aktie;S&P500;Expeditors International;;;D,H
+EXR;STK;SMART;USD;1;Aktie;S&P500;Extra Space Storage;;;D,H
+XOM;STK;SMART;USD;1;Aktie;S&P500;ExxonMobil;;;D,H,M5
+FFIV;STK;SMART;USD;1;Aktie;S&P500;F5, Inc.;;;D,H
+FDS;STK;SMART;USD;1;Aktie;S&P500;FactSet;;;D,H
+FICO;STK;SMART;USD;1;Aktie;S&P500;Fair Isaac;;;D,H
+FAST;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Fastenal;;;D,H,M5
+FRT;STK;SMART;USD;1;Aktie;S&P500;Federal Realty Investment Trust;;;D,H
+FDX;STK;SMART;USD;1;Aktie;S&P500;FedEx;;;D,H
+FDXF;STK;SMART;USD;1;Aktie;S&P500;FedEx Freight;;;D,H
+FERG;STK;SMART;USD;1;Aktie;S&P500;Ferguson Enterprises;;;D,H
+FIS;STK;SMART;USD;1;Aktie;S&P500;Fidelity National Information Services;;;D,H
+FITB;STK;SMART;USD;1;Aktie;S&P500;Fifth Third Bancorp;;;D,H
+FSLR;STK;SMART;USD;1;Aktie;S&P500;First Solar;;;D,H
+FE;STK;SMART;USD;1;Aktie;S&P500;FirstEnergy;;;D,H
+FISV;STK;SMART;USD;1;Aktie;S&P500;Fiserv;;;D,H
+FLEX;STK;SMART;USD;1;Aktie;S&P500;Flex Ltd.;;;D,H
+F;STK;SMART;USD;1;Aktie;S&P500;Ford Motor Company;;;D,H
+FTNT;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Fortinet;;;D,H,M5
+FTV;STK;SMART;USD;1;Aktie;S&P500;Fortive;;;D,H
+FOXA;STK;SMART;USD;1;Aktie;S&P500;Fox Corporation (Class A);;;D,H
+FOX;STK;SMART;USD;1;Aktie;S&P500;Fox Corporation (Class B);;;D,H
+BEN;STK;SMART;USD;1;Aktie;S&P500;Franklin Resources;;;D,H
+FCX;STK;SMART;USD;1;Aktie;S&P500;Freeport-McMoRan;;;D,H
+GRMN;STK;SMART;USD;1;Aktie;S&P500;Garmin;;;D,H
+IT;STK;SMART;USD;1;Aktie;S&P500;Gartner;;;D,H
+GE;STK;SMART;USD;1;Aktie;S&P500;GE Aerospace;;;D,H
+GEHC;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;GE HealthCare;;;D,H,M5
+GEV;STK;SMART;USD;1;Aktie;S&P500;GE Vernova;;;D,H
+GEN;STK;SMART;USD;1;Aktie;S&P500;Gen Digital;;;D,H
+GNRC;STK;SMART;USD;1;Aktie;S&P500;Generac;;;D,H
+GD;STK;SMART;USD;1;Aktie;S&P500;General Dynamics;;;D,H
+GIS;STK;SMART;USD;1;Aktie;S&P500;General Mills;;;D,H
+GM;STK;SMART;USD;1;Aktie;S&P500;General Motors;;;D,H
+GPC;STK;SMART;USD;1;Aktie;S&P500;Genuine Parts Company;;;D,H
+GILD;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Gilead Sciences;;;D,H,M5
+GPN;STK;SMART;USD;1;Aktie;S&P500;Global Payments;;;D,H
+GL;STK;SMART;USD;1;Aktie;S&P500;Globe Life;;;D,H
+GDDY;STK;SMART;USD;1;Aktie;S&P500;GoDaddy;;;D,H
+GS;STK;SMART;USD;1;Aktie;S&P500;Goldman Sachs;;;D,H
+HAL;STK;SMART;USD;1;Aktie;S&P500;Halliburton;;;D,H
+HIG;STK;SMART;USD;1;Aktie;S&P500;Hartford (The);;;D,H
+HAS;STK;SMART;USD;1;Aktie;S&P500;Hasbro;;;D,H
+HCA;STK;SMART;USD;1;Aktie;S&P500;HCA Healthcare;;;D,H
+DOC;STK;SMART;USD;1;Aktie;S&P500;Healthpeak Properties;;;D,H
+HSIC;STK;SMART;USD;1;Aktie;S&P500;Henry Schein;;;D,H
+HSY;STK;SMART;USD;1;Aktie;S&P500;Hershey Company (The);;;D,H
+HPE;STK;SMART;USD;1;Aktie;S&P500;Hewlett Packard Enterprise;;;D,H
+HLT;STK;SMART;USD;1;Aktie;S&P500;Hilton Worldwide;;;D,H
+HD;STK;SMART;USD;1;Aktie;S&P500;Home Depot (The);;;D,H,M5
+HONA;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Honeywell Aerospace;;;D,H,M5
+HON;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Honeywell Technologies;;;D,H,M5
+HRL;STK;SMART;USD;1;Aktie;S&P500;Hormel Foods;;;D,H
+HST;STK;SMART;USD;1;Aktie;S&P500;Host Hotels & Resorts;;;D,H
+HWM;STK;SMART;USD;1;Aktie;S&P500;Howmet Aerospace;;;D,H
+HPQ;STK;SMART;USD;1;Aktie;S&P500;HP Inc.;;;D,H
+HUBB;STK;SMART;USD;1;Aktie;S&P500;Hubbell Incorporated;;;D,H
+HUM;STK;SMART;USD;1;Aktie;S&P500;Humana;;;D,H
+HBAN;STK;SMART;USD;1;Aktie;S&P500;Huntington Bancshares;;;D,H
+HII;STK;SMART;USD;1;Aktie;S&P500;Huntington Ingalls Industries;;;D,H
+IBM;STK;SMART;USD;1;Aktie;S&P500;IBM;;;D,H
+IEX;STK;SMART;USD;1;Aktie;S&P500;IDEX Corporation;;;D,H
+IDXX;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Idexx Laboratories;;;D,H,M5
+ITW;STK;SMART;USD;1;Aktie;S&P500;Illinois Tool Works;;;D,H
+ILMN;STK;SMART;USD;1;Aktie;S&P500;Illumina, Inc.;;;D,H
+INCY;STK;SMART;USD;1;Aktie;S&P500;Incyte;;;D,H
+IR;STK;SMART;USD;1;Aktie;S&P500;Ingersoll Rand;;;D,H
+PODD;STK;SMART;USD;1;Aktie;S&P500;Insulet Corporation;;;D,H
+INTC;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Intel;;;D,H,M5
+IBKR;STK;SMART;USD;1;Aktie;S&P500;Interactive Brokers;;;D,H
+ICE;STK;SMART;USD;1;Aktie;S&P500;Intercontinental Exchange;;;D,H
+IFF;STK;SMART;USD;1;Aktie;S&P500;International Flavors & Fragrances;;;D,H
+IP;STK;SMART;USD;1;Aktie;S&P500;International Paper;;;D,H
+INTU;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Intuit;;;D,H,M5
+ISRG;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Intuitive Surgical;;;D,H,M5
+IVZ;STK;SMART;USD;1;Aktie;S&P500;Invesco;;;D,H
+INVH;STK;SMART;USD;1;Aktie;S&P500;Invitation Homes;;;D,H
+IQV;STK;SMART;USD;1;Aktie;S&P500;IQVIA;;;D,H
+IRM;STK;SMART;USD;1;Aktie;S&P500;Iron Mountain;;;D,H
+JBHT;STK;SMART;USD;1;Aktie;S&P500;J.B. Hunt;;;D,H
+JBL;STK;SMART;USD;1;Aktie;S&P500;Jabil;;;D,H
+JKHY;STK;SMART;USD;1;Aktie;S&P500;Jack Henry & Associates;;;D,H
+J;STK;SMART;USD;1;Aktie;S&P500;Jacobs Solutions;;;D,H
+JNJ;STK;SMART;USD;1;Aktie;S&P500;Johnson & Johnson;;;D,H,M5
+JCI;STK;SMART;USD;1;Aktie;S&P500;Johnson Controls;;;D,H
+JPM;STK;SMART;USD;1;Aktie;S&P500;JPMorgan Chase;;;D,H,M5
+KVUE;STK;SMART;USD;1;Aktie;S&P500;Kenvue;;;D,H
+KDP;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Keurig Dr Pepper;;;D,H,M5
+KEY;STK;SMART;USD;1;Aktie;S&P500;KeyCorp;;;D,H
+KEYS;STK;SMART;USD;1;Aktie;S&P500;Keysight Technologies;;;D,H
+KMB;STK;SMART;USD;1;Aktie;S&P500;Kimberly-Clark;;;D,H
+KIM;STK;SMART;USD;1;Aktie;S&P500;Kimco Realty;;;D,H
+KMI;STK;SMART;USD;1;Aktie;S&P500;Kinder Morgan;;;D,H
+KKR;STK;SMART;USD;1;Aktie;S&P500;KKR & Co.;;;D,H
+KLAC;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;KLA Corporation;;;D,H,M5
+KHC;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Kraft Heinz;;;D,H,M5
+KR;STK;SMART;USD;1;Aktie;S&P500;Kroger;;;D,H
+LHX;STK;SMART;USD;1;Aktie;S&P500;L3Harris;;;D,H
+LH;STK;SMART;USD;1;Aktie;S&P500;Labcorp;;;D,H
+LRCX;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Lam Research;;;D,H,M5
+LVS;STK;SMART;USD;1;Aktie;S&P500;Las Vegas Sands;;;D,H
+LDOS;STK;SMART;USD;1;Aktie;S&P500;Leidos;;;D,H
+LEN;STK;SMART;USD;1;Aktie;S&P500;Lennar;;;D,H
+LII;STK;SMART;USD;1;Aktie;S&P500;Lennox International;;;D,H
+LLY;STK;SMART;USD;1;Aktie;S&P500;Lilly (Eli);;;D,H,M5
+LIN;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Linde plc;;;D,H,M5
+LYV;STK;SMART;USD;1;Aktie;S&P500;Live Nation Entertainment;;;D,H
+LMT;STK;SMART;USD;1;Aktie;S&P500;Lockheed Martin;;;D,H
+L;STK;SMART;USD;1;Aktie;S&P500;Loews Corporation;;;D,H
+LOW;STK;SMART;USD;1;Aktie;S&P500;Lowe's;;;D,H
+LULU;STK;SMART;USD;1;Aktie;S&P500;Lululemon Athletica;;;D,H
+LITE;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Lumentum;;;D,H,M5
+LYB;STK;SMART;USD;1;Aktie;S&P500;LyondellBasell;;;D,H
+MTB;STK;SMART;USD;1;Aktie;S&P500;M&T Bank;;;D,H
+MPC;STK;SMART;USD;1;Aktie;S&P500;Marathon Petroleum;;;D,H
+MAR;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Marriott International;;;D,H,M5
+MRSH;STK;SMART;USD;1;Aktie;S&P500;Marsh McLennan;;;D,H
+MLM;STK;SMART;USD;1;Aktie;S&P500;Martin Marietta Materials;;;D,H
+MRVL;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Marvell Technology;;;D,H,M5
+MAS;STK;SMART;USD;1;Aktie;S&P500;Masco;;;D,H
+MA;STK;SMART;USD;1;Aktie;S&P500;Mastercard;;;D,H,M5
+MKC;STK;SMART;USD;1;Aktie;S&P500;McCormick & Company;;;D,H
+MCD;STK;SMART;USD;1;Aktie;S&P500;McDonald's;;;D,H
+MCK;STK;SMART;USD;1;Aktie;S&P500;McKesson;;;D,H
+MDT;STK;SMART;USD;1;Aktie;S&P500;Medtronic;;;D,H
+MRK;STK;SMART;USD;1;Aktie;S&P500;Merck & Co.;;;D,H
+META;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Meta Platforms;;;D,H,M5
+MET;STK;SMART;USD;1;Aktie;S&P500;MetLife;;;D,H
+MTD;STK;SMART;USD;1;Aktie;S&P500;Mettler Toledo;;;D,H
+MGM;STK;SMART;USD;1;Aktie;S&P500;MGM Resorts;;;D,H
+MCHP;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Microchip Technology;;;D,H,M5
+MU;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Micron Technology;;;D,H,M5
+MSFT;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Microsoft;;;D,H,M5
+MAA;STK;SMART;USD;1;Aktie;S&P500;Mid-America Apartment Communities;;;D,H
+MRNA;STK;SMART;USD;1;Aktie;S&P500;Moderna;;;D,H
+MDLZ;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Mondelez International;;;D,H,M5
+MPWR;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Monolithic Power Systems;;;D,H,M5
+MNST;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Monster Beverage;;;D,H,M5
+MCO;STK;SMART;USD;1;Aktie;S&P500;Moody's Corporation;;;D,H
+MS;STK;SMART;USD;1;Aktie;S&P500;Morgan Stanley;;;D,H
+MOS;STK;SMART;USD;1;Aktie;S&P500;Mosaic Company (The);;;D,H
+MSI;STK;SMART;USD;1;Aktie;S&P500;Motorola Solutions;;;D,H
+MSCI;STK;SMART;USD;1;Aktie;S&P500;MSCI;;;D,H
+NDAQ;STK;SMART;USD;1;Aktie;S&P500;Nasdaq, Inc.;;;D,H
+NTAP;STK;SMART;USD;1;Aktie;S&P500;NetApp;;;D,H
+NFLX;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Netflix;;;D,H,M5
+NEM;STK;SMART;USD;1;Aktie;S&P500;Newmont;;;D,H
+NWSA;STK;SMART;USD;1;Aktie;S&P500;News Corp (Class A);;;D,H
+NWS;STK;SMART;USD;1;Aktie;S&P500;News Corp (Class B);;;D,H
+NEE;STK;SMART;USD;1;Aktie;S&P500;NextEra Energy;;;D,H
+NKE;STK;SMART;USD;1;Aktie;S&P500;Nike, Inc.;;;D,H
+NI;STK;SMART;USD;1;Aktie;S&P500;NiSource;;;D,H
+NDSN;STK;SMART;USD;1;Aktie;S&P500;Nordson Corporation;;;D,H
+NSC;STK;SMART;USD;1;Aktie;S&P500;Norfolk Southern;;;D,H
+NTRS;STK;SMART;USD;1;Aktie;S&P500;Northern Trust;;;D,H
+NOC;STK;SMART;USD;1;Aktie;S&P500;Northrop Grumman;;;D,H
+NCLH;STK;SMART;USD;1;Aktie;S&P500;Norwegian Cruise Line Holdings;;;D,H
+NRG;STK;SMART;USD;1;Aktie;S&P500;NRG Energy;;;D,H
+NUE;STK;SMART;USD;1;Aktie;S&P500;Nucor;;;D,H
+NVDA;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Nvidia;;;D,H,M5
+NVR;STK;SMART;USD;1;Aktie;S&P500;NVR, Inc.;;;D,H
+NXPI;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;NXP Semiconductors;;;D,H,M5
+ORLY;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;O'Reilly Automotive;;;D,H,M5
+OXY;STK;SMART;USD;1;Aktie;S&P500;Occidental Petroleum;;;D,H
+ODFL;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Old Dominion;;;D,H,M5
+OMC;STK;SMART;USD;1;Aktie;S&P500;Omnicom Group;;;D,H
+ON;STK;SMART;USD;1;Aktie;S&P500;ON Semiconductor;;;D,H
+OKE;STK;SMART;USD;1;Aktie;S&P500;Oneok;;;D,H
+ORCL;STK;SMART;USD;1;Aktie;S&P500;Oracle Corporation;;;D,H,M5
+OTIS;STK;SMART;USD;1;Aktie;S&P500;Otis Worldwide;;;D,H
+PCAR;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Paccar;;;D,H,M5
+PKG;STK;SMART;USD;1;Aktie;S&P500;Packaging Corporation of America;;;D,H
+PLTR;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Palantir Technologies;;;D,H,M5
+PANW;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Palo Alto Networks;;;D,H,M5
+PH;STK;SMART;USD;1;Aktie;S&P500;Parker Hannifin;;;D,H
+PAYX;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Paychex;;;D,H,M5
+PYPL;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;PayPal;;;D,H,M5
+PNR;STK;SMART;USD;1;Aktie;S&P500;Pentair;;;D,H
+PEP;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;PepsiCo;;;D,H,M5
+PFE;STK;SMART;USD;1;Aktie;S&P500;Pfizer;;;D,H
+PCG;STK;SMART;USD;1;Aktie;S&P500;PG&E Corporation;;;D,H
+PM;STK;SMART;USD;1;Aktie;S&P500;Philip Morris International;;;D,H
+PSX;STK;SMART;USD;1;Aktie;S&P500;Phillips 66;;;D,H
+PNW;STK;SMART;USD;1;Aktie;S&P500;Pinnacle West Capital;;;D,H
+PNC;STK;SMART;USD;1;Aktie;S&P500;PNC Financial Services;;;D,H
+PPG;STK;SMART;USD;1;Aktie;S&P500;PPG Industries;;;D,H
+PPL;STK;SMART;USD;1;Aktie;S&P500;PPL Corporation;;;D,H
+PFG;STK;SMART;USD;1;Aktie;S&P500;Principal Financial Group;;;D,H
+PG;STK;SMART;USD;1;Aktie;S&P500;Procter & Gamble;;;D,H,M5
+PGR;STK;SMART;USD;1;Aktie;S&P500;Progressive Corporation;;;D,H
+PLD;STK;SMART;USD;1;Aktie;S&P500;Prologis;;;D,H
+PRU;STK;SMART;USD;1;Aktie;S&P500;Prudential Financial;;;D,H
+PTC;STK;SMART;USD;1;Aktie;S&P500;PTC Inc.;;;D,H
+PEG;STK;SMART;USD;1;Aktie;S&P500;Public Service Enterprise Group;;;D,H
+PSA;STK;SMART;USD;1;Aktie;S&P500;Public Storage;;;D,H
+PHM;STK;SMART;USD;1;Aktie;S&P500;PulteGroup;;;D,H
+Q;STK;SMART;USD;1;Aktie;S&P500;Qnity Electronics;;;D,H
+QCOM;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Qualcomm;;;D,H,M5
+PWR;STK;SMART;USD;1;Aktie;S&P500;Quanta Services;;;D,H
+DGX;STK;SMART;USD;1;Aktie;S&P500;Quest Diagnostics;;;D,H
+RL;STK;SMART;USD;1;Aktie;S&P500;Ralph Lauren Corporation;;;D,H
+RJF;STK;SMART;USD;1;Aktie;S&P500;Raymond James Financial;;;D,H
+RDDT;STK;SMART;USD;1;Aktie;S&P500;Reddit;;;D,H
+O;STK;SMART;USD;1;Aktie;S&P500;Realty Income;;;D,H
+REG;STK;SMART;USD;1;Aktie;S&P500;Regency Centers;;;D,H
+REGN;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Regeneron Pharmaceuticals;;;D,H,M5
+RF;STK;SMART;USD;1;Aktie;S&P500;Regions Financial Corporation;;;D,H
+RSG;STK;SMART;USD;1;Aktie;S&P500;Republic Services;;;D,H
+RMD;STK;SMART;USD;1;Aktie;S&P500;ResMed;;;D,H
+RVTY;STK;SMART;USD;1;Aktie;S&P500;Revvity;;;D,H
+HOOD;STK;SMART;USD;1;Aktie;S&P500;Robinhood Markets;;;D,H
+ROK;STK;SMART;USD;1;Aktie;S&P500;Rockwell Automation;;;D,H
+ROL;STK;SMART;USD;1;Aktie;S&P500;Rollins, Inc.;;;D,H
+ROP;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Roper Technologies;;;D,H,M5
+ROST;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Ross Stores;;;D,H,M5
+RCL;STK;SMART;USD;1;Aktie;S&P500;Royal Caribbean Group;;;D,H
+RTX;STK;SMART;USD;1;Aktie;S&P500;RTX Corporation;;;D,H
+SPGI;STK;SMART;USD;1;Aktie;S&P500;S&P Global;;;D,H
+CRM;STK;SMART;USD;1;Aktie;S&P500;Salesforce;;;D,H,M5
+SNDK;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Sandisk;;;D,H,M5
+SBAC;STK;SMART;USD;1;Aktie;S&P500;SBA Communications;;;D,H
+SLB;STK;SMART;USD;1;Aktie;S&P500;Schlumberger;;;D,H
+STX;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Seagate Technology;;;D,H,M5
+SRE;STK;SMART;USD;1;Aktie;S&P500;Sempra;;;D,H
+NOW;STK;SMART;USD;1;Aktie;S&P500;ServiceNow;;;D,H
+SHW;STK;SMART;USD;1;Aktie;S&P500;Sherwin-Williams;;;D,H
+SPG;STK;SMART;USD;1;Aktie;S&P500;Simon Property Group;;;D,H
+SKYD;STK;SMART;USD;1;Aktie;S&P500;Skydance;;;D,H
+SWKS;STK;SMART;USD;1;Aktie;S&P500;Skyworks Solutions;;;D,H
+SJM;STK;SMART;USD;1;Aktie;S&P500;J.M. Smucker Company (The);;;D,H
+SW;STK;SMART;USD;1;Aktie;S&P500;Smurfit Westrock;;;D,H
+SNA;STK;SMART;USD;1;Aktie;S&P500;Snap-on;;;D,H
+SOLV;STK;SMART;USD;1;Aktie;S&P500;Solventum;;;D,H
+SO;STK;SMART;USD;1;Aktie;S&P500;Southern Company;;;D,H
+LUV;STK;SMART;USD;1;Aktie;S&P500;Southwest Airlines;;;D,H
+SWK;STK;SMART;USD;1;Aktie;S&P500;Stanley Black & Decker;;;D,H
+SBUX;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Starbucks;;;D,H,M5
+STT;STK;SMART;USD;1;Aktie;S&P500;State Street Corporation;;;D,H
+STLD;STK;SMART;USD;1;Aktie;S&P500;Steel Dynamics;;;D,H
+STE;STK;SMART;USD;1;Aktie;S&P500;Steris;;;D,H
+SYK;STK;SMART;USD;1;Aktie;S&P500;Stryker Corporation;;;D,H
+SMCI;STK;SMART;USD;1;Aktie;S&P500;Supermicro;;;D,H
+SYF;STK;SMART;USD;1;Aktie;S&P500;Synchrony Financial;;;D,H
+SNPS;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Synopsys;;;D,H,M5
+SYY;STK;SMART;USD;1;Aktie;S&P500;Sysco;;;D,H
+TMUS;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;T-Mobile US;;;D,H,M5
+TROW;STK;SMART;USD;1;Aktie;S&P500;T. Rowe Price;;;D,H
+TTWO;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Take-Two Interactive;;;D,H,M5
+TPR;STK;SMART;USD;1;Aktie;S&P500;Tapestry, Inc.;;;D,H
+TRGP;STK;SMART;USD;1;Aktie;S&P500;Targa Resources;;;D,H
+TGT;STK;SMART;USD;1;Aktie;S&P500;Target Corporation;;;D,H
+TEL;STK;SMART;USD;1;Aktie;S&P500;TE Connectivity;;;D,H
+TDY;STK;SMART;USD;1;Aktie;S&P500;Teledyne Technologies;;;D,H
+TER;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Teradyne;;;D,H,M5
+TSLA;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Tesla, Inc.;;;D,H,M5
+TXN;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Texas Instruments;;;D,H,M5
+TPL;STK;SMART;USD;1;Aktie;S&P500;Texas Pacific Land Corporation;;;D,H
+TXT;STK;SMART;USD;1;Aktie;S&P500;Textron;;;D,H
+TMO;STK;SMART;USD;1;Aktie;S&P500;Thermo Fisher Scientific;;;D,H
+TJX;STK;SMART;USD;1;Aktie;S&P500;TJX Companies;;;D,H
+TKO;STK;SMART;USD;1;Aktie;S&P500;TKO Group Holdings;;;D,H
+TSCO;STK;SMART;USD;1;Aktie;S&P500;Tractor Supply;;;D,H
+TT;STK;SMART;USD;1;Aktie;S&P500;Trane Technologies;;;D,H
+TDG;STK;SMART;USD;1;Aktie;S&P500;TransDigm Group;;;D,H
+TRV;STK;SMART;USD;1;Aktie;S&P500;Travelers Companies (The);;;D,H
+TRMB;STK;SMART;USD;1;Aktie;S&P500;Trimble Inc.;;;D,H
+TFC;STK;SMART;USD;1;Aktie;S&P500;Truist Financial;;;D,H
+TWLO;STK;SMART;USD;1;Aktie;S&P500;Twilio;;;D,H
+TYL;STK;SMART;USD;1;Aktie;S&P500;Tyler Technologies;;;D,H
+TSN;STK;SMART;USD;1;Aktie;S&P500;Tyson Foods;;;D,H
+USB;STK;SMART;USD;1;Aktie;S&P500;U.S. Bancorp;;;D,H
+UBER;STK;SMART;USD;1;Aktie;S&P500;Uber;;;D,H
+UDR;STK;SMART;USD;1;Aktie;S&P500;UDR, Inc.;;;D,H
+ULTA;STK;SMART;USD;1;Aktie;S&P500;Ulta Beauty;;;D,H
+UNP;STK;SMART;USD;1;Aktie;S&P500;Union Pacific Corporation;;;D,H
+UAL;STK;SMART;USD;1;Aktie;S&P500;United Airlines Holdings;;;D,H
+UPS;STK;SMART;USD;1;Aktie;S&P500;United Parcel Service;;;D,H
+URI;STK;SMART;USD;1;Aktie;S&P500;United Rentals;;;D,H
+UNH;STK;SMART;USD;1;Aktie;S&P500;UnitedHealth Group;;;D,H,M5
+UHS;STK;SMART;USD;1;Aktie;S&P500;Universal Health Services;;;D,H
+VLO;STK;SMART;USD;1;Aktie;S&P500;Valero Energy;;;D,H
+VEEV;STK;SMART;USD;1;Aktie;S&P500;Veeva Systems;;;D,H
+VTR;STK;SMART;USD;1;Aktie;S&P500;Ventas;;;D,H
+VLTO;STK;SMART;USD;1;Aktie;S&P500;Veralto;;;D,H
+VRSN;STK;SMART;USD;1;Aktie;S&P500;Verisign;;;D,H
+VRSK;STK;SMART;USD;1;Aktie;S&P500;Verisk Analytics;;;D,H
+VZ;STK;SMART;USD;1;Aktie;S&P500;Verizon;;;D,H
+VRTX;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Vertex Pharmaceuticals;;;D,H,M5
+VRT;STK;SMART;USD;1;Aktie;S&P500;Vertiv;;;D,H
+VTRS;STK;SMART;USD;1;Aktie;S&P500;Viatris;;;D,H
+VICI;STK;SMART;USD;1;Aktie;S&P500;Vici Properties;;;D,H
+V;STK;SMART;USD;1;Aktie;S&P500;Visa Inc.;;;D,H,M5
+VST;STK;SMART;USD;1;Aktie;S&P500;Vistra Corp.;;;D,H
+VMRK;STK;SMART;USD;1;Aktie;S&P500;Vivmark Residential;;;D,H
+VMC;STK;SMART;USD;1;Aktie;S&P500;Vulcan Materials Company;;;D,H
+VYLR;STK;SMART;USD;1;Aktie;S&P500;Vylor;;;D,H
+WRB;STK;SMART;USD;1;Aktie;S&P500;W. R. Berkley Corporation;;;D,H
+GWW;STK;SMART;USD;1;Aktie;S&P500;W. W. Grainger;;;D,H
+WAB;STK;SMART;USD;1;Aktie;S&P500;Wabtec;;;D,H
+WMT;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Walmart;;;D,H,M5
+DIS;STK;SMART;USD;1;Aktie;S&P500;Walt Disney Company (The);;;D,H
+WM;STK;SMART;USD;1;Aktie;S&P500;Waste Management;;;D,H
+WAT;STK;SMART;USD;1;Aktie;S&P500;Waters Corporation;;;D,H
+WEC;STK;SMART;USD;1;Aktie;S&P500;WEC Energy Group;;;D,H
+WFC;STK;SMART;USD;1;Aktie;S&P500;Wells Fargo;;;D,H
+WELL;STK;SMART;USD;1;Aktie;S&P500;Welltower;;;D,H
+WST;STK;SMART;USD;1;Aktie;S&P500;West Pharmaceutical Services;;;D,H
+WDC;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Western Digital;;;D,H,M5
+WY;STK;SMART;USD;1;Aktie;S&P500;Weyerhaeuser;;;D,H
+WSM;STK;SMART;USD;1;Aktie;S&P500;Williams-Sonoma, Inc.;;;D,H
+WMB;STK;SMART;USD;1;Aktie;S&P500;Williams Companies;;;D,H
+WTW;STK;SMART;USD;1;Aktie;S&P500;Willis Towers Watson;;;D,H
+WDAY;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Workday, Inc.;;;D,H,M5
+WYNN;STK;SMART;USD;1;Aktie;S&P500;Wynn Resorts;;;D,H
+XEL;STK;SMART;USD;1;Aktie;S&P500|Nasdaq100;Xcel Energy;;;D,H,M5
+XYL;STK;SMART;USD;1;Aktie;S&P500;Xylem Inc.;;;D,H
+YUM;STK;SMART;USD;1;Aktie;S&P500;Yum! Brands;;;D,H
+ZBRA;STK;SMART;USD;1;Aktie;S&P500;Zebra Technologies;;;D,H
+ZBH;STK;SMART;USD;1;Aktie;S&P500;Zimmer Biomet;;;D,H
+ZTS;STK;SMART;USD;1;Aktie;S&P500;Zoetis;;;D,H
+SHOP;STK;SMART;USD;1;Aktie;Nasdaq100;Shopify;;;D,H,M5
+ASML;STK;SMART;USD;1;Aktie;Nasdaq100;ASML Holding;;;D,H,M5
+ARM;STK;SMART;USD;1;Aktie;Nasdaq100;Arm Holdings;;;D,H,M5
+MELI;STK;SMART;USD;1;Aktie;Nasdaq100;MercadoLibre;;;D,H,M5
+ALAB;STK;SMART;USD;1;Aktie;Nasdaq100;Astera Labs;;;D,H,M5
+CCEP;STK;SMART;USD;1;Aktie;Nasdaq100;Coca-Cola Europacific Partners;;;D,H,M5
+MSTR;STK;SMART;USD;1;Aktie;Nasdaq100;Strategy;;;D,H,M5
+TRI;STK;SMART;USD;1;Aktie;Nasdaq100;Thomson Reuters;;;D,H,M5
+NBIS;STK;SMART;USD;1;Aktie;Nasdaq100;Nebius Group;;;D,H,M5
+RKLB;STK;SMART;USD;1;Aktie;Nasdaq100;Rocket Lab;;;D,H,M5
+CRWV;STK;SMART;USD;1;Aktie;Nasdaq100;CoreWeave;;;D,H,M5
+ALNY;STK;SMART;USD;1;Aktie;Nasdaq100;Alnylam Pharmaceuticals;;;D,H,M5
+PDD;STK;SMART;USD;1;Aktie;Nasdaq100;PDD Holdings;;;D,H,M5
+FER;STK;SMART;USD;1;Aktie;Nasdaq100;Ferrovial;;;D,H,M5
+DAX;IND;EUREX;EUR;1;Index;Europa-Indizes;DAX Index;;;D,H,M5
+MDAX;IND;EUREX;EUR;1;Index;Europa-Indizes;MDAX Index;;;D,H,M5
+SDAX;IND;EUREX;EUR;1;Index;Europa-Indizes;SDAX Index;;;D,H,M5
+ESTX50;IND;EUREX;EUR;1;Index;Europa-Indizes;Euro Stoxx 50 Index;;;D,H,M5
+DIA;STK;SMART;USD;1;ETF;Breite Märkte;SPDR Dow Jones ETF;;;D,H,M5
+MDY;STK;SMART;USD;1;ETF;Breite Märkte;SPDR S&P MidCap 400;;;D,H,M5
+IJR;STK;SMART;USD;1;ETF;Breite Märkte;iShares Core S&P Small-Cap;;;D,H,M5
+VTI;STK;SMART;USD;1;ETF;Breite Märkte;Vanguard Total Stock Market;;;D,H,M5
+VOO;STK;SMART;USD;1;ETF;Breite Märkte;Vanguard S&P 500;;;D,H,M5
+RSP;STK;SMART;USD;1;ETF;Breite Märkte;Invesco S&P 500 Equal Weight;;;D,H,M5
+XLK;STK;SMART;USD;1;ETF;Branchen;Technology Select Sector;;;D,H,M5
+XLF;STK;SMART;USD;1;ETF;Branchen;Financial Select Sector;;;D,H,M5
+XLE;STK;SMART;USD;1;ETF;Branchen;Energy Select Sector;;;D,H,M5
+XLV;STK;SMART;USD;1;ETF;Branchen;Health Care Select Sector;;;D,H,M5
+XLY;STK;SMART;USD;1;ETF;Branchen;Consumer Discretionary Select Sector;;;D,H,M5
+XLP;STK;SMART;USD;1;ETF;Branchen;Consumer Staples Select Sector;;;D,H,M5
+XLI;STK;SMART;USD;1;ETF;Branchen;Industrial Select Sector;;;D,H,M5
+XLB;STK;SMART;USD;1;ETF;Branchen;Materials Select Sector;;;D,H,M5
+XLU;STK;SMART;USD;1;ETF;Branchen;Utilities Select Sector;;;D,H,M5
+XLRE;STK;SMART;USD;1;ETF;Branchen;Real Estate Select Sector;;;D,H,M5
+XLC;STK;SMART;USD;1;ETF;Branchen;Communication Services Select Sector;;;D,H,M5
+SMH;STK;SMART;USD;1;ETF;Branchen;VanEck Semiconductor;;;D,H,M5
+SOXX;STK;SMART;USD;1;ETF;Branchen;iShares Semiconductor;;;D,H,M5
+XBI;STK;SMART;USD;1;ETF;Branchen;SPDR S&P Biotech;;;D,H,M5
+IBB;STK;SMART;USD;1;ETF;Branchen;iShares Biotechnology;;;D,H,M5
+KRE;STK;SMART;USD;1;ETF;Branchen;SPDR S&P Regional Banking;;;D,H,M5
+XHB;STK;SMART;USD;1;ETF;Branchen;SPDR S&P Homebuilders;;;D,H,M5
+XRT;STK;SMART;USD;1;ETF;Branchen;SPDR S&P Retail;;;D,H,M5
+XME;STK;SMART;USD;1;ETF;Branchen;SPDR S&P Metals & Mining;;;D,H,M5
+OIH;STK;SMART;USD;1;ETF;Branchen;VanEck Oil Services;;;D,H,M5
+XOP;STK;SMART;USD;1;ETF;Branchen;SPDR S&P Oil & Gas Exploration;;;D,H,M5
+ITA;STK;SMART;USD;1;ETF;Branchen;iShares US Aerospace & Defense;;;D,H,M5
+IGV;STK;SMART;USD;1;ETF;Branchen;iShares Expanded Tech-Software;;;D,H,M5
+VNQ;STK;SMART;USD;1;ETF;Branchen;Vanguard Real Estate;;;D,H,M5
+ARKK;STK;SMART;USD;1;ETF;Branchen;ARK Innovation;;;D,H,M5
+TLT;STK;SMART;USD;1;ETF;Anleihen;iShares 20+ Year Treasury;;;D,H,M5
+IEF;STK;SMART;USD;1;ETF;Anleihen;iShares 7-10 Year Treasury;;;D,H,M5
+SHY;STK;SMART;USD;1;ETF;Anleihen;iShares 1-3 Year Treasury;;;D,H,M5
+IEI;STK;SMART;USD;1;ETF;Anleihen;iShares 3-7 Year Treasury;;;D,H,M5
+TLH;STK;SMART;USD;1;ETF;Anleihen;iShares 10-20 Year Treasury;;;D,H,M5
+LQD;STK;SMART;USD;1;ETF;Anleihen;iShares Investment Grade Corporate;;;D,H,M5
+HYG;STK;SMART;USD;1;ETF;Anleihen;iShares High Yield Corporate;;;D,H,M5
+JNK;STK;SMART;USD;1;ETF;Anleihen;SPDR High Yield Bond;;;D,H,M5
+AGG;STK;SMART;USD;1;ETF;Anleihen;iShares Core US Aggregate Bond;;;D,H,M5
+BND;STK;SMART;USD;1;ETF;Anleihen;Vanguard Total Bond Market;;;D,H,M5
+TIP;STK;SMART;USD;1;ETF;Anleihen;iShares TIPS Bond;;;D,H,M5
+EMB;STK;SMART;USD;1;ETF;Anleihen;iShares Emerging Markets Bond;;;D,H,M5
+MUB;STK;SMART;USD;1;ETF;Anleihen;iShares National Muni Bond;;;D,H,M5
+BIL;STK;SMART;USD;1;ETF;Anleihen;SPDR 1-3 Month T-Bill;;;D,H,M5
+SHV;STK;SMART;USD;1;ETF;Anleihen;iShares Short Treasury;;;D,H,M5
+GLD;STK;SMART;USD;1;ETF;Rohstoffe;SPDR Gold Shares;;;D,H,M5
+SLV;STK;SMART;USD;1;ETF;Rohstoffe;iShares Silver Trust;;;D,H,M5
+IAU;STK;SMART;USD;1;ETF;Rohstoffe;iShares Gold Trust;;;D,H,M5
+GDX;STK;SMART;USD;1;ETF;Rohstoffe;VanEck Gold Miners;;;D,H,M5
+GDXJ;STK;SMART;USD;1;ETF;Rohstoffe;VanEck Junior Gold Miners;;;D,H,M5
+USO;STK;SMART;USD;1;ETF;Rohstoffe;United States Oil Fund;;;D,H,M5
+UNG;STK;SMART;USD;1;ETF;Rohstoffe;United States Natural Gas Fund;;;D,H,M5
+DBC;STK;SMART;USD;1;ETF;Rohstoffe;Invesco DB Commodity Index;;;D,H,M5
+DBA;STK;SMART;USD;1;ETF;Rohstoffe;Invesco DB Agriculture;;;D,H,M5
+PDBC;STK;SMART;USD;1;ETF;Rohstoffe;Invesco Optimum Yield Diversified Commodity;;;D,H,M5
+CPER;STK;SMART;USD;1;ETF;Rohstoffe;United States Copper Index;;;D,H,M5
+PPLT;STK;SMART;USD;1;ETF;Rohstoffe;abrdn Physical Platinum;;;D,H,M5
+PALL;STK;SMART;USD;1;ETF;Rohstoffe;abrdn Physical Palladium;;;D,H,M5
+URA;STK;SMART;USD;1;ETF;Rohstoffe;Global X Uranium;;;D,H,M5
+WEAT;STK;SMART;USD;1;ETF;Rohstoffe;Teucrium Wheat;;;D,H,M5
+CORN;STK;SMART;USD;1;ETF;Rohstoffe;Teucrium Corn;;;D,H,M5
+SOYB;STK;SMART;USD;1;ETF;Rohstoffe;Teucrium Soybean;;;D,H,M5
+UGA;STK;SMART;USD;1;ETF;Rohstoffe;United States Gasoline;;;D,H,M5
+BNO;STK;SMART;USD;1;ETF;Rohstoffe;United States Brent Oil;;;D,H,M5
+EWG;STK;SMART;USD;1;ETF;Länder;iShares MSCI Germany;;;D,H,M5
+EWU;STK;SMART;USD;1;ETF;Länder;iShares MSCI United Kingdom;;;D,H,M5
+EWJ;STK;SMART;USD;1;ETF;Länder;iShares MSCI Japan;;;D,H,M5
+EWZ;STK;SMART;USD;1;ETF;Länder;iShares MSCI Brazil;;;D,H,M5
+EWY;STK;SMART;USD;1;ETF;Länder;iShares MSCI South Korea;;;D,H,M5
+EWT;STK;SMART;USD;1;ETF;Länder;iShares MSCI Taiwan;;;D,H,M5
+EWH;STK;SMART;USD;1;ETF;Länder;iShares MSCI Hong Kong;;;D,H,M5
+EWA;STK;SMART;USD;1;ETF;Länder;iShares MSCI Australia;;;D,H,M5
+EWC;STK;SMART;USD;1;ETF;Länder;iShares MSCI Canada;;;D,H,M5
+EWW;STK;SMART;USD;1;ETF;Länder;iShares MSCI Mexico;;;D,H,M5
+EWI;STK;SMART;USD;1;ETF;Länder;iShares MSCI Italy;;;D,H,M5
+EWP;STK;SMART;USD;1;ETF;Länder;iShares MSCI Spain;;;D,H,M5
+EWQ;STK;SMART;USD;1;ETF;Länder;iShares MSCI France;;;D,H,M5
+EWL;STK;SMART;USD;1;ETF;Länder;iShares MSCI Switzerland;;;D,H,M5
+EWS;STK;SMART;USD;1;ETF;Länder;iShares MSCI Singapore;;;D,H,M5
+EWD;STK;SMART;USD;1;ETF;Länder;iShares MSCI Sweden;;;D,H,M5
+EWN;STK;SMART;USD;1;ETF;Länder;iShares MSCI Netherlands;;;D,H,M5
+EZU;STK;SMART;USD;1;ETF;Länder;iShares MSCI Eurozone;;;D,H,M5
+FXI;STK;SMART;USD;1;ETF;Länder;iShares China Large-Cap;;;D,H,M5
+MCHI;STK;SMART;USD;1;ETF;Länder;iShares MSCI China;;;D,H,M5
+INDA;STK;SMART;USD;1;ETF;Länder;iShares MSCI India;;;D,H,M5
+EEM;STK;SMART;USD;1;ETF;Länder;iShares MSCI Emerging Markets;;;D,H,M5
+EFA;STK;SMART;USD;1;ETF;Länder;iShares MSCI EAFE;;;D,H,M5
+VEA;STK;SMART;USD;1;ETF;Länder;Vanguard FTSE Developed Markets;;;D,H,M5
+VWO;STK;SMART;USD;1;ETF;Länder;Vanguard FTSE Emerging Markets;;;D,H,M5
+VGK;STK;SMART;USD;1;ETF;Länder;Vanguard FTSE Europe;;;D,H,M5
+EZA;STK;SMART;USD;1;ETF;Länder;iShares MSCI South Africa;;;D,H,M5
+EPOL;STK;SMART;USD;1;ETF;Länder;iShares MSCI Poland;;;D,H,M5
+TUR;STK;SMART;USD;1;ETF;Länder;iShares MSCI Turkey;;;D,H,M5
+ECH;STK;SMART;USD;1;ETF;Länder;iShares MSCI Chile;;;D,H,M5
+EIDO;STK;SMART;USD;1;ETF;Länder;iShares MSCI Indonesia;;;D,H,M5
+THD;STK;SMART;USD;1;ETF;Länder;iShares MSCI Thailand;;;D,H,M5
+VNM;STK;SMART;USD;1;ETF;Länder;VanEck Vietnam;;;D,H,M5
+ARGT;STK;SMART;USD;1;ETF;Länder;Global X MSCI Argentina;;;D,H,M5
+KSA;STK;SMART;USD;1;ETF;Länder;iShares MSCI Saudi Arabia;;;D,H,M5
+VXX;STK;SMART;USD;1;ETF;Volatilität;iPath S&P 500 VIX Short-Term Futures;;;D,H,M5
+UVXY;STK;SMART;USD;1;ETF;Volatilität;ProShares Ultra VIX Short-Term;;;D,H,M5
+SVXY;STK;SMART;USD;1;ETF;Volatilität;ProShares Short VIX Short-Term;;;D,H,M5
+JEPQ;STK;SMART;USD;1;ETF;Einkommen;JPMorgan Nasdaq Equity Premium Income;;;D,H,M5
+JEPI;STK;SMART;USD;1;ETF;Einkommen;JPMorgan Equity Premium Income;;;D,H,M5
+SCHD;STK;SMART;USD;1;ETF;Einkommen;Schwab US Dividend Equity;;;D,H,M5
+DIVO;STK;SMART;USD;1;ETF;Einkommen;Amplify CWP Enhanced Dividend Income;;;D,H,M5
+ES;FUT;CME;USD;0;Future;Aktienindex-Futures;E-mini S&P 500;;;D,H,M5
+NQ;FUT;CME;USD;0;Future;Aktienindex-Futures;E-mini Nasdaq-100;;;D,H,M5
+RTY;FUT;CME;USD;0;Future;Aktienindex-Futures;E-mini Russell 2000;;;D,H,M5
+YM;FUT;CBOT;USD;0;Future;Aktienindex-Futures;E-mini Dow;;;D,H,M5
+DAX;FUT;EUREX;EUR;0;Future;Aktienindex-Futures;DAX Future (FDAX);FDAX;25;D,H,M5
+ESTX50;FUT;EUREX;EUR;0;Future;Aktienindex-Futures;Euro Stoxx 50 Future (FESX);FESX;10;D,H,M5
+VX;FUT;CFE;USD;0;Future;Aktienindex-Futures;VIX Future;;;D,H,M5
+GC;FUT;COMEX;USD;0;Future;Metalle;Gold;;;D,H,M5
+SI;FUT;COMEX;USD;0;Future;Metalle;Silber;;;D,H,M5
+HG;FUT;COMEX;USD;0;Future;Metalle;Kupfer;;;D,H,M5
+PL;FUT;NYMEX;USD;0;Future;Metalle;Platin;;;D,H,M5
+PA;FUT;NYMEX;USD;0;Future;Metalle;Palladium;;;D,H,M5
+CL;FUT;NYMEX;USD;0;Future;Energie;Rohöl WTI;;;D,H,M5
+NG;FUT;NYMEX;USD;0;Future;Energie;Erdgas;;;D,H,M5
+RB;FUT;NYMEX;USD;0;Future;Energie;Benzin RBOB;;;D,H,M5
+HO;FUT;NYMEX;USD;0;Future;Energie;Heizöl;;;D,H,M5
+BZ;FUT;NYMEX;USD;0;Future;Energie;Rohöl Brent;;;D,H,M5
+ZC;FUT;CBOT;USD;0;Future;Agrar;Mais;;;D,H,M5
+ZS;FUT;CBOT;USD;0;Future;Agrar;Sojabohnen;;;D,H,M5
+ZW;FUT;CBOT;USD;0;Future;Agrar;Weizen;;;D,H,M5
+ZL;FUT;CBOT;USD;0;Future;Agrar;Sojaöl;;;D,H,M5
+ZM;FUT;CBOT;USD;0;Future;Agrar;Sojaschrot;;;D,H,M5
+ZO;FUT;CBOT;USD;0;Future;Agrar;Hafer;;;D,H,M5
+ZR;FUT;CBOT;USD;0;Future;Agrar;Reis;;;D,H,M5
+KE;FUT;CBOT;USD;0;Future;Agrar;Hartweizen KC;;;D,H,M5
+KC;FUT;NYBOT;USD;0;Future;Agrar;Kaffee;;;D,H,M5
+CT;FUT;NYBOT;USD;0;Future;Agrar;Baumwolle;;;D,H,M5
+SB;FUT;NYBOT;USD;0;Future;Agrar;Zucker;;;D,H,M5
+CC;FUT;NYBOT;USD;0;Future;Agrar;Kakao;;;D,H,M5
+OJ;FUT;NYBOT;USD;0;Future;Agrar;Orangensaft;;;D,H,M5
+LE;FUT;CME;USD;0;Future;Agrar;Lebendrind;;;D,H,M5
+GF;FUT;CME;USD;0;Future;Agrar;Mastrind;;;D,H,M5
+HE;FUT;CME;USD;0;Future;Agrar;Magerschwein;;;D,H,M5
+ZB;FUT;CBOT;USD;0;Future;Zinsen;US-Staatsanleihe 30J;;;D,H,M5
+ZN;FUT;CBOT;USD;0;Future;Zinsen;US T-Note 10J;;;D,H,M5
+ZF;FUT;CBOT;USD;0;Future;Zinsen;US T-Note 5J;;;D,H,M5
+ZT;FUT;CBOT;USD;0;Future;Zinsen;US T-Note 2J;;;D,H,M5
+UB;FUT;CBOT;USD;0;Future;Zinsen;US Ultra-Bond;;;D,H,M5
+SR3;FUT;CME;USD;0;Future;Zinsen;3-Monats-SOFR;;;D,H,M5
+GBL;FUT;EUREX;EUR;0;Future;Zinsen;Euro-Bund;FGBL;;D,H,M5
+GBM;FUT;EUREX;EUR;0;Future;Zinsen;Euro-Bobl;FGBM;;D,H,M5
+GBS;FUT;EUREX;EUR;0;Future;Zinsen;Euro-Schatz;FGBS;;D,H,M5
+EUR;FUT;CME;USD;0;Future;Währungs-Futures;Euro FX;;;D,H,M5
+GBP;FUT;CME;USD;0;Future;Währungs-Futures;Britisches Pfund;;;D,H,M5
+JPY;FUT;CME;USD;0;Future;Währungs-Futures;Japanischer Yen;;;D,H,M5
+AUD;FUT;CME;USD;0;Future;Währungs-Futures;Australischer Dollar;;;D,H,M5
+CAD;FUT;CME;USD;0;Future;Währungs-Futures;Kanadischer Dollar;;;D,H,M5
+CHF;FUT;CME;USD;0;Future;Währungs-Futures;Schweizer Franken;;;D,H,M5
+NZD;FUT;CME;USD;0;Future;Währungs-Futures;Neuseeland-Dollar;;;D,H,M5
+MXP;FUT;CME;USD;0;Future;Währungs-Futures;Mexikanischer Peso;;;D,H,M5
+EURUSD;CASH;IDEALPRO;USD;0;Währung;Devisenpaare;EUR/USD;;;D,H,M5
+GBPUSD;CASH;IDEALPRO;USD;0;Währung;Devisenpaare;GBP/USD;;;D,H
+USDJPY;CASH;IDEALPRO;JPY;0;Währung;Devisenpaare;USD/JPY;;;D,H
+USDCHF;CASH;IDEALPRO;CHF;0;Währung;Devisenpaare;USD/CHF;;;D,H
+AUDUSD;CASH;IDEALPRO;USD;0;Währung;Devisenpaare;AUD/USD;;;D,H
+USDCAD;CASH;IDEALPRO;CAD;0;Währung;Devisenpaare;USD/CAD;;;D,H
+NZDUSD;CASH;IDEALPRO;USD;0;Währung;Devisenpaare;NZD/USD;;;D,H
+EURGBP;CASH;IDEALPRO;GBP;0;Währung;Devisenpaare;EUR/GBP;;;D,H
+EURJPY;CASH;IDEALPRO;JPY;0;Währung;Devisenpaare;EUR/JPY;;;D,H
+EURCHF;CASH;IDEALPRO;CHF;0;Währung;Devisenpaare;EUR/CHF;;;D,H
+ADS;STK;IBIS;EUR;1;Aktie;DAX;Adidas;;;D,H,M5
+AIR;STK;IBIS;EUR;1;Aktie;DAX;Airbus;;;D,H,M5
+ALV;STK;IBIS;EUR;1;Aktie;DAX;Allianz;;;D,H,M5
+BAS;STK;IBIS;EUR;1;Aktie;DAX;BASF;;;D,H,M5
+BAYN;STK;IBIS;EUR;1;Aktie;DAX;Bayer;;;D,H,M5
+BEI;STK;IBIS;EUR;1;Aktie;DAX;Beiersdorf;;;D,H,M5
+BMW;STK;IBIS;EUR;1;Aktie;DAX;BMW;;;D,H,M5
+BNR;STK;IBIS;EUR;1;Aktie;DAX;Brenntag;;;D,H,M5
+CBK;STK;IBIS;EUR;1;Aktie;DAX;Commerzbank;;;D,H,M5
+CON;STK;IBIS;EUR;1;Aktie;DAX;Continental;;;D,H,M5
+DTG;STK;IBIS;EUR;1;Aktie;DAX;Daimler Truck;;;D,H,M5
+DBK;STK;IBIS;EUR;1;Aktie;DAX;Deutsche Bank;;;D,H,M5
+DB1;STK;IBIS;EUR;1;Aktie;DAX;Deutsche Börse;;;D,H,M5
+DHL;STK;IBIS;EUR;1;Aktie;DAX;Deutsche Post;;;D,H,M5
+DTE;STK;IBIS;EUR;1;Aktie;DAX;Deutsche Telekom;;;D,H,M5
+EOAN;STK;IBIS;EUR;1;Aktie;DAX;E.ON;;;D,H,M5
+FRE;STK;IBIS;EUR;1;Aktie;DAX;Fresenius;;;D,H,M5
+FME;STK;IBIS;EUR;1;Aktie;DAX;Fresenius Medical Care;;;D,H,M5
+G1A;STK;IBIS;EUR;1;Aktie;DAX;GEA Group;;;D,H,M5
+HNR1;STK;IBIS;EUR;1;Aktie;DAX;Hannover Rück;;;D,H,M5
+HEI;STK;IBIS;EUR;1;Aktie;DAX;Heidelberg Materials;;;D,H,M5
+HEN3;STK;IBIS;EUR;1;Aktie;DAX;Henkel;;;D,H,M5
+IFX;STK;IBIS;EUR;1;Aktie;DAX;Infineon;;;D,H,M5
+MBG;STK;IBIS;EUR;1;Aktie;DAX;Mercedes-Benz Group;;;D,H,M5
+MRK;STK;IBIS;EUR;1;Aktie;DAX;Merck;;;D,H,M5
+MTX;STK;IBIS;EUR;1;Aktie;DAX;MTU Aero Engines;;;D,H,M5
+MUV2;STK;IBIS;EUR;1;Aktie;DAX;Munich Re;;;D,H,M5
+PAH3;STK;IBIS;EUR;1;Aktie;DAX;Porsche SE;;;D,H,M5
+QIA;STK;IBIS;EUR;1;Aktie;DAX;Qiagen;;;D,H,M5
+RHM;STK;IBIS;EUR;1;Aktie;DAX;Rheinmetall;;;D,H,M5
+RWE;STK;IBIS;EUR;1;Aktie;DAX;RWE;;;D,H,M5
+SAP;STK;IBIS;EUR;1;Aktie;DAX;SAP;;;D,H,M5
+G24;STK;IBIS;EUR;1;Aktie;DAX;Scout24;;;D,H,M5
+SIE;STK;IBIS;EUR;1;Aktie;DAX;Siemens;;;D,H,M5
+ENR;STK;IBIS;EUR;1;Aktie;DAX;Siemens Energy;;;D,H,M5
+SHL;STK;IBIS;EUR;1;Aktie;DAX;Siemens Healthineers;;;D,H,M5
+SY1;STK;IBIS;EUR;1;Aktie;DAX;Symrise;;;D,H,M5
+VOW3;STK;IBIS;EUR;1;Aktie;DAX;Volkswagen;;;D,H,M5
+VNA;STK;IBIS;EUR;1;Aktie;DAX;Vonovia;;;D,H,M5
+ZAL;STK;IBIS;EUR;1;Aktie;DAX;Zalando;;;D,H,M5
+AIXA;STK;IBIS;EUR;1;Aktie;MDAX;Aixtron;;;D,H
+AT1;STK;IBIS;EUR;1;Aktie;MDAX;Aroundtown;;;D,H
+NDA;STK;IBIS;EUR;1;Aktie;MDAX;Aurubis;;;D,H
+BC8;STK;IBIS;EUR;1;Aktie;MDAX;Bechtle;;;D,H
+BFSA;STK;IBIS;EUR;1;Aktie;MDAX;Befesa;;;D,H
+GBF;STK;IBIS;EUR;1;Aktie;MDAX;Bilfinger;;;D,H
+AFX;STK;IBIS;EUR;1;Aktie;MDAX;Carl Zeiss Meditec;;;D,H
+EVD;STK;IBIS;EUR;1;Aktie;MDAX;CTS Eventim;;;D,H
+DHER;STK;IBIS;EUR;1;Aktie;MDAX;Delivery Hero;;;D,H
+LHA;STK;IBIS;EUR;1;Aktie;MDAX;Lufthansa;;;D,H
+EVK;STK;IBIS;EUR;1;Aktie;MDAX;Evonik;;;D,H
+EVT;STK;IBIS;EUR;1;Aktie;MDAX;Evotec;;;D,H
+FRA;STK;IBIS;EUR;1;Aktie;MDAX;Fraport;;;D,H
+FNTN;STK;IBIS;EUR;1;Aktie;MDAX;Freenet;;;D,H
+FPE3;STK;IBIS;EUR;1;Aktie;MDAX;Fuchs Petrolub;;;D,H
+GXI;STK;IBIS;EUR;1;Aktie;MDAX;Gerresheimer;;;D,H
+HFG;STK;IBIS;EUR;1;Aktie;MDAX;HelloFresh;;;D,H
+HAG;STK;IBIS;EUR;1;Aktie;MDAX;Hensoldt;;;D,H
+HOT;STK;IBIS;EUR;1;Aktie;MDAX;Hochtief;;;D,H
+BOSS;STK;IBIS;EUR;1;Aktie;MDAX;Hugo Boss;;;D,H
+JEN;STK;IBIS;EUR;1;Aktie;MDAX;Jenoptik;;;D,H
+JUN3;STK;IBIS;EUR;1;Aktie;MDAX;Jungheinrich;;;D,H
+SDF;STK;IBIS;EUR;1;Aktie;MDAX;K+S;;;D,H
+KGX;STK;IBIS;EUR;1;Aktie;MDAX;KION Group;;;D,H
+KBX;STK;IBIS;EUR;1;Aktie;MDAX;Knorr-Bremse;;;D,H
+KRN;STK;IBIS;EUR;1;Aktie;MDAX;Krones;;;D,H
+LXS;STK;IBIS;EUR;1;Aktie;MDAX;Lanxess;;;D,H
+LEG;STK;IBIS;EUR;1;Aktie;MDAX;LEG Immobilien;;;D,H
+NEM;STK;IBIS;EUR;1;Aktie;MDAX;Nemetschek;;;D,H
+NDX1;STK;IBIS;EUR;1;Aktie;MDAX;Nordex;;;D,H
+PUM;STK;IBIS;EUR;1;Aktie;MDAX;Puma;;;D,H
+RAA;STK;IBIS;EUR;1;Aktie;MDAX;Rational;;;D,H
+RDC;STK;IBIS;EUR;1;Aktie;MDAX;Redcare Pharmacy;;;D,H
+RRTL;STK;IBIS;EUR;1;Aktie;MDAX;RTL Group;;;D,H
+WAF;STK;IBIS;EUR;1;Aktie;MDAX;Siltronic;;;D,H
+STM;STK;IBIS;EUR;1;Aktie;MDAX;Stabilus;;;D,H
+SAX;STK;IBIS;EUR;1;Aktie;MDAX;Ströer;;;D,H
+TEG;STK;IBIS;EUR;1;Aktie;MDAX;TAG Immobilien;;;D,H
+TLX;STK;IBIS;EUR;1;Aktie;MDAX;Talanx;;;D,H
+TMV;STK;IBIS;EUR;1;Aktie;MDAX;TeamViewer;;;D,H
+TKA;STK;IBIS;EUR;1;Aktie;MDAX;thyssenkrupp;;;D,H
+8TRA;STK;IBIS;EUR;1;Aktie;MDAX;Traton;;;D,H
+TUI1;STK;IBIS;EUR;1;Aktie;MDAX;TUI;;;D,H
+UTDI;STK;IBIS;EUR;1;Aktie;MDAX;United Internet;;;D,H
+WCH;STK;IBIS;EUR;1;Aktie;MDAX;Wacker Chemie;;;D,H
+ADN1;STK;IBIS;EUR;1;Aktie;SDAX;Adesso;;;D,H
+ADV;STK;IBIS;EUR;1;Aktie;SDAX;Adtran Networks;;;D,H
+ACT;STK;IBIS;EUR;1;Aktie;SDAX;Alzchem;;;D,H
+AAD;STK;IBIS;EUR;1;Aktie;SDAX;Amadeus FiRe;;;D,H
+AOF;STK;IBIS;EUR;1;Aktie;SDAX;Atoss Software;;;D,H
+BVB;STK;IBIS;EUR;1;Aktie;SDAX;Borussia Dortmund;;;D,H
+COK;STK;IBIS;EUR;1;Aktie;SDAX;Cancom;;;D,H
+CWC;STK;IBIS;EUR;1;Aktie;SDAX;Cewe;;;D,H
+DMP;STK;IBIS;EUR;1;Aktie;SDAX;Dermapharm;;;D,H
+DBAN;STK;IBIS;EUR;1;Aktie;SDAX;Deutsche Beteiligungs;;;D,H
+DEQ;STK;IBIS;EUR;1;Aktie;SDAX;Deutsche Euroshop;;;D,H
+DEZ;STK;IBIS;EUR;1;Aktie;SDAX;Deutz;;;D,H
+DOU;STK;IBIS;EUR;1;Aktie;SDAX;Douglas;;;D,H
+DRW3;STK;IBIS;EUR;1;Aktie;SDAX;Drägerwerk;;;D,H
+DUE;STK;IBIS;EUR;1;Aktie;SDAX;Dürr;;;D,H
+EUZ;STK;IBIS;EUR;1;Aktie;SDAX;Eckert & Ziegler;;;D,H
+ELG;STK;IBIS;EUR;1;Aktie;SDAX;Elmos Semiconductor;;;D,H
+EKT;STK;IBIS;EUR;1;Aktie;SDAX;Energiekontor;;;D,H
+FYB;STK;IBIS;EUR;1;Aktie;SDAX;Formycon;;;D,H
+GFT;STK;IBIS;EUR;1;Aktie;SDAX;GFT Technologies;;;D,H
+GYC;STK;IBIS;EUR;1;Aktie;SDAX;Grand City Properties;;;D,H
+GLJ;STK;IBIS;EUR;1;Aktie;SDAX;Grenke;;;D,H
+HAB;STK;IBIS;EUR;1;Aktie;SDAX;Hamborner REIT;;;D,H
+HDD;STK;IBIS;EUR;1;Aktie;SDAX;Heidelberger Druckmaschinen;;;D,H
+HBH;STK;IBIS;EUR;1;Aktie;SDAX;Hornbach Holding;;;D,H
+HYQ;STK;IBIS;EUR;1;Aktie;SDAX;Hypoport;;;D,H
+INH;STK;IBIS;EUR;1;Aktie;SDAX;Indus Holding;;;D,H
+JST;STK;IBIS;EUR;1;Aktie;SDAX;Jost Werke;;;D,H
+KCO;STK;IBIS;EUR;1;Aktie;SDAX;Klöckner & Co;;;D,H
+SANT;STK;IBIS;EUR;1;Aktie;SDAX;Kontron;;;D,H
+KSB3;STK;IBIS;EUR;1;Aktie;SDAX;KSB;;;D,H
+KWS;STK;IBIS;EUR;1;Aktie;SDAX;KWS Saat;;;D,H
+LPK;STK;IBIS;EUR;1;Aktie;SDAX;LPKF Laser;;;D,H
+MBB;STK;IBIS;EUR;1;Aktie;SDAX;MBB;;;D,H
+MLP;STK;IBIS;EUR;1;Aktie;SDAX;MLP;;;D,H
+MUX;STK;IBIS;EUR;1;Aktie;SDAX;Mutares;;;D,H
+NA9;STK;IBIS;EUR;1;Aktie;SDAX;Nagarro;;;D,H
+NOEJ;STK;IBIS;EUR;1;Aktie;SDAX;Norma Group;;;D,H
+PAT;STK;IBIS;EUR;1;Aktie;SDAX;Patrizia;;;D,H
+PBB;STK;IBIS;EUR;1;Aktie;SDAX;Deutsche Pfandbriefbank;;;D,H
+PNE3;STK;IBIS;EUR;1;Aktie;SDAX;PNE;;;D,H
+PCZ;STK;IBIS;EUR;1;Aktie;SDAX;ProCredit;;;D,H
+PSM;STK;IBIS;EUR;1;Aktie;SDAX;ProSiebenSat.1;;;D,H
+TPE;STK;IBIS;EUR;1;Aktie;SDAX;PVA TePla;;;D,H
+SFQ;STK;IBIS;EUR;1;Aktie;SDAX;SAF-Holland;;;D,H
+SZG;STK;IBIS;EUR;1;Aktie;SDAX;Salzgitter;;;D,H
+SHA;STK;IBIS;EUR;1;Aktie;SDAX;Schaeffler;;;D,H
+1SXP;STK;IBIS;EUR;1;Aktie;SDAX;Schott Pharma;;;D,H
+YSN;STK;IBIS;EUR;1;Aktie;SDAX;Secunet;;;D,H
+F3C;STK;IBIS;EUR;1;Aktie;SDAX;SFC Energy;;;D,H
+SIX2;STK;IBIS;EUR;1;Aktie;SDAX;Sixt;;;D,H
+S92;STK;IBIS;EUR;1;Aktie;SDAX;SMA Solar;;;D,H
+SPG;STK;IBIS;EUR;1;Aktie;SDAX;Springer Nature;;;D,H
+STO3;STK;IBIS;EUR;1;Aktie;SDAX;Sto;;;D,H
+SBS;STK;IBIS;EUR;1;Aktie;SDAX;Stratec;;;D,H
+SZU;STK;IBIS;EUR;1;Aktie;SDAX;Südzucker;;;D,H
+SMHN;STK;IBIS;EUR;1;Aktie;SDAX;Süss Microtec;;;D,H
+NCH2;STK;IBIS;EUR;1;Aktie;SDAX;thyssenkrupp nucera;;;D,H
+VOS;STK;IBIS;EUR;1;Aktie;SDAX;Vossloh;;;D,H
+WAC;STK;IBIS;EUR;1;Aktie;SDAX;Wacker Neuson;;;D,H
+WUW;STK;IBIS;EUR;1;Aktie;SDAX;Wüstenrot & Württembergische;;;D,H
+ILM1;STK;IBIS;EUR;1;Aktie;SDAX;Medios;;;D,H
