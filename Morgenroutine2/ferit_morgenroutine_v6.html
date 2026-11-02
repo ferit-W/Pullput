@@ -1678,10 +1678,11 @@ function saveManual(){
 }
 
 // ═══════════════════ DATA: YAHOO ═══════════════════
-async function fetchOnce(u, ms){
+async function fetchOnce(u, ms, opts){
   const c = new AbortController();
   const t = setTimeout(()=>c.abort(), ms||9000);
-  try{ return await fetch(u, {headers:{'Accept':'application/json,text/plain,*/*'}, signal:c.signal}); }
+  // v6.19: optionale Angaben (Methode, Body) für das Tagesarchiv
+  try{ return await fetch(u, Object.assign({headers:{'Accept':'application/json,text/plain,*/*'}}, opts||{}, {signal:c.signal})); }
   finally{ clearTimeout(t); }
 }
 // ── v6.17: ÖFFENTLICHE PROXYS NUR NOCH OHNE LOKALEN SERVER ─────────────────
@@ -3773,7 +3774,7 @@ const INFO_TEXTE = {
     ziel:'Zwei Fragen getrennt beantworten: In welche Richtung läuft der Markt? Wie stark schwankt er?',
     warum:'Die Rückrechnung zeigte: Ein STOP bedeutete meist „Markt schwankt stark“, nicht „Markt fällt“. Nach STOP wegen VIX > 28 oder dünner Breite stieg der S&P 500 danach im Schnitt um 1,5 bis 1,6 %. Nur „2 Indizes in P6“ war ein echtes Abwärtssignal (schwächste Folgerendite, tiefste Rückschläge). Beides in einem Wort zu vermischen führt in die Irre.',
     lesen:'Trend: Long (3 Indizes in P3, keiner in P6), Short (2 oder mehr in P6), sonst neutral. Risiko: hoch (VIX > 28, starke Backwardation oder Breite unter 3), erhöht (VIX ≥ 20, flache oder leichte Backwardation, Breite unter 6), sonst niedrig. Reine Anzeige, ändert die Ampel nicht.',
-    bsp:'Typischer Fall: Trend Long, Risiko erhöht — Aufwärtstrend steht, aber der VIX liegt bei 23. Typisch nach einem Rücksetzer — Long möglich, Positionen kleiner, Stopps enger beobachten.'},
+    bsp:'Zur Einordnung eigener Durststrecken aus dem Systemtest (Rücksetzer-Einstieg, 0,25 % Risiko, 2017–2026): 33 Verlierer in Folge und ein Rückgang von 104,6 R von 09/2021 bis 05/2023 — die Verluste häuften sich in der Bärenphase 2022. Solche Serien gehören zum normalen Verlauf. Typischer Fall: Trend Long, Risiko erhöht — Aufwärtstrend steht, aber der VIX liegt bei 23. Typisch nach einem Rücksetzer — Long möglich, Positionen kleiner, Stopps enger beobachten.'},
   wechsel: {t:'Wechsel heute (AM6)',
     ziel:'Zeigen, dass der Zustand heute neu ist und noch nicht bestätigt.',
     warum:'Rund ein Drittel aller Ampelphasen dauerte in der Rückrechnung nur einen Tag. Die Ampel deshalb erst nach zwei Tagen umschalten zu lassen, hat im Test aber Rendite gekostet (0,24/0,61 statt 0,24/0,71). Darum bleibt die Ampel unverändert, und der Wechsel wird nur gekennzeichnet.',
@@ -4497,6 +4498,85 @@ function snapshotDaten(){
   };
 }
 
+// ═══ v6.19 · PHASE 3: TAGESARCHIV (A1, A1b, A1c) ═══════════════════════════
+// Zweck: In ein paar Jahren mit echten Daten prüfen können, ob die Ampel funktioniert
+// hat und wo ihre Lücken lagen — auch mit einer KI. Dafür braucht es je Handelstag
+// den vollständigen Stand: Regelversion, Zustand, Gründe UND alle Rohwerte, damit
+// spätere Regeln rückwirkend auf dieselben Tage gerechnet werden können.
+// Gespeichert auf dem Laufwerk in daten/archiv_JJJJ.json (Server führt zusammen,
+// ein Eintrag je Handelstag). Schlüssel ist der Handelstag der Kursdaten (letzter
+// SPY-Schluss), nicht der Kalendertag — wie in der Rückrechnung: Signal zum Schluss t.
+const ARCHIV_SCHEMA = 1;
+function archivHandelstag(){
+  const spy=(STATE.indices||[]).find(i=>i.key==='SPY'&&!i.err&&i.times&&i.times.length);
+  return spy ? datumAus(spy.times[spy.times.length-1]) : null;
+}
+function archivEintrag(){
+  const v=STATE.ampel; if(!v || v.label==='WARTE') return null;
+  const r2=x=>(x==null||!isFinite(x))?null:Math.round(x*100)/100;
+  let P=null; try{ P=panikComponents(); }catch(e){}
+  let K=null; try{ K=tagesKonsequenz(v); }catch(e){}
+  let termine=[]; try{ termine=termineHeute(); }catch(e){}
+  return Object.assign(snapshotDaten(), {
+    schema: ARCHIV_SCHEMA, quelle:'live', lauf: new Date().toISOString(),
+    gruende: v.reasons||[], codes: v.codes||[],
+    konsequenz: K ? {richtung:K.richtung, groesse:K.groesse, module:K.module, gruende:K.gruende} : null,
+    indizes: (STATE.indices||[]).filter(i=>!i.err).map(i=>({k:i.key, kurs:r2(i.price), phase:i.phase&&i.phase.code,
+      e20:r2(i.e20), e50:r2(i.e50), e200:r2(i.e200), abst200:r2(i.ema200Dist), alt:!!i.stale})),
+    sektoren: (STATE.sectors||[]).filter(s=>!s.err).map(s=>({k:s.etf, kurs:r2(s.price), phase:s.phase&&s.phase.code,
+      ueber200:s.aboveEma200, ueber50:s.aboveEma50, rs1m:r2(s.rs1m), alt:!!s.stale})),
+    rohwerte: { vix:STATE.vix, vix3m:STATE.vix3m, vix9d:STATE.vix9d, vvix:STATE.vvix, fg:STATE.fg?STATE.fg.score:null,
+      pcr:MANUAL.pcr??null, aaiiBear:MANUAL.bear??null, naaim:MANUAL.naaim??null,
+      panikTeile: (P && P.C) ? P.C.map(c=>({k:c.k, pkt:c.pts})) : null, panikAbdeckung: P?P.covered:null },
+    termineHeute: termine,
+    spySchluss: (()=>{ const s=(STATE.indices||[]).find(i=>i.key==='SPY'&&i.closes); return s? r2(s.closes[s.closes.length-1]) : null; })(),
+  });
+}
+async function archivSchreiben(){
+  const tag=archivHandelstag(); const e=archivEintrag();
+  if(!tag || !e){ return false; }
+  e.handelstag = tag;
+  try{
+    const r=await fetchOnce('http://localhost:8765/archiv/tage?jahr='+tag.slice(0,4), 8000, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({tage:{[tag]:e}}) });
+    return !!(r && r.ok);
+  }catch(err){ return false; }
+}
+// A1c: Folgerenditen nachtragen, sobald genug Handelstage vergangen sind.
+// Gleiche Definition wie die Rückrechnung: SPY-Schluss t+n / Schluss t − 1,
+// dazu der tiefste Stand der nächsten 20 Tage (größter Rückschlag).
+function folgeRenditen(tage, closes, times){
+  const pos={}; times.forEach((t,i)=>{ const d=datumAus(t); if(d) pos[d]=i; });
+  const upd={};
+  Object.keys(tage).forEach(d=>{
+    const e=tage[d]; const i=pos[d]; if(i==null) return;
+    const c0=closes[i]; if(!isFinite(c0)) return;
+    const neu={};
+    [5,20,60].forEach(n=>{ const k='spy_fwd'+n; if(e[k]==null && i+n<closes.length) neu[k]=+(closes[i+n]/c0-1).toFixed(5); });
+    if(e.spy_maxdd20==null && i+20<closes.length){ const m=Math.min(...closes.slice(i+1,i+21)); neu.spy_maxdd20=+(m/c0-1).toFixed(5); }
+    if(Object.keys(neu).length) upd[d]=neu;
+  });
+  return upd;
+}
+async function archivNachtragen(){
+  const spy=(STATE.indices||[]).find(i=>i.key==='SPY'&&i.closes&&i.times&&!i.stale);
+  if(!spy) return 0;
+  const jahr=new Date().getFullYear(); let n=0;
+  for(const j of [jahr-1, jahr]){
+    try{
+      const r=await fetchOnce('http://localhost:8765/data/load?name=archiv_'+j, 6000);
+      if(!r.ok) continue;
+      const a=await r.json(); if(!a||!a.tage) continue;
+      const upd=folgeRenditen(a.tage, spy.closes, spy.times);
+      const anz=Object.keys(upd).length; if(!anz) continue;
+      const w=await fetchOnce('http://localhost:8765/archiv/tage?jahr='+j, 8000, {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({tage:upd}) });
+      if(w && w.ok) n+=anz;
+    }catch(e){}
+  }
+  return n;
+}
+
 function saveSnapshot(auto){
   if(!STATE.ampel || STATE.ampel.label==='WARTE'){
     if(!auto) toast('Erst Morgenroutine laufen lassen','err');
@@ -4764,6 +4844,9 @@ async function runMorning(){
     // v6.10: Tages-Snapshot automatisch anlegen — legt nichts an, wenn für heute
     // schon einer existiert. Nach dem vollständigen Lauf, damit alle Werte drin sind.
     try{ if(saveSnapshot(true)) toast('Tages-Snapshot angelegt','ok'); }catch(e){ console.warn('Snapshot',e); }
+    // v6.19 (A1/A1c): Tagesarchiv auf dem Laufwerk + Folgerenditen früherer Tage nachtragen
+    if(kursOk){ archivSchreiben().then(ok=>{ STATE.archivOk=ok; if(ok) return archivNachtragen(); })
+      .then(n=>{ if(n) console.log('Archiv: Folgerenditen für '+n+' Tage nachgetragen'); }).catch(()=>{}); }
     if(kursOk) toast('Morgenroutine komplett ✓','ok');
     else toast('Lauf beendet — aber keine frischen Kurse. Server-Fenster und Internet prüfen.','err');
   }catch(e){ console.error('run',e); toast('Fehler: '+e.message,'err'); }

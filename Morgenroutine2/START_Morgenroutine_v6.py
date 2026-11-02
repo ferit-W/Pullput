@@ -349,6 +349,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return
         if self.path.startswith("/data/save"):
             return self._data_save()
+        if self.path.startswith("/archiv/tage"):
+            return self._archiv_tage()
         if self.path.startswith("/config/datadir"):
             return self._set_datadir()
         self.send_error(404, "unknown POST endpoint")
@@ -500,6 +502,65 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             try:
                 self.send_error(500, "save error: %s" % e)
+            except Exception:
+                pass
+
+    def _archiv_tage(self):
+        """v6.19 (A1): Tagesarchiv. POST /archiv/tage?jahr=JJJJ, Body {"tage": {"JJJJ-MM-TT": {...}}}.
+
+        Die Eintraege werden in daten/archiv_JJJJ.json ZUSAMMENGEFUEHRT statt die Datei
+        zu ersetzen: Ein Rechner ergaenzt seinen Tag, ein anderer traegt spaeter die
+        Folgerenditen nach - keiner ueberschreibt den anderen. Je Tag werden die Felder
+        zusammengefuehrt (neue Werte gewinnen, vorhandene Felder bleiben).
+        Gespeichert wird ueber denselben Weg wie /data/save: .bak, atomar, Wochen-Backup.
+        """
+        try:
+            params = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            jahr = (params.get("jahr", [""])[0] or "").strip()
+            if not _re.match(r"^(19|20)\d\d$", jahr):
+                return self.send_error(400, "jahr fehlt oder ungueltig")
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                length = 0
+            if length <= 0 or length > MAX_SAVE_BYTES:
+                return self.send_error(400, "Body leer oder zu gross")
+            try:
+                neu = json.loads(self.rfile.read(length).decode("utf-8"))
+                tage = neu.get("tage") if isinstance(neu, dict) else None
+                if not isinstance(tage, dict):
+                    raise ValueError("Feld 'tage' fehlt")
+            except Exception as e:
+                return self.send_error(400, "ungueltiges JSON: %s" % e)
+            name = "archiv_" + jahr
+            os.makedirs(DATA_DIR, exist_ok=True)
+            os.makedirs(BACKUP_DIR, exist_ok=True)
+            target = os.path.join(DATA_DIR, name + ".json")
+            with _lock_fuer(name):
+                alt = {"jahr": int(jahr), "tage": {}}
+                if os.path.isfile(target):
+                    try:
+                        with open(target, "r", encoding="utf-8") as f:
+                            alt = json.load(f)
+                    except Exception:
+                        return self._send_json({"ok": False, "error": "archiv_%s.json unlesbar - nichts geaendert" % jahr}, code=500)
+                alt.setdefault("tage", {})
+                geaendert = 0
+                for tag, eintrag in tage.items():
+                    if not (isinstance(tag, str) and _re.match(r"^\d{4}-\d{2}-\d{2}$", tag) and tag.startswith(jahr)):
+                        continue
+                    if not isinstance(eintrag, dict):
+                        continue
+                    ziel = alt["tage"].get(tag) or {}
+                    ziel.update(eintrag)
+                    alt["tage"][tag] = ziel
+                    geaendert += 1
+                alt["ts"] = int(_time.time() * 1000)
+                raw = json.dumps(alt, ensure_ascii=False, sort_keys=True).encode("utf-8")
+                return self._data_save_locked(name, target, raw)
+        except Exception as e:
+            try:
+                self.send_error(500, "archiv error: %s" % e)
             except Exception:
                 pass
 
