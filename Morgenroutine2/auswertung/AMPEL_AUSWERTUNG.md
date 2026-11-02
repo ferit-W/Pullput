@@ -310,3 +310,72 @@ Ein eigener Zustand **„VOREINSTIEG“** in hellem Grün, klar unterscheidbar v
 - Hinweis: STOP vor 23 Handelstagen
 
 Die Konsequenz-Zeile zeigt dazu „LONG · Voreinstieg, eine Stufe kleiner“. Du siehst also auf einen Blick, *warum* die Ampel einen frühen Einstieg erlaubt, und entscheidest selbst.
+
+---
+
+## 8. Test AM9 „PANIK-EINSTIEG“ (nachgeprüft am 02.11.2026)
+
+Der Gedanke dahinter kommt aus der Lüddemann-Ausbildung: Wenn die Panik am größten ist, ist eine Trendwende am wahrscheinlichsten. Man steigt dann mit kleinen Positionen ein, aber erst bei einem ersten Zeichen von Stabilisierung. Die Regel wurde vor der Auswertung festgelegt und eingecheckt (`am9_panik_einstieg_test.py`).
+
+**Die Regel.** Ein Signal entsteht, wenn alle drei Bedingungen erfüllt sind:
+
+1. Der Panik-Score lag an einem der letzten 5 Tage bei mindestens 55.
+2. Der VIX liegt unter dem VIX3M oder unter seinem 5-Tage-Durchschnitt.
+3. Der SPY schließt über dem höchsten Schluss der 3 Vortage.
+
+Danach gilt das Signal 15 Tage mit 33 % Investitionsgrad. Es endet vorher, wenn der SPY unter den tiefsten Schluss der 10 Tage vor dem Signal fällt.
+
+### Ergebnis: nicht bestanden
+
+Angegeben ist die Sharpe-Kennzahl 2007–2016 / 2017–2026.
+
+- **Ampel heute:** 0,24 / 0,71
+- **Ampel heute mit AM9:** 0,13 / 0,71. Schlechter beziehungsweise gleich.
+- **AM1 + AM4:** 0,44 / 0,83
+- **AM1 + AM4 mit AM9:** 0,32 / 0,86. Im ersten Zeitraum schlechter, im zweiten leicht besser.
+
+Die Vorgabe „besser in beiden Zeiträumen“ ist damit **nicht erfüllt**. Die Regel wird deshalb **nicht** in die Ampel und nicht in den Investitionsgrad eingebaut. Nachjustieren werde ich sie nicht, denn eine Anpassung nach dem Blick auf die Ergebnisse wäre Kurvenanpassung.
+
+### Was die Signale trotzdem zeigen
+
+Es gab 67 Signale.
+
+- **Nach 20 Tagen:** im Schnitt +1,4 %, 64 % positiv.
+- **Nach 60 Tagen:** im Schnitt +3,1 %.
+- **Rückschläge:** In 15 % der Fälle kam vorher ein Rückschlag über 7 %.
+
+**Die Stärke:** Kurz nach jedem großen Tief lag ein Signal, meist ein bis drei Tage danach:
+
+- 10.03.2009 (+6 % über dem Tief)
+- 05.10.2011
+- 12.02.2016 (+2 %)
+- 04.04.2018 (+2 %)
+- 27.12.2018 (+6 %)
+- 24.03.2020 (+9 %)
+- 13.10.2022 (+3 %)
+- 09.04.2025
+
+**Die Schwäche:** Es gab genauso Signale mitten im Fall:
+
+- 19.09., 13.10. und 28.10.2008 (danach −16 bis −27 %)
+- 27.01.2009
+- 04.03.2020 (−26 %)
+- 26.11.2018
+- 14.03.2025
+
+Von außen ist nicht zu unterscheiden, ob ein Signal den Boden trifft oder nur eine Zwischenerholung im Fall ist. Ohne das Jahr 2008 wären die Werte besser (+2,0 % nach 20 Tagen, 12 % Rückschläge über 7 %). Das Jahr herauszunehmen wäre aber Schönrechnen.
+
+### Wie es trotzdem in die Morgenroutine kommt
+
+Da es Bestandteil deines Lüddemann-Vorgehens ist, wird der Panik-Einstieg als **eigener, klar gekennzeichneter Hinweis** umgesetzt. Er ist kein Ampelzustand und ändert weder die Ampel noch die Konsequenz-Zeile. Der Hinweis zeigt:
+
+- die Überschrift „⚡ Panik-Wende möglich“ mit den drei Bedingungen als Prüfliste
+- die Trefferbilanz aus dieser Rückrechnung (64 % positiv nach 20 Tagen, in 15 % vorher über 7 % Rückschlag)
+- den ausdrücklichen Hinweis „nur kleine Positionen, nur in starken Indizes oder Aktien, eigener Stopp unter dem Tief“
+
+Ob und wie du handelst, entscheidest du. Jedes Signal wird im Archiv mitgeschrieben (A1), so dass sich die Regel mit echten Daten weiter beurteilen lässt.
+
+### Unterschied zum Voreinstieg (AM4)
+
+- **Panik-Wende:** Der Markt ist noch in Panik und zeigt erst ein erstes Lebenszeichen. Das ist sehr früh, ein Einstieg gegen den Trend, mit großen Schwankungen.
+- **Voreinstieg:** Der Markt hat sich beruhigt (Termstruktur normal), der Trend steht wieder (3 Indizes in P3), nur der VIX ist noch erhöht. Das ist früh, aber trendbestätigt, und in beiden Zeiträumen besser.

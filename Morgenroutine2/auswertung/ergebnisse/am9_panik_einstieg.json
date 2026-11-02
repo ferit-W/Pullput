@@ -1,0 +1,752 @@
+{
+ "regel": "(unverändert lassen, sonst ist der Test wertlos):\n  Signal am Tag t, wenn ALLE gelten:\n    1. Panik-Score >= 55 an mindestens einem der letzten 5 Handelstage (inkl. t)\n    2. Stabilisierung: VIX < VIX3M  ODER  VIX < eigener 5-Tage-Durchschnitt\n    3. SPY-Schluss t > höchster Schluss der 3 Vortage\n  Danach Zustand PANIK-EINSTIEG für 15 Handelstage (inkl. Signaltag) mit 33 %\n  Investitionsgrad — als Untergrenze: ein höherer Grad aus der Ampel gilt weiter.\n  Abbruch vorher, wenn SPY unter den tiefsten Schluss der 10 Tage vor dem Signal fällt.\n  Geprüft auf Basis \"Ampel heute\" und \"AM1 + AM4\", getrennt 2007-2016 / 2017-2026.\n  Freigabe nur bei Verbesserung in BEIDEN Zeiträumen.",
+ "varianten": {
+  "Ampel heute": {
+   "gesamt": {
+    "rendite_pa": 4.07,
+    "max_drawdown": -19.3,
+    "vola_pa": 8.9,
+    "sharpe_ohne_zins": 0.49,
+    "investiert_anteil": 61.0,
+    "wechsel_pro_jahr": 40.3
+   },
+   "2007-2016": {
+    "rendite_pa": 1.67,
+    "max_drawdown": -16.2,
+    "vola_pa": 8.3,
+    "sharpe_ohne_zins": 0.24,
+    "investiert_anteil": 57.0,
+    "wechsel_pro_jahr": 41.5
+   },
+   "2017-2026": {
+    "rendite_pa": 6.49,
+    "max_drawdown": -19.3,
+    "vola_pa": 9.5,
+    "sharpe_ohne_zins": 0.71,
+    "investiert_anteil": 65.0,
+    "wechsel_pro_jahr": 39.2
+   }
+  },
+  "Ampel heute + AM9": {
+   "gesamt": {
+    "rendite_pa": 3.71,
+    "max_drawdown": -21.8,
+    "vola_pa": 9.5,
+    "sharpe_ohne_zins": 0.43,
+    "investiert_anteil": 64.0,
+    "wechsel_pro_jahr": 44.4
+   },
+   "2007-2016": {
+    "rendite_pa": 0.74,
+    "max_drawdown": -21.8,
+    "vola_pa": 9.2,
+    "sharpe_ohne_zins": 0.13,
+    "investiert_anteil": 60.0,
+    "wechsel_pro_jahr": 45.8
+   },
+   "2017-2026": {
+    "rendite_pa": 6.72,
+    "max_drawdown": -19.3,
+    "vola_pa": 9.8,
+    "sharpe_ohne_zins": 0.71,
+    "investiert_anteil": 68.0,
+    "wechsel_pro_jahr": 43.1
+   }
+  },
+  "AM1 + AM4": {
+   "gesamt": {
+    "rendite_pa": 5.92,
+    "max_drawdown": -21.4,
+    "vola_pa": 9.7,
+    "sharpe_ohne_zins": 0.64,
+    "investiert_anteil": 66.0,
+    "wechsel_pro_jahr": 32.5
+   },
+   "2007-2016": {
+    "rendite_pa": 3.59,
+    "max_drawdown": -14.3,
+    "vola_pa": 9.0,
+    "sharpe_ohne_zins": 0.44,
+    "investiert_anteil": 62.0,
+    "wechsel_pro_jahr": 30.8
+   },
+   "2017-2026": {
+    "rendite_pa": 8.26,
+    "max_drawdown": -21.4,
+    "vola_pa": 10.2,
+    "sharpe_ohne_zins": 0.83,
+    "investiert_anteil": 71.0,
+    "wechsel_pro_jahr": 34.1
+   }
+  },
+  "AM1 + AM4 + AM9": {
+   "gesamt": {
+    "rendite_pa": 5.75,
+    "max_drawdown": -21.4,
+    "vola_pa": 10.2,
+    "sharpe_ohne_zins": 0.6,
+    "investiert_anteil": 69.0,
+    "wechsel_pro_jahr": 35.7
+   },
+   "2007-2016": {
+    "rendite_pa": 2.69,
+    "max_drawdown": -21.0,
+    "vola_pa": 9.8,
+    "sharpe_ohne_zins": 0.32,
+    "investiert_anteil": 65.0,
+    "wechsel_pro_jahr": 34.5
+   },
+   "2017-2026": {
+    "rendite_pa": 8.86,
+    "max_drawdown": -21.4,
+    "vola_pa": 10.5,
+    "sharpe_ohne_zins": 0.86,
+    "investiert_anteil": 73.0,
+    "wechsel_pro_jahr": 36.8
+   }
+  }
+ },
+ "signale": [
+  {
+   "tag": "2007-08-07",
+   "ampel": "CAUTION",
+   "panik_max5": 57.0,
+   "spy_20T_pct": -1.1,
+   "spy_60T_pct": 0.8,
+   "rueckschlag_20T_pct": -5.9
+  },
+  {
+   "tag": "2007-08-21",
+   "ampel": "STOP",
+   "panik_max5": 79.0,
+   "spy_20T_pct": 3.8,
+   "spy_60T_pct": -0.8,
+   "rueckschlag_20T_pct": -2.0
+  },
+  {
+   "tag": "2007-11-13",
+   "ampel": "CAUTION",
+   "panik_max5": 56.0,
+   "spy_20T_pct": 0.9,
+   "spy_60T_pct": -8.6,
+   "rueckschlag_20T_pct": -4.6
+  },
+  {
+   "tag": "2007-11-28",
+   "ampel": "CAUTION",
+   "panik_max5": 56.0,
+   "spy_20T_pct": 0.1,
+   "spy_60T_pct": -6.1,
+   "rueckschlag_20T_pct": -1.4
+  },
+  {
+   "tag": "2008-01-24",
+   "ampel": "STOP",
+   "panik_max5": 69.0,
+   "spy_20T_pct": 3.2,
+   "spy_60T_pct": 3.7,
+   "rueckschlag_20T_pct": 0.0
+  },
+  {
+   "tag": "2008-03-11",
+   "ampel": "STOP",
+   "panik_max5": 66.0,
+   "spy_20T_pct": 3.5,
+   "spy_60T_pct": 3.8,
+   "rueckschlag_20T_pct": -2.3
+  },
+  {
+   "tag": "2008-07-16",
+   "ampel": "STOP",
+   "panik_max5": 69.0,
+   "spy_20T_pct": 3.5,
+   "spy_60T_pct": -29.3,
+   "rueckschlag_20T_pct": -1.2
+  },
+  {
+   "tag": "2008-09-19",
+   "ampel": "STOP",
+   "panik_max5": 80.0,
+   "spy_20T_pct": -18.5,
+   "spy_60T_pct": -24.3,
+   "rueckschlag_20T_pct": -27.0
+  },
+  {
+   "tag": "2008-10-13",
+   "ampel": "STOP",
+   "panik_max5": 90.0,
+   "spy_20T_pct": -10.1,
+   "spy_60T_pct": -10.8,
+   "rueckschlag_20T_pct": -15.9
+  },
+  {
+   "tag": "2008-10-28",
+   "ampel": "STOP",
+   "panik_max5": 78.0,
+   "spy_20T_pct": -4.4,
+   "spy_60T_pct": -9.2,
+   "rueckschlag_20T_pct": -18.9
+  },
+  {
+   "tag": "2008-11-24",
+   "ampel": "STOP",
+   "panik_max5": 86.0,
+   "spy_20T_pct": 1.2,
+   "spy_60T_pct": -9.5,
+   "rueckschlag_20T_pct": -4.1
+  },
+  {
+   "tag": "2009-01-27",
+   "ampel": "STOP",
+   "panik_max5": 62.0,
+   "spy_20T_pct": -13.5,
+   "spy_60T_pct": -0.8,
+   "rueckschlag_20T_pct": -14.6
+  },
+  {
+   "tag": "2009-03-10",
+   "ampel": "STOP",
+   "panik_max5": 70.0,
+   "spy_20T_pct": 13.6,
+   "spy_60T_pct": 30.2,
+   "rueckschlag_20T_pct": 3.9
+  },
+  {
+   "tag": "2009-04-02",
+   "ampel": "STOP",
+   "panik_max5": 61.0,
+   "spy_20T_pct": 7.9,
+   "spy_60T_pct": 9.1,
+   "rueckschlag_20T_pct": -3.1
+  },
+  {
+   "tag": "2010-05-12",
+   "ampel": "CAUTION",
+   "panik_max5": 60.0,
+   "spy_20T_pct": -5.4,
+   "spy_60T_pct": -2.6,
+   "rueckschlag_20T_pct": -9.1
+  },
+  {
+   "tag": "2010-05-27",
+   "ampel": "STOP",
+   "panik_max5": 64.0,
+   "spy_20T_pct": -1.7,
+   "spy_60T_pct": -3.5,
+   "rueckschlag_20T_pct": -3.5
+  },
+  {
+   "tag": "2010-06-10",
+   "ampel": "STOP",
+   "panik_max5": 61.0,
+   "spy_20T_pct": -1.5,
+   "spy_60T_pct": -0.0,
+   "rueckschlag_20T_pct": -6.8
+  },
+  {
+   "tag": "2011-03-21",
+   "ampel": "CAUTION",
+   "panik_max5": 63.0,
+   "spy_20T_pct": 1.6,
+   "spy_60T_pct": -1.5,
+   "rueckschlag_20T_pct": 0.3
+  },
+  {
+   "tag": "2011-06-20",
+   "ampel": "CAUTION",
+   "panik_max5": 64.0,
+   "spy_20T_pct": 2.5,
+   "spy_60T_pct": -6.2,
+   "rueckschlag_20T_pct": -2.0
+  },
+  {
+   "tag": "2011-08-12",
+   "ampel": "REVERSE",
+   "panik_max5": 88.0,
+   "spy_20T_pct": -2.4,
+   "spy_60T_pct": 6.0,
+   "rueckschlag_20T_pct": -6.6
+  },
+  {
+   "tag": "2011-09-14",
+   "ampel": "STOP",
+   "panik_max5": 68.0,
+   "spy_20T_pct": -0.8,
+   "spy_60T_pct": 3.8,
+   "rueckschlag_20T_pct": -9.5
+  },
+  {
+   "tag": "2011-09-27",
+   "ampel": "STOP",
+   "panik_max5": 63.0,
+   "spy_20T_pct": 8.0,
+   "spy_60T_pct": 8.8,
+   "rueckschlag_20T_pct": -4.5
+  },
+  {
+   "tag": "2011-10-05",
+   "ampel": "STOP",
+   "panik_max5": 71.0,
+   "spy_20T_pct": 8.4,
+   "spy_60T_pct": 9.5,
+   "rueckschlag_20T_pct": -0.7
+  },
+  {
+   "tag": "2012-05-22",
+   "ampel": "STOP",
+   "panik_max5": 55.0,
+   "spy_20T_pct": 0.1,
+   "spy_60T_pct": 7.5,
+   "rueckschlag_20T_pct": -3.2
+  },
+  {
+   "tag": "2012-06-06",
+   "ampel": "STOP",
+   "panik_max5": 59.0,
+   "spy_20T_pct": 2.6,
+   "spy_60T_pct": 6.9,
+   "rueckschlag_20T_pct": -0.6
+  },
+  {
+   "tag": "2014-10-17",
+   "ampel": "STOP",
+   "panik_max5": 68.0,
+   "spy_20T_pct": 7.4,
+   "spy_60T_pct": 4.6,
+   "rueckschlag_20T_pct": 1.3
+  },
+  {
+   "tag": "2015-08-27",
+   "ampel": "STOP",
+   "panik_max5": 75.0,
+   "spy_20T_pct": -5.7,
+   "spy_60T_pct": 4.9,
+   "rueckschlag_20T_pct": -5.7
+  },
+  {
+   "tag": "2015-10-01",
+   "ampel": "STOP",
+   "panik_max5": 57.0,
+   "spy_20T_pct": 6.6,
+   "spy_60T_pct": 6.4,
+   "rueckschlag_20T_pct": 1.4
+  },
+  {
+   "tag": "2016-01-22",
+   "ampel": "STOP",
+   "panik_max5": 67.0,
+   "spy_20T_pct": 2.5,
+   "spy_60T_pct": 12.0,
+   "rueckschlag_20T_pct": -2.5
+  },
+  {
+   "tag": "2016-02-12",
+   "ampel": "STOP",
+   "panik_max5": 60.0,
+   "spy_20T_pct": 6.5,
+   "spy_60T_pct": 8.8,
+   "rueckschlag_20T_pct": 1.2
+  },
+  {
+   "tag": "2016-11-07",
+   "ampel": "CAUTION",
+   "panik_max5": 57.0,
+   "spy_20T_pct": 4.9,
+   "spy_60T_pct": 6.9,
+   "rueckschlag_20T_pct": 1.1
+  },
+  {
+   "tag": "2018-02-13",
+   "ampel": "STOP",
+   "panik_max5": 67.0,
+   "spy_20T_pct": 2.0,
+   "spy_60T_pct": 1.2,
+   "rueckschlag_20T_pct": -0.7
+  },
+  {
+   "tag": "2018-04-04",
+   "ampel": "STOP",
+   "panik_max5": 57.0,
+   "spy_20T_pct": -1.1,
+   "spy_60T_pct": 2.1,
+   "rueckschlag_20T_pct": -2.2
+  },
+  {
+   "tag": "2018-10-16",
+   "ampel": "STOP",
+   "panik_max5": 60.0,
+   "spy_20T_pct": -3.7,
+   "spy_60T_pct": -7.2,
+   "rueckschlag_20T_pct": -5.9
+  },
+  {
+   "tag": "2018-10-31",
+   "ampel": "STOP",
+   "panik_max5": 61.0,
+   "spy_20T_pct": 0.8,
+   "spy_60T_pct": -1.3,
+   "rueckschlag_20T_pct": -3.8
+  },
+  {
+   "tag": "2018-11-26",
+   "ampel": "STOP",
+   "panik_max5": 55.0,
+   "spy_20T_pct": -7.6,
+   "spy_60T_pct": 4.1,
+   "rueckschlag_20T_pct": -12.7
+  },
+  {
+   "tag": "2018-12-27",
+   "ampel": "STOP",
+   "panik_max5": 80.0,
+   "spy_20T_pct": 6.3,
+   "spy_60T_pct": 12.9,
+   "rueckschlag_20T_pct": -1.4
+  },
+  {
+   "tag": "2019-08-19",
+   "ampel": "CAUTION",
+   "panik_max5": 56.0,
+   "spy_20T_pct": 3.8,
+   "spy_60T_pct": 6.6,
+   "rueckschlag_20T_pct": -1.8
+  },
+  {
+   "tag": "2020-03-04",
+   "ampel": "REVERSE",
+   "panik_max5": 78.0,
+   "spy_20T_pct": -16.7,
+   "spy_60T_pct": 1.0,
+   "rueckschlag_20T_pct": -26.3
+  },
+  {
+   "tag": "2020-03-24",
+   "ampel": "REVERSE",
+   "panik_max5": 100.0,
+   "spy_20T_pct": 13.1,
+   "spy_60T_pct": 25.1,
+   "rueckschlag_20T_pct": -0.3
+  },
+  {
+   "tag": "2020-04-17",
+   "ampel": "STOP",
+   "panik_max5": 70.0,
+   "spy_20T_pct": 4.8,
+   "spy_60T_pct": 14.3,
+   "rueckschlag_20T_pct": -3.0
+  },
+  {
+   "tag": "2020-05-18",
+   "ampel": "STOP",
+   "panik_max5": 63.0,
+   "spy_20T_pct": 6.7,
+   "spy_60T_pct": 15.4,
+   "rueckschlag_20T_pct": 1.0
+  },
+  {
+   "tag": "2020-06-16",
+   "ampel": "STOP",
+   "panik_max5": 62.0,
+   "spy_20T_pct": 2.9,
+   "spy_60T_pct": 7.2,
+   "rueckschlag_20T_pct": -3.7
+  },
+  {
+   "tag": "2020-06-30",
+   "ampel": "STOP",
+   "panik_max5": 56.0,
+   "spy_20T_pct": 4.3,
+   "spy_60T_pct": 5.9,
+   "rueckschlag_20T_pct": 0.6
+  },
+  {
+   "tag": "2020-11-02",
+   "ampel": "STOP",
+   "panik_max5": 69.0,
+   "spy_20T_pct": 9.2,
+   "spy_60T_pct": 12.0,
+   "rueckschlag_20T_pct": 2.2
+  },
+  {
+   "tag": "2021-02-02",
+   "ampel": "CAUTION",
+   "panik_max5": 57.0,
+   "spy_20T_pct": -1.3,
+   "spy_60T_pct": 9.3,
+   "rueckschlag_20T_pct": -1.3
+  },
+  {
+   "tag": "2021-09-23",
+   "ampel": "GO",
+   "panik_max5": 55.0,
+   "spy_20T_pct": 2.1,
+   "spy_60T_pct": 2.5,
+   "rueckschlag_20T_pct": -3.4
+  },
+  {
+   "tag": "2021-10-06",
+   "ampel": "STOP",
+   "panik_max5": 59.0,
+   "spy_20T_pct": 6.4,
+   "spy_60T_pct": 8.9,
+   "rueckschlag_20T_pct": -1.1
+  },
+  {
+   "tag": "2021-12-06",
+   "ampel": "CAUTION",
+   "panik_max5": 60.0,
+   "spy_20T_pct": 0.0,
+   "spy_60T_pct": -7.7,
+   "rueckschlag_20T_pct": -2.8
+  },
+  {
+   "tag": "2022-01-28",
+   "ampel": "STOP",
+   "panik_max5": 72.0,
+   "spy_20T_pct": -4.4,
+   "spy_60T_pct": -7.3,
+   "rueckschlag_20T_pct": -6.2
+  },
+  {
+   "tag": "2022-02-25",
+   "ampel": "STOP",
+   "panik_max5": 69.0,
+   "spy_20T_pct": 4.4,
+   "spy_60T_pct": -9.8,
+   "rueckschlag_20T_pct": -4.7
+  },
+  {
+   "tag": "2022-03-15",
+   "ampel": "STOP",
+   "panik_max5": 67.0,
+   "spy_20T_pct": 1.8,
+   "spy_60T_pct": -10.5,
+   "rueckschlag_20T_pct": 0.6
+  },
+  {
+   "tag": "2022-05-04",
+   "ampel": "STOP",
+   "panik_max5": 74.0,
+   "spy_20T_pct": -0.8,
+   "spy_60T_pct": -1.4,
+   "rueckschlag_20T_pct": -5.9
+  },
+  {
+   "tag": "2022-05-13",
+   "ampel": "STOP",
+   "panik_max5": 79.0,
+   "spy_20T_pct": -6.6,
+   "spy_60T_pct": 5.0,
+   "rueckschlag_20T_pct": -6.6
+  },
+  {
+   "tag": "2022-05-23",
+   "ampel": "STOP",
+   "panik_max5": 76.0,
+   "spy_20T_pct": -4.0,
+   "spy_60T_pct": 7.2,
+   "rueckschlag_20T_pct": -7.1
+  },
+  {
+   "tag": "2022-06-23",
+   "ampel": "STOP",
+   "panik_max5": 73.0,
+   "spy_20T_pct": 1.4,
+   "spy_60T_pct": -1.5,
+   "rueckschlag_20T_pct": -3.3
+  },
+  {
+   "tag": "2022-09-28",
+   "ampel": "STOP",
+   "panik_max5": 73.0,
+   "spy_20T_pct": 4.7,
+   "spy_60T_pct": 5.5,
+   "rueckschlag_20T_pct": -1.7
+  },
+  {
+   "tag": "2022-10-04",
+   "ampel": "STOP",
+   "panik_max5": 79.0,
+   "spy_20T_pct": -0.6,
+   "spy_60T_pct": 1.4,
+   "rueckschlag_20T_pct": -5.4
+  },
+  {
+   "tag": "2022-10-13",
+   "ampel": "STOP",
+   "panik_max5": 73.0,
+   "spy_20T_pct": 11.4,
+   "spy_60T_pct": 10.6,
+   "rueckschlag_20T_pct": 2.2
+  },
+  {
+   "tag": "2024-08-08",
+   "ampel": "CAUTION",
+   "panik_max5": 63.0,
+   "spy_20T_pct": 2.5,
+   "spy_60T_pct": 6.9,
+   "rueckschlag_20T_pct": 0.1
+  },
+  {
+   "tag": "2025-03-14",
+   "ampel": "STOP",
+   "panik_max5": 62.0,
+   "spy_20T_pct": -4.9,
+   "spy_60T_pct": 6.0,
+   "rueckschlag_20T_pct": -12.5
+  },
+  {
+   "tag": "2025-04-09",
+   "ampel": "REVERSE",
+   "panik_max5": 92.0,
+   "spy_20T_pct": 7.6,
+   "spy_60T_pct": 19.0,
+   "rueckschlag_20T_pct": -2.0
+  },
+  {
+   "tag": "2025-10-20",
+   "ampel": "GO",
+   "panik_max5": 57.0,
+   "spy_20T_pct": -1.7,
+   "spy_60T_pct": 3.0,
+   "rueckschlag_20T_pct": -1.7
+  },
+  {
+   "tag": "2025-11-24",
+   "ampel": "CAUTION",
+   "panik_max5": 63.0,
+   "spy_20T_pct": 2.3,
+   "spy_60T_pct": 1.8,
+   "rueckschlag_20T_pct": -0.5
+  },
+  {
+   "tag": "2026-03-17",
+   "ampel": "CAUTION",
+   "panik_max5": 57.0,
+   "spy_20T_pct": 6.1,
+   "spy_60T_pct": 12.1,
+   "rueckschlag_20T_pct": -4.5
+  },
+  {
+   "tag": "2026-03-25",
+   "ampel": "STOP",
+   "panik_max5": 64.0,
+   "spy_20T_pct": 10.7,
+   "spy_60T_pct": 13.7,
+   "rueckschlag_20T_pct": -2.0
+  },
+  {
+   "tag": "2026-03-31",
+   "ampel": "CAUTION",
+   "panik_max5": 73.0,
+   "spy_20T_pct": 9.7,
+   "spy_60T_pct": 13.1,
+   "rueckschlag_20T_pct": 0.1
+  }
+ ],
+ "zusammenfassung_signale": {
+  "anzahl": 67,
+  "spy_20T_mittel_pct": 1.42,
+  "spy_20T_positiv_pct": 64.0,
+  "spy_60T_mittel_pct": 3.1,
+  "rueckschlag_20T_mittel_pct": -4.09,
+  "rueckschlag_ueber7pct_anteil": 15.0,
+  "aktive_tage": 794
+ },
+ "nach_tiefs": [
+  {
+   "tief": "2009-03-09",
+   "signale_innerhalb_45_tage": [
+    "2009-01-27",
+    "2009-03-10",
+    "2009-04-02"
+   ],
+   "abstand_zum_tief_pct": [
+    24.1,
+    6.0,
+    22.5
+   ]
+  },
+  {
+   "tief": "2011-10-03",
+   "signale_innerhalb_45_tage": [
+    "2011-09-14",
+    "2011-09-27",
+    "2011-10-05"
+   ],
+   "abstand_zum_tief_pct": [
+    8.6,
+    6.9,
+    4.1
+   ]
+  },
+  {
+   "tief": "2016-02-11",
+   "signale_innerhalb_45_tage": [
+    "2016-01-22",
+    "2016-02-12"
+   ],
+   "abstand_zum_tief_pct": [
+    4.2,
+    2.1
+   ]
+  },
+  {
+   "tief": "2018-04-02",
+   "signale_innerhalb_45_tage": [
+    "2018-04-04"
+   ],
+   "abstand_zum_tief_pct": [
+    2.4
+   ]
+  },
+  {
+   "tief": "2018-12-24",
+   "signale_innerhalb_45_tage": [
+    "2018-11-26",
+    "2018-12-27"
+   ],
+   "abstand_zum_tief_pct": [
+    14.2,
+    5.9
+   ]
+  },
+  {
+   "tief": "2020-03-23",
+   "signale_innerhalb_45_tage": [
+    "2020-03-04",
+    "2020-03-24",
+    "2020-04-17"
+   ],
+   "abstand_zum_tief_pct": [
+    40.3,
+    9.1,
+    28.6
+   ]
+  },
+  {
+   "tief": "2022-10-12",
+   "signale_innerhalb_45_tage": [
+    "2022-09-28",
+    "2022-10-04",
+    "2022-10-13"
+   ],
+   "abstand_zum_tief_pct": [
+    3.9,
+    6.0,
+    2.6
+   ]
+  },
+  {
+   "tief": "2025-04-08",
+   "signale_innerhalb_45_tage": [
+    "2025-03-14",
+    "2025-04-09"
+   ],
+   "abstand_zum_tief_pct": [
+    13.4,
+    10.5
+   ]
+  }
+ ]
+}
