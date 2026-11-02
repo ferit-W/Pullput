@@ -379,3 +379,51 @@ Ob und wie du handelst, entscheidest du. Jedes Signal wird im Archiv mitgeschrie
 
 - **Panik-Wende:** Der Markt ist noch in Panik und zeigt erst ein erstes Lebenszeichen. Das ist sehr früh, ein Einstieg gegen den Trend, mit großen Schwankungen.
 - **Voreinstieg:** Der Markt hat sich beruhigt (Termstruktur normal), der Trend steht wieder (3 Indizes in P3), nur der VIX ist noch erhöht. Das ist früh, aber trendbestätigt, und in beiden Zeiträumen besser.
+
+---
+
+## 9. Test Marktbreite aus Einzelaktien: 52-Wochen-Hochs/-Tiefs und Aktien in Phase 3 (02.11.2026)
+
+Die Regeln wurden vor der Auswertung festgelegt und eingecheckt (`breite_test.py`).
+
+**Daten.** Tägliche Kurse von 489 der heutigen S&P-500-Aktien vom 31.10.2016 bis 30.10.2026. Geprüft wird ab November 2017, weil die 52 Wochen Anlaufzeit brauchen. Zwei Einschränkungen:
+
+- Es sind nur 10 Jahre.
+- Es sind nur die *heutigen* Mitglieder. Ausgeschiedene Aktien fehlen, deshalb werden neue Tiefs vor allem in den früheren Jahren zu selten gezählt.
+
+**Kennzahlen je Tag.**
+
+- Anteil Aktien mit neuem 52-Wochen-Hoch bzw. -Tief, als 10-Tage-Durchschnitt der Differenz (NHNL10)
+- Anteil Aktien in Phase 3 (Kurs über EMA50 über EMA200)
+- Veränderung dieses Anteils gegenüber vor 5 Tagen. Das entspricht deiner Idee „heute 300 Aktien long statt gestern 200“.
+
+### Getestete Regeln auf der neuen Ampel (AM1 + AM4)
+
+Angegeben ist Sharpe 2017-11 bis 2021 / 2022 bis 2026-09.
+
+- **Neue Ampel (AM1 + AM4):** 0,79 / 0,74
+- **B1, mehr neue Tiefs als Hochs, daher GO zurück auf CAUTION:** 0,80 / 0,75. Formal in beiden besser, aber nur um 0,01. **Praktisch wirkungslos.** Fällt die Breite so stark, steht die Ampel fast immer schon auf CAUTION oder STOP.
+- **B2, GO nur, wenn mindestens die Hälfte der Aktien in P3 steht:** 0,77 / 0,63. **Schlechter.**
+- **B3, Aufstieg auf Voreinstieg, wenn der P3-Anteil in 5 Tagen um 5 Punkte steigt:** 0,72 / 0,73. **Schlechter.**
+
+Damit wird **keine** der drei Regeln in die Ampel eingebaut.
+
+### Was die Breite trotzdem zeigt (beschreibend)
+
+Folgerendite des S&P 500 nach 20 Tagen:
+
+- **Netto-Hochs (NHNL10) unter −5, also deutlich mehr neue Tiefs:** **+5,6 %, in 83 % der Fälle positiv.** Bei über +3, also vielen neuen Hochs: +0,5 %.
+- **Unter 20 % der Aktien in P3:** **+4,6 %, 78 % positiv.** Über 65 % in P3: +0,3 %.
+- **Veränderung des P3-Anteils über 5 Tage:** kein klares Muster. Ein starker Anstieg um 10 Punkte und mehr brachte +0,6 %, ein starker Rückgang +1,2 %. Etwas weniger Rückschlagrisiko zeigte sich bei leicht steigender Breite (8 % statt 13 bis 15 % Rückschläge über 7 %).
+
+**Einordnung:** Wie beim Panik-Score wirkt extreme Breitenschwäche **kontrarian**. Wenn kaum noch Aktien im Aufwärtstrend sind und viele neue Tiefs machen, ist der Ausverkauf oft durch. Das passt zum Lüddemann-Gedanken der Panik-Wende und zur NYSE-Studie aus der Recherche. Viele neue Hochs sind dagegen kein Warnsignal, nur ein schwächeres Plus.
+
+### Verwendung
+
+- **Als Anzeige im Lagebild (T1):** Anteil der Aktien in P3, neue Hochs und Tiefs sowie deren Veränderung. Das beantwortet „Wie viele Aktien tragen den Markt?“. Stand 30.10.2026: 44 % der Aktien in P3, 9,2 % neue Hochs gegen 0,8 % neue Tiefs.
+- **Im Hinweis „⚡ Panik-Wende möglich“ (AM9):** NHNL10 unter −5 oder P3-Anteil unter 20 % als zusätzliche Information, aber nicht als geprüfte Regel.
+- **Im Archiv:** Alle Werte werden täglich mitgeschrieben. Mit der Zeit entsteht so eine eigene, unverzerrte Datenreihe ohne Survivorship-Verzerrung.
+
+### Wichtige Einschränkung zur neuen Ampel (AM1 + AM4)
+
+In diesem kürzeren Fenster zeigt sich: Von **2022 bis 2026** war die **alte** Ampel besser (0,81) als die neue (0,74). Von 2017 bis 2021 war es umgekehrt (0,47 gegenüber 0,79). Über die ganzen 19 Jahre bleibt die neue Ampel vorn. Ihr Vorsprung stammt aber vor allem aus den Jahren bis 2021. Das ist kein Grund, AM1 und AM4 zu verwerfen. Es zeigt aber, wie schnell sich die Rangfolge in kurzen Zeiträumen dreht. Mit dem Archiv (A1) und dem Prüfstand (AM8) wird das künftig laufend beobachtet.
