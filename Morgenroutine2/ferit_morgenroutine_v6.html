@@ -587,9 +587,13 @@ footer strong{color:var(--ink2)}
   <!-- Drawer: KI & Settings -->
   <div class="drawer" id="dw-set">
     <div class="drawer-box">
-      <div class="dw-title">Gemini (optional — nur für Briefing-Text &amp; Makro/Earnings-Kalender)</div>
+      <div class="dw-title">KI (optional — Briefing, Kalender, Trading-Partner) · Schlüssel liegen nur auf diesem PC</div>
       <div class="field-grid">
-        <div class="field"><label>Gemini API-Key</label><input type="password" id="gem-key" placeholder="AIzaSy…"><span class="hint">aistudio.google.com/apikey</span></div>
+        <div class="field"><label>Anbieter</label>
+          <select id="ki-standard"><option value="gemini">Gemini (Standard)</option><option value="claude">Claude</option></select>
+          <span class="hint" id="ki-status">wird geladen …</span></div>
+        <div class="field"><label>Gemini API-Key</label><input type="password" id="gem-key" placeholder="AIzaSy… (leer = unverändert)"><span class="hint">aistudio.google.com/apikey</span></div>
+        <div class="field"><label>Claude API-Key</label><input type="password" id="claude-key" placeholder="sk-ant-… (leer = unverändert)"><span class="hint">console.anthropic.com · Modell claude-opus-5-5 · einmalig <code>pip install anthropic</code></span></div>
         <div class="field"><label>Modell</label>
           <select id="gem-model">
             <option value="gemini-2.5-pro">Gemini 2.5 Pro (gründlicher, teurer)</option>
@@ -793,6 +797,15 @@ footer strong{color:var(--ink2)}
       <div class="brief-tag">Executive Briefing <span class="ai-badge">KI-Text · verifizieren</span></div>
       <div id="brief-txt"></div>
     </div>
+  </section>
+
+  <!-- ════ v6.19 (Phase 5): KI als Trading-Partner ════ -->
+  <section class="subpanel collapsed" id="sp-partner" style="margin-top:12px">
+    <div class="sp-head" onclick="toggleSub('sp-partner',event)">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="sp-t">🧭 Trading-Partner (KI)</span><span class="sp-meta">Lage, Ausblick, Neigung — Meinung, keine Regel</span><span class="info-i" onclick="event.stopPropagation();infoPop('partner')" title="Wie der Trading-Partner arbeitet">i</span></div>
+      <div class="sp-right"><button class="sp-btn" onclick="event.stopPropagation();tradingPartner(false)">▶ fragen</button><button class="sp-btn" onclick="event.stopPropagation();tradingPartner(true)" title="mit Websuche für aktuelle Ereignisse (Wahlen, Notenbank, Zahlen) — dauert länger, kostet mehr">▶ mit Websuche</button></div>
+    </div>
+    <div class="sp-body" id="partner-body"><div class="init">Fragt die KI nach Lage, Ausblick und Neigung — auf Basis der Daten dieser Seite. Die Ampel bleibt die Regel.</div></div>
   </section>
 
   <!-- ════ v6.17: TAGESSTART ════
@@ -1728,7 +1741,31 @@ function initSettings(){
   $('m-term').value = MANUAL.term || 'contango';
 }
 function initAiAuto(){ const el=document.getElementById('gem-auto'); if(el) el.value = AI_AUTO ? '1' : '0'; }
-function saveGem(){ const v=$('gem-key').value.trim(); GEM_KEY=v; MODEL=$('gem-model').value; saveLS(SK.gem,v); saveLS(SK.model,MODEL); $('gem-msg').textContent = v? '✓ Key gespeichert — Briefing & Kalender aktiv.' : 'Key geleert.'; }
+// v6.19 (Phase 5): Schlüssel gehen an den Server (ki_schluessel.json), nicht mehr in den Browser.
+async function kiStatusLaden(){
+  try{ const r=await fetchOnce('http://localhost:8765/config/ki',4000); STATE.ki = r.ok ? await r.json() : null; }catch(e){ STATE.ki=null; }
+  const el=$('ki-status'), sel=$('ki-standard');
+  if(sel && STATE.ki) sel.value=STATE.ki.standard||'gemini';
+  if(el) el.textContent = !STATE.ki ? 'Server nicht erreichbar — Gemini-Schlüssel nur im Browser' :
+    `Gemini ${STATE.ki.gemini?'✓':'—'} · Claude ${STATE.ki.claude?'✓':'—'}${STATE.ki.claude&&!STATE.ki.claude_sdk?' (pip install anthropic fehlt)':''}`;
+  return STATE.ki;
+}
+function kiDa(){ return !!(STATE.ki && (STATE.ki.gemini || STATE.ki.claude)) || !!GEM_KEY; }
+async function saveKiServer(){
+  const body={standard:($('ki-standard')||{}).value||'gemini', gemini_modell:($('gem-model')||{}).value||''};
+  const g=($('gem-key')||{}).value.trim(), c=($('claude-key')||{}).value.trim();
+  if(g) body.gemini=g; if(c) body.claude=c;
+  try{ const r=await fetchOnce('http://localhost:8765/config/ki',6000,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+       const j=await r.json(); if(!j.ok) throw new Error(j.fehler||'Fehler');
+       // Alten Browser-Schlüssel entfernen, sobald der Server ihn hat
+       if(j.gemini){ GEM_KEY=''; try{ localStorage.removeItem(SK.gem); }catch(e){} }
+       if($('gem-key')) $('gem-key').value=''; if($('claude-key')) $('claude-key').value='';
+       await kiStatusLaden(); return true;
+  }catch(e){ return false; }
+}
+function saveGem(){ saveKiServer().then(ok=>{ if(ok){ const m=$('gem-msg'); if(m) m.textContent='✓ Schlüssel auf dem PC gespeichert (ki_schluessel.json) — nicht mehr im Browser.'; } });
+  if(STATE.ki){ MODEL=$('gem-model').value; saveLS(SK.model,MODEL); return; }
+  const v=$('gem-key').value.trim(); GEM_KEY=v; MODEL=$('gem-model').value; saveLS(SK.gem,v); saveLS(SK.model,MODEL); $('gem-msg').textContent = v? '✓ Key gespeichert — Briefing & Kalender aktiv.' : 'Key geleert.'; }
 function saveManual(){
   MANUAL = {
     pcr: numOrNull($('m-pcr').value),
@@ -2626,7 +2663,7 @@ function renderTreasury(){
 // wird ausdrücklich auf Mechanik statt Prognose festgelegt.
 async function aiAnleihen(btn){
   const box=$('aibond-box'); if(!box) return;
-  if(!GEM_KEY){ box.innerHTML='<span style="color:var(--gold)">Kein Gemini-Key hinterlegt (⚙ Einstellungen → Key speichern).</span>'; return; }
+  if(!kiDa()){ box.innerHTML='<span style="color:var(--gold)">Kein KI-Schlüssel hinterlegt (⚙ Einstellungen → Key speichern).</span>'; return; }
 
   // Zahlen aus dem laufenden Stand zusammenstellen — nichts wird geraten.
   // v6.18 FIX (F1): Die 2-jährige Rendite liegt getrennt in STATE.t2y — vorher fand der
@@ -2676,7 +2713,7 @@ async function aiAnleihen(btn){
 
 async function aiFed(btn){
   const box=$('aifed-box'); if(!box) return;
-  if(!GEM_KEY){ box.innerHTML='<span style="color:var(--gold)">Kein Gemini-Key hinterlegt (⚙ Einstellungen → Key speichern).</span>'; return; }
+  if(!kiDa()){ box.innerHTML='<span style="color:var(--gold)">Kein KI-Schlüssel hinterlegt (⚙ Einstellungen → Key speichern).</span>'; return; }
   const nx=fedNext(), dStr=nx?nx.date.toLocaleDateString('de-DE',{day:'2-digit',month:'long',year:'numeric'}):'der nächsten Sitzung';
   btn.disabled=true; btn.textContent='🤖 suche …';
   box.innerHTML='<div class="loading"><div class="spinner"></div>Gemini sucht aktuelle FedWatch-Daten …</div>';
@@ -3254,7 +3291,7 @@ function gapDetailHTML(d, gapPx, sym){
 async function aiGap(btn){
   const sym=btn.dataset.sym; const safe=sym.replace(/[^A-Za-z0-9]/g,'_'); const box=$('aigap-'+safe);
   if(!box) return;
-  if(!GEM_KEY){ box.innerHTML='<span style="color:var(--gold)">Kein Gemini-Key hinterlegt (⚙ Einstellungen → Key speichern).</span>'; return; }
+  if(!kiDa()){ box.innerHTML='<span style="color:var(--gold)">Kein KI-Schlüssel hinterlegt (⚙ Einstellungen → Key speichern).</span>'; return; }
   const cd=(window._gapData||{})[sym]; const d=cd?cd.d:null;
   const g=lastGaps.find(x=>x.symbol===sym)||{};
   const dir=(g.gap>=0)?'Up-Gap (P3-Long-Kandidat)':'Down-Gap (P6-Short-Kandidat)';
@@ -3976,6 +4013,11 @@ const INFO_TEXTE = {
     warum:'Die Morgenroutine schreibt bei jedem Lauf den Tag in daten/archiv_JJJJ.json: Zustand, Regelversion, Gründe, Konsequenz, alle Index- und Sektorwerte, Sentiment-Rohwerte. Später werden automatisch die Folgerenditen des S&P 500 nachgetragen, genau wie in der Rückrechnung gerechnet. Mit den Rohwerten lassen sich auch künftige Regeln rückwirkend auf dieselben Tage rechnen.',
     lesen:'Datum wählen → „anzeigen“ zeigt den Tag und was danach geschah; ◀ ▶ blättern. „Bericht erstellen“ fasst alle Tage je Ampelzustand zusammen und listet die Lücken (grün vor Einbruch, rot vor Erholung); dazu entstehen archiv_ki_paket.csv und archiv_ki_frage.txt für eine KI. „Rückrechnung einspielen“ trägt einmalig die Jahre 2007–2026 als „nachgerechnet“ ein, Live-Tage bleiben unberührt.',
     bsp:'Aus der Rückrechnung: Am 20.02.2020 stand die Ampel auf GO — VIX 15,6, 9 Sektoren über EMA200, Contango. In den 20 Tagen danach fiel der S&P 500 um 31 %. Solche Tage zeigt der Bericht als „Lücke 1“: Mit diesen Eingangswerten war der Einbruch nicht zu sehen.'},
+  partner: {t:'Trading-Partner (KI, Phase 5)',
+    ziel:'Eine zweite Meinung zur Lage: Wie sieht die KI den Markt, den Ausblick für 1–4 Wochen, und neigt sie eher zu Long, neutral, defensiv oder Short?',
+    warum:'Die Ampel ist getestet, aber starr — sie kennt keine Wahl, keine Notenbank-Rede, keine Saison. Der Partner liest dieselben Daten (Ampel, Breite, VIX, Termstruktur, Kredit, Termine der Woche inkl. Wahlen und Verfall, Saison der Sektoren, Positionen, Ergebnisse des Systemtests) und darf auf Wunsch per Websuche aktuelle Ereignisse ergänzen. Vier feste Regeln: Meinung ist als Meinung markiert, keine erfundenen Zahlen, Widerspruch zur Regel wird offen benannt, jede Einschätzung kommt ins Archiv.',
+    lesen:'Neigung und Sicherheit oben, daneben zum Vergleich die Ampel. Ein roter Kasten heißt: Die KI sieht es anders als deine Regel — dann bewusst entscheiden, nicht automatisch folgen. Anbieter (Gemini oder Claude) wählst du unter ⚙. Nach einigen Monaten zeigt der Archiv-Bericht, wie oft die Neigung richtig lag — erst dann weißt du, ob der Partner etwas taugt.',
+    bsp:'Typischer Fall: Ampel GO, Partner „eher defensiv, Sicherheit mittel“ — Begründung: US-Wahl morgen, VIX-Termstruktur flach, Saison November für Versorger schwach. Das ändert die Regel nicht, kann aber ein Grund sein, heute nur halbe Größe zu nehmen.'},
   scanner: {t:'Setup-Scanner „Rücksetzer im Trend“ (T3)',
     ziel:'Die tägliche Vorauswahl: Welche Aktien zeigen heute genau den Einstieg, der im Systemtest einen Vorteil hatte?',
     warum:'Regel wie im Systemtest (Phase 2b): Phase 3, an einem der 5 Vortage Schluss unter der EMA20, heute wieder darüber; Stopp am 10-Tage-Tief, Stoppabstand 1–15 %. Gefiltert wird nur mit „Platz bis zum Widerstand größer als der Stoppabstand“ — das einzige deiner Kriterien, das im Test in beiden Zeiträumen geholfen hat. RS gegen den Sektor war gemischt und dient deshalb nur zur Sortierung. Nähe zum 52-Wochen-Hoch hat im Test geschadet und filtert nicht. Die Rechnung ist gegen den Testcode geprüft (353 Vergleiche, identisch).',
@@ -4173,6 +4215,15 @@ function saeubereKiHtml(html){
 }
 
 async function callGemini(prompt, useSearch, maxTokens){
+  // v6.19 (Phase 5): über den Server, wenn dort ein Schlüssel liegt — Anbieter laut Einstellung
+  if(STATE.ki && (STATE.ki.gemini || STATE.ki.claude)){
+    const r=await fetchOnce('http://localhost:8765/ki', 300000, {method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt, suche:!!useSearch, maxTokens:maxTokens||8192})});
+    const j=await r.json();
+    if(!j.ok){ if(/ungültig/.test(j.fehler||'')) throw new Error('KEY_INVALID'); throw new Error(j.fehler||'KI-Fehler'); }
+    STATE.kiZuletzt={anbieter:j.anbieter, modell:j.modell};
+    return j.text;
+  }
   if(!GEM_KEY) throw new Error('NO_KEY');
   const models=[MODEL, ...(MODEL_FB[MODEL]||['gemini-2.5-flash'])];
   let last='';
@@ -4197,7 +4248,7 @@ async function callGemini(prompt, useSearch, maxTokens){
 function extractJSON(t){ let c=t.replace(/```(?:json)?/gi,'').replace(/```/g,'').trim(); try{return JSON.parse(c);}catch(e){} const m=c.match(/\{[\s\S]*\}/); if(m){try{return JSON.parse(m[0]);}catch(e){const f=m[0].replace(/,(\s*[}\]])/g,'$1');try{return JSON.parse(f);}catch(e2){}}} throw new Error('JSON: '+c.slice(0,120)); }
 
 async function loadNews(erzwingen){
-  if(!GEM_KEY){ $('news-body').innerHTML='<div class="ebox">Kein Gemini-Key — Makro/Earnings bleibt leer. Key unter „🤖 KI & Einstellungen".</div>'; setStatus('st-ai','idle'); return; }
+  if(!kiDa()){ $('news-body').innerHTML='<div class="ebox">Kein Gemini-Key — Makro/Earnings bleibt leer. Key unter „🤖 KI & Einstellungen".</div>'; setStatus('st-ai','idle'); return; }
   setStatus('st-ai','warn','lade');
   $('news-body').innerHTML='<div class="loading"><div class="spinner"></div>Gemini · Makro + Earnings…</div>';
   const now=new Date(), end=new Date(now.getTime()+7*864e5);
@@ -4525,7 +4576,7 @@ function aiStand(ts){
 }
 
 async function genBriefing(v, erzwingen){
-  if(!GEM_KEY) return;
+  if(!kiDa()) return;
   const spy=(STATE.indices||[]).find(i=>i.key==='SPY');
   const ctx={ datum:new Date().toLocaleDateString('de-DE'), ampel:v.label, gruende:v.reasons,
     phasen:`${v.p3}× P3 / ${v.p6}× P6`, vix:v.vix, vix_vortag:(v.dVix!=null?(v.dVix>0?'+':'')+v.dVix.toFixed(1):null),
@@ -4620,11 +4671,11 @@ function aiBlock(tic){
   const a=STATE.watchAI[tic];
   if(a&&a.state==='loading') return `<div class="wc-ai-load"><div class="spinner"></div>KI bewertet…</div>`;
   if(a&&a.state==='err') return `<button class="wc-ai-btn" onclick="aiWatch('${tic}')">🤖 KI-Check</button><div class="wc-ai-err">⚠ ${a.text}</div>`;
-  if(a&&a.state==='done') return `<div class="wc-ai"><span class="wc-ai-tag">🤖 KI-Einordnung · Gemini · verifizieren${a.ts?' · Stand '+new Date(a.ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</span>${a.html}</div><button class="wc-ai-btn" onclick="aiWatch('${tic}')">↻ neu bewerten</button>`;
+  if(a&&a.state==='done') return `<div class="wc-ai"><span class="wc-ai-tag">🤖 KI-Einordnung · verifizieren${a.ts?' · Stand '+new Date(a.ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</span>${a.html}</div><button class="wc-ai-btn" onclick="aiWatch('${tic}')">↻ neu bewerten</button>`;
   return `<button class="wc-ai-btn" onclick="aiWatch('${tic}')">🤖 KI-Check</button>`;
 }
 async function aiWatch(tic){
-  if(!GEM_KEY){ toast('Kein Gemini-Key — unter „🤖 KI & Einstellungen" eintragen','err'); return; }
+  if(!kiDa()){ toast('Kein KI-Schlüssel — unter „🤖 KI & Einstellungen" eintragen','err'); return; }
   const w=STATE.watch.find(x=>x.ticker===tic);
   if(!w||w.price==null){ toast('Erst Kurse laden (↻ Refresh)','err'); return; }
   STATE.watchAI[tic]={state:'loading'}; renderWatch();
@@ -4989,6 +5040,7 @@ async function positionsMonitor(){
     }
     return `<div style="${z.warn?'border-left:3px solid var(--amber);padding-left:6px':''}">· <b>${esc(z.sym)}</b> ${long?'Long':'Short'} — ${teile.join(' · ')}${hinweise.length?'<br>&nbsp;&nbsp;'+hinweise.join(' · '):''}</div>`;
   }).join('');
+  STATE.positionenKurz = zeilen.map(z=>({s:z.sym, richtung:z.t.direction, r:z.r!=null?Math.round(z.r*10)/10:null, stoppAbstandR:z.abstandR!=null?Math.round(z.abstandR*10)/10:null, phase:z.phase||null, zahlen:z.zahlen?z.zahlen.datum.toISOString().slice(0,10):null, nachziehen:!!(z.nz&&(z.nz.e4!=null||z.nz.e5!=null)), hinweis:!!z.warn}));
   el.innerHTML = `<b>Positionen</b> (${offen.length} offen${warn?`, <span style="color:var(--amber)">${warn} mit Hinweis</span>`:''}) <span class="info-i" onclick="infoPop('positionen')" title="Positions-Monitor">i</span>`
     + (offen.length>25?' <span style="color:var(--steel)">— die ersten 25</span>':'') + `<div style="margin-top:4px">${html}</div>`;
 }
@@ -5089,6 +5141,82 @@ function desktopAlarmePruefen(v){
   if(v.voreinstieg && v.voreinstieg.aktiv) desktopMeldung('voreinstieg', '🌱 Voreinstieg erfüllt', 'Alle vier Bedingungen erfüllt — Prüfliste in der Morgenroutine');
   if(v.panikWende && v.panikWende.aktiv) desktopMeldung('panikwende', '⚡ Panik-Wende möglich', 'Hinweis, kein Ampelzustand — Prüfliste ansehen');
   if(v.breitenWende && v.breitenWende.aktiv) desktopMeldung('breitenwende', '⚡ Breiten-Wende möglich', 'Hinweis, kein Ampelzustand — Prüfliste ansehen');
+}
+
+// ═══ v6.19 · PHASE 5: KI ALS TRADING-PARTNER (K0) ═══════════════════════════
+// Vier feste Regeln:
+//   1. Meinung ist als Meinung gekennzeichnet — die Ampel bleibt die Regel.
+//   2. Grundlage sind die Daten dieser Seite (auf Wunsch plus Websuche für Ereignisse,
+//      dann mit Quellen). Keine erfundenen Zahlen.
+//   3. Widerspricht die Einschätzung der Ampel oder dem Handelsplan, wird das offen benannt.
+//   4. Jede Einschätzung kommt ins Archiv und wird später gegen den Verlauf bewertet.
+const PARTNER_NEIGUNG = ['eher long','neutral','eher defensiv','eher short'];
+function partnerPaket(){
+  const v=STATE.ampel||{}, r2=x=>x==null||!isFinite(x)?null:Math.round(x*100)/100;
+  let K=null; try{ K=tagesKonsequenz(v); }catch(e){}
+  let W=null; try{ W=wochenTermine(); }catch(e){}
+  const seas=STATE.seas||{};
+  return {
+    datum: new Date().toLocaleDateString('de-DE',{weekday:'long', day:'2-digit', month:'long', year:'numeric'}),
+    ampel: {zustand:v.label, grundzustand:v.basis, trend:v.trend, risiko:v.risiko, gruende:v.reasons, regelwerk:v.version,
+            voreinstieg:v.voreinstieg?{aktiv:v.voreinstieg.aktiv, erfuellt:v.voreinstieg.liste.filter(x=>x.ok).length}:null,
+            panikWende:v.panikWende?v.panikWende.aktiv:null, breitenWende:v.breitenWende?v.breitenWende.aktiv:null},
+    konsequenz: K?{richtung:K.richtung, groesse:K.groesse, gruende:K.gruende}:null,
+    vix:STATE.vix, vix3m:STATE.vix3m, termstruktur:STATE.vixTerm&&STATE.vixTerm.regime, panikScore:v.panik, fearGreed:v.fg,
+    sektorBreiteEMA200:v.part, aktienBreite:STATE.aktienBreite||null, kreditHY:STATE.kredit||null,
+    indizes:(STATE.indices||[]).filter(i=>!i.err).map(i=>({k:i.key, phase:i.phase&&i.phase.code, abstandEMA200:r2(i.ema200Dist), mom6:r2(i.mom6)})),
+    sektorenRS1M:(STATE.sectors||[]).filter(s=>!s.err&&s.rs1m!=null).map(s=>({k:s.etf, rs1m:r2(s.rs1m), phase:s.phase&&s.phase.code})),
+    saisonSektoren: Object.keys(seas).slice(0,11).map(k=>({k, fwd:seas[k]&&r2(seas[k].fwd)})),
+    renditen: (STATE.treasury||[]).filter(t=>!t.err).map(t=>({k:t.key, kurs:t.cur})), zwei:STATE.t2y&&STATE.t2y.cur,
+    fedBand: (()=>{ try{ return fedBand(); }catch(e){ return null; } })(),
+    termineWoche: W?W.eintraege.map(e=>e.d+' '+e.was):[], wochenampel:W&&W.stufe,
+    ueberNacht: STATE.uebernacht||null,
+    positionen: STATE.positionenKurz||null,
+    systemtest: 'Eigener Rücksetzer-Einstieg in P3: positiver Erwartungswert 2017–2026; Platz bis Widerstand hilft; Einstiege liefen bei Ampel GO am schwächsten, bei CAUTION/VOREINSTIEG besser; 20–30 Verlierer in Folge kamen vor.',
+    handelsplan: 'Risiko 0,25 % je Trend-Trade, 0,40 % Gap/News, höchstens 10 Positionen; gehandelt wird P3 long und P6 short.'
+  };
+}
+function partnerPrompt(paket, suche){
+  return `Du bist mein Trading-Partner. Ich bin Trendhändler (Lüddemann-Phasen, Rücksetzer-Einstieg, Swing-Haltedauer Tage bis Wochen) und entscheide selbst.
+Regeln für dich:
+1. Was du sagst, ist eine MEINUNG, keine Regel. Die Ampel unten ist meine getestete Regel.
+2. Stütze dich auf die Daten unten${suche?' und, nur für aktuelle Ereignisse (Wahlen, Notenbank, Unternehmenszahlen), auf eine Websuche — nenne dann die Quellen':''}. Erfinde keine Zahlen. Wenn etwas fehlt, sag es.
+3. Wenn deine Einschätzung der Ampel oder dem Handelsplan widerspricht, schreibe das ausdrücklich in "gegen_die_regeln" und begründe es. Sonst null.
+4. Saisonalität, Termine (z. B. Wahlen, Verfall, Notenbank) und die Lage der Breite gehören in die Einschätzung.
+Antworte NUR mit JSON in genau dieser Form, auf Deutsch, knapp:
+{"lage":"2-3 Sätze","ausblick":"1-4 Wochen, 2-3 Sätze","neigung":"${PARTNER_NEIGUNG.join('|')}","sicherheit":"niedrig|mittel|hoch","begruendung":["…"],"gegen_die_regeln":null,"risiken":["…"],"beobachten":["…"],"quellen":["…"]}
+
+DATEN (Stand der Morgenroutine):
+${JSON.stringify(paket)}`;
+}
+async function tradingPartner(mitSuche){
+  const el=$('partner-body'); if(!el) return;
+  const p=$('sp-partner'); if(p) p.classList.remove('collapsed');
+  if(!kiDa()){ el.innerHTML='<div class="init" style="color:var(--gold)">Kein KI-Schlüssel — unter ⚙ „KI & Einstellungen“ eintragen.</div>'; return; }
+  if(!STATE.ampel || STATE.ampel.label==='WARTE'){ el.innerHTML='<div class="init">Erst die Morgenroutine laufen lassen — der Partner braucht die Daten.</div>'; return; }
+  el.innerHTML='<div class="loading"><div class="spinner"></div>Der Trading-Partner liest die Lage …</div>';
+  let j;
+  try{ j = extractJSON(await callGemini(partnerPrompt(partnerPaket(), !!mitSuche), !!mitSuche, 8192)); }
+  catch(e){ el.innerHTML='<div class="init" style="color:var(--red)">KI fehlgeschlagen: '+esc(e.message||String(e))+'</div>'; return; }
+  const neigung = PARTNER_NEIGUNG.includes(j.neigung) ? j.neigung : 'neutral';
+  const farbe = {'eher long':'var(--green)','neutral':'var(--steel)','eher defensiv':'var(--amber)','eher short':'var(--red)'}[neigung];
+  const wer = STATE.kiZuletzt ? `${STATE.kiZuletzt.anbieter==='claude'?'Claude':'Gemini'} · ${STATE.kiZuletzt.modell}` : 'Gemini (Browser)';
+  const liste = a => Array.isArray(a)&&a.length ? '<ul style="margin:3px 0 0 18px;padding:0">'+a.map(x=>`<li>${esc(String(x))}</li>`).join('')+'</ul>' : '–';
+  el.innerHTML = `<div style="font-size:.76rem;line-height:1.6">`
+    + `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="az-chip" style="color:${farbe};font-size:.8rem">Neigung: ${esc(neigung)}</span>`
+    + `<span class="az-chip">Sicherheit: ${esc(j.sicherheit||'–')}</span><span class="az-chip" style="color:var(--steel)">Ampel (Regel): ${esc(STATE.ampel.label)}</span>`
+    + `<span style="color:var(--steel);font-size:.66rem">🧭 MEINUNG der KI (${esc(wer)}) — keine Regel, die Entscheidung liegt bei dir</span></div>`
+    + (j.gegen_die_regeln ? `<div class="az-box" style="border-left-color:var(--red)"><b>⚠ Widerspricht der Regel:</b> ${esc(String(j.gegen_die_regeln))}</div>` : '')
+    + `<div style="margin-top:6px"><b>Lage:</b> ${esc(j.lage||'–')}</div><div><b>Ausblick 1–4 Wochen:</b> ${esc(j.ausblick||'–')}</div>`
+    + `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:6px">`
+    + `<div><b>Begründung</b>${liste(j.begruendung)}</div><div><b>Risiken</b>${liste(j.risiken)}</div><div><b>Beobachten</b>${liste(j.beobachten)}</div></div>`
+    + (Array.isArray(j.quellen)&&j.quellen.length ? `<div style="color:var(--steel);font-size:.66rem;margin-top:4px">Quellen: ${j.quellen.map(x=>esc(String(x))).join(' · ')}</div>` : '')
+    + `<div style="color:var(--steel);font-size:.66rem;margin-top:4px">Im Archiv gespeichert — der Archiv-Bericht wertet später aus, wie oft die Neigung richtig lag.</div></div>`;
+  // Regel 4: ins Archiv (Handelstag der Kurse), damit es später bewertet werden kann
+  const tag = archivHandelstag() || todayKey();
+  STATE.partnerHeute = {anbieter:STATE.kiZuletzt?STATE.kiZuletzt.anbieter:'gemini', modell:STATE.kiZuletzt?STATE.kiZuletzt.modell:MODEL,
+    neigung, sicherheit:j.sicherheit||null, gegenRegel:!!j.gegen_die_regeln, ampel:STATE.ampel.label, lage:String(j.lage||'').slice(0,600), ausblick:String(j.ausblick||'').slice(0,600), zeit:new Date().toISOString(), mitSuche:!!mitSuche};
+  try{ await fetchOnce('http://localhost:8765/archiv/tage?jahr='+tag.slice(0,4), 6000, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({tage:{[tag]:{ki_partner:STATE.partnerHeute}}})}); }catch(e){}
 }
 
 function saveSnapshot(auto){
@@ -5257,7 +5385,7 @@ function renderDiag(){
     {n:'Yahoo Kurse', ok:idxOk>0, txt:`${idxOk}/${INDICES.length} Idx · ${sekOk}/${SECTORS.length} Sekt${idxStale+sekStale?` · ${idxStale+sekStale}× aus Cache`:''}`, sub:`Stand ${asof}${asofDays!=null?` (~${asofDays} Tg*)`:''}`, warn:priceStale||(idxStale+sekStale>0), ts:STATE.ts.prices},
     {n:'CNN Fear & Greed', ok:STATE.fg!=null, txt:STATE.fg!=null?`Score ${STATE.fg.score} · ${STATE.fg.rating||''}`:'nicht geladen', sub:'', warn:false, ts:STATE.ts.fg},
     {n:'VIX-Termstruktur', ok:STATE.vixTerm!=null, txt:STATE.vixTerm?`${STATE.vixTerm.regime} · VX/VX3M ${STATE.vixTerm.ratio.toFixed(2)}`:'manuell/–', sub:`${STATE.vix3m!=null?`VIX3M ${fmtPx(STATE.vix3m,1)}`:''}${STATE.vix9d!=null?` · VIX9D ${fmtPx(STATE.vix9d,1)}`:''}${STATE.frontStress?' · ⚠ Front-End-Stress':''}`, warn:!!STATE.frontStress, ts:STATE.ts.prices},
-    {n:'KI-Text (Gemini)', ok:!!GEM_KEY, txt:GEM_KEY?('Modell '+MODEL):'kein Key', sub:'nur Briefing & Kalender', warn:false, ts:null}
+    {n:'KI-Text', ok:kiDa(), txt: STATE.ki&&(STATE.ki.gemini||STATE.ki.claude) ? ('über den Server · '+(STATE.ki.standard==='claude'?'Claude '+STATE.ki.claude_modell:'Gemini '+STATE.ki.gemini_modell)) : (GEM_KEY?('Browser-Schlüssel · '+MODEL):'kein Schlüssel'), sub:'Briefing, Kalender, Trading-Partner', warn:!!(GEM_KEY&&!(STATE.ki&&STATE.ki.gemini)), ts:null}
   ];
   let html='<div class="diag-grid">';
   rows.forEach(r=>{ const cls=!r.ok?'d-off':r.warn?'d-warn':'d-ok'; html+=`<div class="diag-row ${cls}"><div class="d-dot"></div><div class="d-main"><div class="d-name">${r.n}</div><div class="d-txt">${r.txt}</div>${r.sub?`<div class="d-sub">${r.sub}</div>`:''}</div><div class="d-age">${r.ts?fmtAgo(r.ts):''}</div></div>`; });
@@ -5452,8 +5580,8 @@ async function runMorning(){
       setStatus('st-proxy','err','öffentlich ('+PROXY_DIAG.public+'×)');
     }
     setProg(94);
-    if(GEM_KEY && AI_AUTO && v && v.label!=='WARTE'){ setStatus('st-ai','warn','lade'); await genBriefing(v).catch(()=>{}); await loadNews().catch(()=>{}); }
-    else if(GEM_KEY && !AI_AUTO){ setStatus('st-ai','idle','aus'); }   // v6.2.8
+    if(kiDa() && AI_AUTO && v && v.label!=='WARTE'){ setStatus('st-ai','warn','lade'); await genBriefing(v).catch(()=>{}); await loadNews().catch(()=>{}); }
+    else if(kiDa() && !AI_AUTO){ setStatus('st-ai','idle','aus'); }   // v6.2.8
     else { setStatus('st-ai','idle'); }
     setProg(100);
     // v6.17 FIX: Stand und Erfolgsmeldung nur, wenn wirklich Kurse kamen. Vorher meldete
@@ -5482,6 +5610,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
   // v6.11: Erst den Stand vom Laufwerk holen, dann anzeigen. Ohne Server bleibt
   // alles wie bisher — die Funktion scheitert still.
   ladeHandelsplanMR();   // v6.19 (W1)
+  kiStatusLaden();       // v6.19 (Phase 5)
   sammlerStatus().then(zeigeSammler);       // v6.19 (N4)
   mrLoadSettings().then(neu=>{
     if(neu){

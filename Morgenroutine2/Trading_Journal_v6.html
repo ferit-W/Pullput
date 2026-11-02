@@ -1548,11 +1548,7 @@ async function getAIAnalysis(model) {
   const resultDiv = document.getElementById('aiAnalysisResult');
   const apiKey = document.getElementById('apiKeyInput').value.trim();
   
-  if (!apiKey) {
-    showToast('API-Schlüssel nicht konfiguriert.', true);
-    resultDiv.innerHTML = `<p class="text-red-600">Bitte geben Sie Ihren Google AI API-Schlüssel in das dafür vorgesehene Feld ein und speichern Sie ihn, um diese Funktion zu nutzen.</p>`;
-    return;
-  }
+  // v6.7: Ohne Browser-Schlüssel geht es über den Server der Morgenroutine (Prüfung unten).
 
   resultDiv.innerHTML = `<div class="flex items-center gap-2 text-gray-600">
     <div class="spinner border-2 border-gray-400 border-t-blue-500 rounded-full w-4 h-4 animate-spin"></div>
@@ -1613,13 +1609,25 @@ async function getAIAnalysis(model) {
 
   const userQuery = `Hier sind meine letzten Trades:\n${tradeDataForAI}`;
   
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+
+  // v6.7 (J8): zuerst über den Server der Morgenroutine (Schlüssel liegt nur auf dem PC, Gemini oder
+  // Claude laut Einstellung). Ohne Server-Schlüssel wie bisher direkt — dann im Kopf statt in der Adresse.
+  try {
+    const rs = await fetch('http://localhost:8765/ki', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({prompt: systemPrompt + '\n\n' + userQuery, maxTokens: 8192})});
+    const js = await rs.json();
+    if (js && js.ok) { resultDiv.innerHTML = marked.parse(String(js.text).replace(/</g,'&lt;').replace(/>/g,'&gt;')) + `<p class="text-xs text-gray-400">KI: ${escapeHtml(js.anbieter)} · ${escapeHtml(js.modell)} (über den lokalen Server)</p>`; return; }
+    if (js && js.fehler && !/Kein .*Schlüssel/.test(js.fehler)) { resultDiv.innerHTML = `<p class="text-red-600">Analyse fehlgeschlagen: ${escapeHtml(js.fehler)}</p>`; return; }
+  } catch (e) { /* Server aus: direkter Weg */ }
+  if (!apiKey) { resultDiv.innerHTML = '<p class="text-red-600">Kein KI-Schlüssel: in der Morgenroutine unter ⚙ hinterlegen.</p>'; return; }
 
   try {
     const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey,
         },
         body: JSON.stringify({
             contents: [{ parts: [{ text: userQuery }] }],
@@ -1647,7 +1655,7 @@ async function getAIAnalysis(model) {
       throw new Error('Kein Text erhalten (Grund: ' + grund + '). Meist Sicherheitsfilter oder Token-Limit.');
     }
     
-    resultDiv.innerHTML = marked.parse(aiText);
+    resultDiv.innerHTML = marked.parse(String(aiText).replace(/</g,'&lt;').replace(/>/g,'&gt;'));   // v6.7 (J8): kein HTML aus der KI-Antwort
 
   } catch (error) {
     console.error('AI Analysis Error:', error);

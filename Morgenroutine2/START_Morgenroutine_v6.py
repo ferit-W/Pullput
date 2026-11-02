@@ -247,6 +247,14 @@ _BREITE_CACHE = {"ts": 0, "daten": None}
 _SCAN_CACHE = {"ts": 0, "daten": None}
 
 
+def _ki_modul():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("ki_anbindung_mod", os.path.join(DIRECTORY, "ki_anbindung.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def _ms_modul():
     """marktsammler.py frisch laden (Aenderungen am Ordner greifen ohne Neustart)."""
     import importlib.util
@@ -368,6 +376,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self._send_json({"ok": False, "grund": "iv: %s" % e})
         if self.path.startswith("/config/marktsammler"):
             return self._send_json(_ms_modul().status())
+        if self.path.startswith("/config/ki"):
+            return self._send_json(_ki_modul().status())
         if self.path.startswith("/scan"):
             return self._scan()
         if self.path.startswith("/gapdetail"):
@@ -424,6 +434,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._archiv_werkzeug("befuellen")
         if self.path.startswith("/config/marktsammler"):
             return self._ms_setzen()
+        if self.path.startswith("/config/ki"):
+            return self._ki_setzen()
+        if self.path == "/ki" or self.path.startswith("/ki?"):
+            return self._ki_frage()
         if self.path.startswith("/config/datadir"):
             return self._set_datadir()
         self.send_error(404, "unknown POST endpoint")
@@ -951,6 +965,35 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._send_json(_ms_modul().kerzen_fuer(sym, n))
         except Exception as e:
             return self._send_json({"ok": False, "grund": "kerzen: %s" % e})
+
+    def _json_body(self):
+        length = int(self.headers.get("Content-Length") or 0)
+        if length > MAX_SAVE_BYTES:
+            raise ValueError("zu gross")
+        return json.loads(self.rfile.read(length).decode("utf-8")) if length else {}
+
+    def _ki_setzen(self):
+        """v6.19 (Phase 5): KI-Schluessel in ki_schluessel.json (nur auf diesem PC). Antwort ohne Schluessel."""
+        try:
+            return self._send_json(_ki_modul().speichere(self._json_body()))
+        except Exception as e:
+            return self._send_json({"ok": False, "fehler": str(e)})
+
+    def _ki_frage(self):
+        """v6.19 (Phase 5): Anfrage an Gemini oder Claude ueber den Server - der Schluessel
+        verlaesst den PC nur im Kopf der Anfrage an den Anbieter, nie in einer Adresse."""
+        try:
+            b = self._json_body()
+            prompt = b.get("prompt") or ""
+            if not prompt or len(prompt) > 200000:
+                return self._send_json({"ok": False, "fehler": "prompt fehlt oder zu lang"}, 400)
+            mod = _ki_modul()
+            try:
+                return self._send_json(mod.frage(prompt, b.get("anbieter"), bool(b.get("suche")), b.get("maxTokens") or 8192))
+            except mod.KIFehler as e:
+                return self._send_json({"ok": False, "fehler": str(e)})
+        except Exception as e:
+            return self._send_json({"ok": False, "fehler": "ki: %s" % e}, 500)
 
     def _ms_setzen(self):
         try:

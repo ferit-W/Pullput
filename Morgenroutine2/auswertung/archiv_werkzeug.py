@@ -227,6 +227,26 @@ def bericht(ordner=None):
             s = _stat([e.get("spy_fwd20") for e in pw])
             L += ["", "**Hinweise im Live-Betrieb:** VOREINSTIEG an %d Tagen · Panik-Wende an %d Tagen%s" % (
                 len(ve), len(pw), (", danach im Schnitt %s nach 20 Tagen" % _pct(s["mittel"])) if s else "")]
+            # Phase 5 (K0, Regel 4): Wie gut lag der KI-Trading-Partner?
+            kp = [(d, e) for d, e in g.items() if isinstance(e.get("ki_partner"), dict) and e.get("spy_fwd20") is not None]
+            L += ["", "**KI-Trading-Partner — Neigung gegen den Verlauf** (S&P 500, 20 Tage ab Folgetag):"]
+            if not kp:
+                L += ["- noch keine bewertbaren Tage (eine Einschätzung braucht 21 Handelstage bis zur Bewertung)"]
+            else:
+                for n in ("eher long", "neutral", "eher defensiv", "eher short"):
+                    sub = [e for _, e in kp if e["ki_partner"].get("neigung") == n]
+                    if sub:
+                        st = _stat([e.get("spy_fwd20") for e in sub])
+                        L.append("- %s: %d Tage · danach %s · positiv in %.0f %%" % (n, len(sub), _pct(st["mittel"]), st["positiv"] * 100))
+                gegen = [e for _, e in kp if e["ki_partner"].get("gegenRegel")]
+                if gegen:
+                    st = _stat([e.get("spy_fwd20") for e in gegen])
+                    L.append("- Tage mit Widerspruch zur Ampel: %d · danach %s · positiv in %.0f %%" % (len(gegen), _pct(st["mittel"]), st["positiv"] * 100))
+                treffer = sum(1 for _, e in kp if (e["ki_partner"].get("neigung") == "eher long" and e["spy_fwd20"] > 0)
+                              or (e["ki_partner"].get("neigung") in ("eher defensiv", "eher short") and e["spy_fwd20"] < 0))
+                gerichtet = sum(1 for _, e in kp if e["ki_partner"].get("neigung") != "neutral")
+                if gerichtet:
+                    L.append("- Trefferquote der gerichteten Neigungen: %d von %d (%.0f %%). Erst ab rund 50 Tagen aussagekräftig." % (treffer, gerichtet, treffer / gerichtet * 100))
             versionen = sorted({str(e.get("version")) for e in g.values() if e.get("version")}) or ["–"]
             L += ["", "Regelversionen im Zeitraum: " + ", ".join(versionen)]
         L.append("")
@@ -238,12 +258,13 @@ def bericht(ordner=None):
         f.write(md)
 
     felder = ["datum", "quelle", "version", "label", "label_alt", "p3", "p6", "vix", "term", "breite200", "rsBeat",
-              "panik", "fg", "kreditHY", "kreditHY63", "aktien_p3_anteil", "aktien_nhnl10", "trend", "risiko",
+              "panik", "fg", "kreditHY", "kreditHY63", "aktien_p3_anteil", "aktien_nhnl10", "trend", "risiko", "ki_neigung",
               "spy_fwd5", "spy_fwd20", "spy_fwd60", "spy_maxdd20"]
     with open(os.path.join(ordner, "archiv_ki_paket.csv"), "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, delimiter=";")
         w.writerow(felder)
         for d, e in tage.items():
+            e = dict(e, ki_neigung=(e.get("ki_partner") or {}).get("neigung"))
             w.writerow([d] + [("" if e.get(k) is None else e.get(k)) for k in felder[1:]])
     frage = """Du bekommst die Datei archiv_ki_paket.csv (Semikolon, ein Handelstag je Zeile).
 Sie enthält die Ampel meiner Morgenroutine (Spalte label) mit allen Eingangswerten und die
