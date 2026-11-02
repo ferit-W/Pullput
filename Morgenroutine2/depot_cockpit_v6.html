@@ -36,16 +36,16 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
 </head>
 <body>
 <header style="background:var(--bg2);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)">
-  <div style="max-width:1480px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;justify-content:space-between">
+  <div style="max-width:none;margin:0 auto;padding:11px 20px;display:flex;align-items:center;justify-content:space-between">
     <div style="display:flex;align-items:center;gap:10px">
       <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--vio));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.88rem">Σ</div>
       <div><div style="font-size:.92rem;font-weight:700;line-height:1.2">Depot-Cockpit</div><div class="mono" style="font-size:.57rem;color:var(--t3)">v6.3 · Server-Lesen · Live-Lesen · Steuerjahr · Portfolio-DD · Pro-Trade-FX</div></div>
     </div>
     <div class="mono" style="font-size:.6rem;color:var(--t3)" id="dataAge"></div>
   </div>
-  <nav style="max-width:1480px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto" id="nav"></nav>
+  <nav style="max-width:none;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto" id="nav"></nav>
 </header>
-<main style="max-width:1480px;margin:0 auto;padding:18px 20px" id="main"></main>
+<main style="max-width:none;margin:0 auto;padding:18px 20px" id="main"></main>
 <div class="toast-c" id="toasts"></div>
 
 <script>
