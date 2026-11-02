@@ -58,13 +58,27 @@ Wo es Testergebnisse gibt, steht die ehrliche Bilanz dabei, also Trefferquote, F
 
 Bisher wurde nur die *Ampel* getestet, also das Marktumfeld, und das am S&P 500. Ob dein eigentlicher Einstieg in Einzelaktien einen Vorteil hat, ist noch offen. Die Daten der 489 S&P-500-Aktien von 2016 bis 2026 liegen dafür bereit.
 
-- **S1 Setup-Test:** Einstieg im Rücksetzer einer Aktie in P3 an EMA20/50 nach mindestens 3 Korrekturkerzen, mit Stopp nach ATR. Wie oft und wie viel R pro Trade, getrennt nach Ampelzustand, Sektorphase und Voreinstieg? Damit bekommt T3 (Setup-Scanner) belegte Regeln.
+- **S1 Setup-Test mit deinen drei Kriterien:** nicht „alle P3-Aktien“, sondern begrenzte Plätze (höchstens 10) und nur Kandidaten, die alle drei Kriterien erfüllen:
+  1. Allzeithoch bzw. 52-Wochen-Hoch
+  2. Platz bis zum Widerstand größer als der Stopp-Abstand, also ein ausreichendes Verhältnis von Ziel zu Risiko
+  3. relative Stärke gegen den eigenen Sektor positiv
+  Gemessen wird schrittweise, was jedes Kriterium beiträgt. Frühere Tests mit RSI und Momentum als Vorfilter brachten nichts. Ein ehrliches „bringt nichts“ ist deshalb ein mögliches und brauchbares Ergebnis.
 - **S2 Ausstieg:** feste Ziele (CRV) gegen Nachziehen des Stopps (EMA20, Swing-Tief, ATR-Trailing). Welche Variante passt zum Trendhandel?
 - **S3 Positionsgröße und Gesamtrisiko:** 0,25 % je Trade und maximal 10 Positionen. Welche Verlustserien und welcher Drawdown sind damit realistisch?
 
 - **S4 52-Wochen-Ausbruch (Lüddemann-Trendhandel):** Einstieg, wenn eine Aktie ein neues 52-Wochen- oder Allzeithoch macht. Die Theorie dahinter: Über dem 52-Wochen-Hoch liegt niemand mehr im Minus, deshalb gibt es weniger Verkaufsdruck. Getestet wird gegen den Rücksetzer-Einstieg aus S1, getrennt nach Ampelzustand und Marktbreite. Die Forschung zur Nähe am 52-Wochen-Hoch (George & Hwang 2004) stützt den Gedanken für Einzelaktien.
 
 Alle vier gelten mit dem Vorbehalt der Survivorship-Verzerrung (nur heutige Mitglieder) und werden nach dem Grundsatz oben getestet.
+
+## Neu aufgenommen: Lücken auf dem Weg zur bestmöglichen Morgenroutine
+
+- **N1 Gesamtrisiko über alle Werkzeuge:** Trend-Trades und Stillhalter zusammen, dazu Konzentration nach Sektor und Gleichlauf der Positionen. Die Frage lautet: Wie viel steht heute insgesamt auf dem Spiel, und hängt alles am selben Thema?
+- **N2 Platz-Check bis zum Widerstand:** Das letzte markante Hoch wird automatisch erkannt. Der Platz bis dorthin wird gegen den Stopp-Abstand gerechnet, in Setup-Scanner, Watchlist und „Trade vorbereiten“.
+- **N3 Quartalszahlen für Positionen und Kandidaten:** Termin je Titel aus Yahoo. Warnung, wenn Zahlen innerhalb der Haltedauer oder vor dem nächsten Handelstag liegen.
+- **N4 Zweite Datenquelle:** Die Yahoo-Schnittstelle ist inoffiziell und kann jederzeit ausfallen oder sich ändern. Recherche und Einbau eines Ersatzes, mindestens für Indizes und VIX.
+- **N5 Deutscher Markt gleichwertig:** Breite, neue Hochs und Tiefs sowie Phasen auch für DAX, MDAX und SDAX, nicht nur für die USA.
+- **N6 Handy-App:** Die Morgenroutine wird als App auf dem Samsung installierbar, über „Zum Startbildschirm hinzufügen“ in Chrome (PWA), mit eigener, schlanker Handy-Ansicht. Dazu optional eine tägliche Push-Nachricht mit Ampel, Neigung des Trading-Partners, Terminen und Positionen mit Handlungsbedarf. Die funktioniert auch unterwegs, ohne den Server ins Internet zu öffnen. Die Variante wählst du.
+- **N7 Recherche-Punkte:** gute, freie Quellen für historische Earnings-Termine (damit N3 auch im Backtest nutzbar wird) und für eine Datenquelle ohne Survivorship-Verzerrung.
 
 ## Phase 3 · Archiv als Grundlage für die spätere Auswertung
 
@@ -124,7 +138,7 @@ Alle vier gelten mit dem Vorbehalt der Survivorship-Verzerrung (nur heutige Mitg
 Diese Punkte setze ich erst um, wenn du dich entschieden hast:
 
 1. ~~KI-Anbieter~~ **entschieden:** Gemini und Claude wählbar, Gemini als Standard.
-2. **U6 Handy-Ansicht:** Dafür müsste der Server ins Heimnetz geöffnet werden, mit Passwortschutz. Ohne ausdrückliches Ja bleibt er nur auf dem eigenen Rechner erreichbar.
+2. **N6 Handy-App:** Welche Variante? (a) App im Heim-WLAN, dafür wird der Server mit Passwort fürs Heimnetz geöffnet, (b) tägliche Push-Nachricht aufs Handy, geht auch unterwegs, (c) beides.
 3. **W4 Broker-Abgleich:** entschieden: **später**. Dann mit eigener Liste „Altbestand, nicht abgleichen“.
 4. ~~Stillhalter-Journal~~ **erledigt:** Die Datei liegt im Repository und ist geprüft (`PRUEFBERICHT_Stillhalter_v6.2.md`).
 5. **DAX-Optionen:** Handelst du ODAX (Multiplikator 5)? Davon hängt SH7 ab.
