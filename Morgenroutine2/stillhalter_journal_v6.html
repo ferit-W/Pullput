@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stillhalter Journal v6.2</title>
+<title>Stillhalter Journal v6.3</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -53,7 +53,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
   <div style="max-width:1480px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;justify-content:space-between">
     <div style="display:flex;align-items:center;gap:10px">
       <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--vio));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.88rem">Θ</div>
-      <div><div style="font-size:.92rem;font-weight:700;line-height:1.2">Stillhalter Journal</div><div class="mono" style="font-size:.57rem;color:var(--t3)">v6.1 · IB/CapTrader · Risk Engine</div><!-- v6.1: Woher der sichtbare Datenstand stammt. Bei zwei Rechnern am geteilten Ordner die wichtigste Angabe. --><span id="sync-badge" class="mono" title="Datenstand wird geprüft …" style="display:inline-block;margin-top:3px;padding:1px 8px;border-radius:9999px;font-size:.56rem;font-weight:700;background:rgba(255,255,255,.06);color:var(--t3)">Datenstand …</span></div>
+      <div><div style="font-size:.92rem;font-weight:700;line-height:1.2">Stillhalter Journal</div><div class="mono" style="font-size:.57rem;color:var(--t3)">v6.3 · IB/CapTrader · Risk Engine</div><!-- v6.1: Woher der sichtbare Datenstand stammt. Bei zwei Rechnern am geteilten Ordner die wichtigste Angabe. --><span id="sync-badge" class="mono" title="Datenstand wird geprüft …" style="display:inline-block;margin-top:3px;padding:1px 8px;border-radius:9999px;font-size:.56rem;font-weight:700;background:rgba(255,255,255,.06);color:var(--t3)">Datenstand …</span></div>
     </div>
     <div style="display:flex;align-items:center;gap:5px">
       <button class="btn btn-g btn-s" onclick="openSettings()">⚙</button>
@@ -157,7 +157,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
 // ═══════════════════════════════════════════════════════
 // DATA LAYER
 // ═══════════════════════════════════════════════════════
-const TK='soj4_t',SK='soj4_s',GK='soj4_g',MUL=100;
+const TK='soj4_t',SK='soj4_s',GK='soj4_g',MUL=100; // Hinweis (SH7): 100 gilt für US- und Eurex-Aktienoptionen. DAX-Optionen (ODAX, Multiplikator 5) werden nicht gehandelt und würden falsch gerechnet.
 // ── v6.2 (EUR/USD-NOTWERT SICHTBAR GEMACHT) ─────────────────────────────────
 // Bisher steckte 1,085 an fünf Stellen als stiller Standard — Stand vom Bauzeitpunkt.
 // Fehlte der Kurs in den Settings, wurde damit gerechnet, ohne dass man es sah.
@@ -302,6 +302,9 @@ function calcRisk(t){
 // Dollar-Risiko geteilt, was zu wenige Kontrakte ergab.
 // Neu: calcRiskEUR() rechnet über die vorhandene toEUR()-Funktion um, inklusive
 // des am Trade gespeicherten fxClose, falls vorhanden.
+// v6.3 (SH5): Short Strangle/Straddle ohne eingetragenes Max-Risk haben nach oben unbegrenztes
+// Risiko. Sie zählen weiter mit 0 in der Summe, werden aber überall ausdrücklich als „unbegrenzt“ gezeigt.
+const risikoUnbegrenzt=t=>(t.strategy==='STRANGLE'||t.strategy==='STRADDLE')&&!(+t.maxRisk>0);
 function calcRiskEUR(t){ const r=calcRisk(t); return r==null?null:toEUR(r,t.currency||'USD',t.fxClose); }
 
 function tradeRiskPct(t){const a=ls().accountSize;const r=calcRiskEUR(t);if(!a||!r)return null;return(r/a)*100;}
@@ -595,7 +598,13 @@ function optIntegrityChecks(){
     +`Betroffen: ${ohneStrike.slice(0,6).map(lbl).join(', ')}`);
 
   // ── 9. Risiko nicht berechenbar ───────────────────────────────────────────
-  const risikoLos=T.filter(t=>t.status==='OPEN' && !(calcRisk(t)>0));
+  // v6.3 FIX (SH5): Covered Calls (durch Aktien gedeckt) und Aktienbestand sind kein Fehler —
+  // vorher stand die Warnung dauerhaft da und verdeckte echte Befunde. Strangles bekommen eine eigene Meldung.
+  const risikoLos=T.filter(t=>t.status==='OPEN' && !['CC','STOCK'].includes(t.strategy) && !risikoUnbegrenzt(t) && !(calcRisk(t)>0));
+  const unbegr=T.filter(t=>t.status==='OPEN' && risikoUnbegrenzt(t));
+  if(unbegr.length) add('hinweis','Offene Position mit unbegrenztem Risiko',
+    `${unbegr.length} Short Strangle/Straddle. Das Risiko nach oben ist unbegrenzt und steckt NICHT in der Summe des Kontorisikos. `
+    +`Wer eine eigene Obergrenze ansetzt (z. B. Stopp), trägt sie im Feld „Max Risk“ ein. Betroffen: ${unbegr.slice(0,6).map(lbl).join(', ')}`);
   if(risikoLos.length) add('mittel','Offene Position ohne berechenbares Risiko',
     `${risikoLos.length} Positionen liefern kein Risiko. Die Auslastung gegen die Kontogröße wird dadurch zu niedrig ausgewiesen. `
     +`Betroffen: ${risikoLos.slice(0,6).map(lbl).join(', ')}`);
@@ -707,9 +716,9 @@ function rDash(){
 
   // Monthly target
   const tm=new Date().toISOString().substring(0,7);
-  const mp=T.filter(t=>t.entryDate.startsWith(tm)).reduce((s,t)=>s+t.premium*t.contracts*MUL,0);
+  const mp=T.filter(t=>t.entryDate.startsWith(tm)).reduce((s,t)=>s+toEUR(t.premium*t.contracts*MUL,t.currency||'USD',t.fxClose),0); // v6.3 FIX (SH6): Ziel ist in €, also Prämien in € umrechnen
   if(S.monthlyTarget){const pc=Math.min(100,mp/S.monthlyTarget*100);
-    h+=`<div class="card" style="padding:12px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><span style="font-size:.76rem;color:var(--t2)">Prämien-Ziel ${tm}</span><span class="mono" style="font-size:.76rem;${pc>=100?'color:var(--grn)':'color:var(--acc)'}">${f$(Math.round(mp))} / ${f$(S.monthlyTarget)} (${pc.toFixed(0)}%)</span></div><div class="pb"><div class="pb-f" style="width:${pc}%;background:${pc>=100?'var(--grn)':'var(--acc)'}"></div></div></div>`;}
+    h+=`<div class="card" style="padding:12px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><span style="font-size:.76rem;color:var(--t2)">Prämien-Ziel ${tm}</span><span class="mono" style="font-size:.76rem;${pc>=100?'color:var(--grn)':'color:var(--acc)'}">${fE(Math.round(mp))} / ${fE(S.monthlyTarget)} (${pc.toFixed(0)}%)</span></div><div class="pb"><div class="pb-f" style="width:${pc}%;background:${pc>=100?'var(--grn)':'var(--acc)'}"></div></div></div>`;}
 
   if(fxFehlt()) h+=`<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:10px 12px;margin-bottom:14px;font-size:.76rem;color:var(--amb)">⚠ Kein EUR/USD-Kurs in den Settings — Euro-Werte (Risiko, Budget, P&amp;L in €) werden mit dem Notwert ${FX_NOTWERT} gerechnet. <a href="#" onclick="openSettings();return false" style="color:var(--amb);font-weight:700">Kurs eintragen</a></div>`;
   // Risk alert
@@ -1028,8 +1037,8 @@ function saveTrade(e){
 
 function editTrade(id){const t=ld().find(x=>x.id===id);if(!t)return;editId=id;$('main').innerHTML=rForm(t);setTimeout(()=>{updDTE();calcLive();},30);}
 function dupTrade(id){const t=ld().find(x=>x.id===id);if(!t)return;editId=null;$('main').innerHTML=rForm({...t,id:null,entryDate:today(),status:'OPEN',pnl:null,closeDate:null,adjustments:[]});toast('Dupliziert','t-info');}
-function delTrade(id){const t=ld().find(x=>x.id===id);if(!t)return;if(!confirm(`Trade löschen?\n\n${t.underlying} ${t.strategy} · ${t.entryDate}\nPrämie: ${f$(Math.round(t.premium*t.contracts*MUL))}\n${t.pnl!==null?'P&L: '+f$(Math.round(t.pnl)):''}\n\nDiese Aktion kann nicht rückgängig gemacht werden.`))return;sv(ld().filter(t=>t.id!==id));editId=null;toast('Trade gelöscht');go('trades');}
-function reopenTrade(id){const T=ld();const t=T.find(x=>x.id===id);if(!t)return;t.status='OPEN';t.closeDate=null;t.closeType=null;t.closePrice=null;t.closeCommission=0;t.pnl=null;sv(T);toast('Wieder geöffnet','t-info');render();}
+function delTrade(id){const t=ld().find(x=>x.id===id);if(!t)return;if(!confirm(`Trade löschen?\n\n${t.underlying} ${t.strategy} · ${t.entryDate}\nPrämie: ${f$(Math.round(t.premium*t.contracts*MUL))}\n${t.pnl!==null?'P&L: '+f$(Math.round(t.pnl)):''}\n\nDiese Aktion kann nicht rückgängig gemacht werden.`))return;sv(ld().filter(t=>t.id!==id).map(x=>{ /* v6.3 FIX (SH7): Roll-Zeiger der Nachbarn auf die gelöschte Position entfernen */ if(x.rolledTo===id)x.rolledTo=null; if(x.rolledFrom===id)x.rolledFrom=null; return x;}));editId=null;toast('Trade gelöscht');go('trades');}
+function reopenTrade(id){const T=ld();const t=T.find(x=>x.id===id);if(!t)return;t.status='OPEN';t.closeDate=null;t.closeType=null;t.closePrice=null;t.closeCommission=0;t.pnl=null;t.closeNotes='';t.fxClose=null;t.assignmentPrice=null;t.assignmentShares=null; /* v6.3 FIX (SH7): Abschlussdaten vollständig entfernen */sv(T);toast('Wieder geöffnet','t-info');render();}
 
 // ═══ CLOSE TRADE ═══
 // v6.2 FIX: Das Feld "Shares" im Assignment stand fest auf 100 — bei 2 Kontrakten
@@ -1083,7 +1092,7 @@ function rRisk(){
   const S=ls(),O=ld().filter(t=>t.status==='OPEN'),ac=S.accountSize||0,mT=S.maxTR||5,mA=S.maxAR||25;
   const oR=totalRisk(),oD=totalDelta(),rP=ac?(oR/ac*100):0,avail=availBudget();
   if(!ac)return`<div class="empty fu"><div style="font-size:2rem;opacity:.5;margin-bottom:10px">⚠</div><h3>Kontogröße erforderlich</h3><p>Hinterlege deine Kontogröße in den Settings.</p><button class="btn btn-p" onclick="openSettings()">⚙ Settings</button></div>`;
-  const byU={};O.forEach(t=>{if(!byU[t.underlying])byU[t.underlying]={r:0,p:0,d:0,n:0,c:0};byU[t.underlying].r+=calcRiskEUR(t)||0; /* v6.3 FIX (SH4): EUR wie die Kontogröße */byU[t.underlying].p+=t.premium*t.contracts*MUL;byU[t.underlying].d+=(t.delta||0)*t.contracts*MUL;byU[t.underlying].n++;byU[t.underlying].c+=t.contracts;});
+  const byU={};O.forEach(t=>{if(!byU[t.underlying])byU[t.underlying]={r:0,p:0,d:0,n:0,c:0,u:0};if(risikoUnbegrenzt(t))byU[t.underlying].u++;byU[t.underlying].r+=calcRiskEUR(t)||0; /* v6.3 FIX (SH4): EUR wie die Kontogröße */byU[t.underlying].p+=t.premium*t.contracts*MUL;byU[t.underlying].d+=(t.delta||0)*t.contracts*MUL;byU[t.underlying].n++;byU[t.underlying].c+=t.contracts;});
 
   let h=`<div class="fu"><h2 style="font-size:1.05rem;font-weight:700;margin-bottom:14px">⚠ Risiko-Management</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:16px">
@@ -1093,6 +1102,7 @@ function rRisk(){
       <div style="display:flex;justify-content:space-between"><span style="font-size:.8rem;color:var(--t2)">% Konto</span><span class="mono" style="font-size:.85rem;font-weight:700;${rP>mA?'color:var(--red)':'color:var(--grn)'}">${fp(rP)}</span></div>
       <div class="rg" style="margin:3px 0"><div class="rg-f" style="width:${Math.min(100,rP/mA*100)}%;background:${rP>mA?'var(--red)':rP>mA*.7?'var(--amb)':'var(--grn)'}"></div></div>
       <div style="display:flex;justify-content:space-between;font-size:.57rem;color:var(--t3)"><span>0%</span><span style="color:var(--amb)">${mA}% Limit</span></div>
+      ${O.filter(risikoUnbegrenzt).length?`<div style="display:flex;justify-content:space-between" title="Short Strangle/Straddle ohne eingetragenes Max Risk — nicht in der Summe enthalten"><span style="font-size:.8rem;color:var(--amb)">Zusätzlich unbegrenzt</span><span class="mono" style="font-size:.8rem;color:var(--amb)">${O.filter(risikoUnbegrenzt).length} Pos.</span></div>`:''}
       <div style="display:flex;justify-content:space-between;margin-top:3px"><span style="font-size:.8rem;color:var(--t2)">Verfügbar</span><span class="mono" style="font-size:.8rem;color:var(--grn)">${avail!==null?fE(Math.round(avail)):'–'}</span></div>
     </div></div>
     <div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:8px">Greeks Aggregiert</div><div style="display:grid;gap:7px">
@@ -1112,7 +1122,7 @@ function rRisk(){
   // UL concentration table
   h+=`<div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:10px">Risiko nach Underlying</div><table class="dtb"><thead><tr><th>UL</th><th style="text-align:right">#</th><th style="text-align:right">K</th><th style="text-align:right">Risk</th><th style="text-align:right">%</th><th style="text-align:right">Δ</th><th style="width:70px">Gauge</th></tr></thead><tbody>`;
   Object.entries(byU).sort((a,b)=>b[1].r-a[1].r).forEach(([sym,d])=>{const p=d.r/ac*100,sl=mT*2;
-    h+=`<tr style="cursor:default"><td style="font-weight:600">${sym}</td><td class="mono" style="text-align:right">${d.n}</td><td class="mono" style="text-align:right">${d.c}</td><td class="mono" style="text-align:right;${p>sl?'color:var(--red);font-weight:600':''}">${fE(Math.round(d.r))}</td><td class="mono" style="text-align:right;${p>sl?'color:var(--red)':p>sl*.7?'color:var(--amb)':'color:var(--grn)'}">${fp(p)}</td><td class="mono" style="text-align:right;${d.d>0?'color:var(--grn)':d.d<0?'color:var(--red)':''}">${d.d>0?'+':''}${d.d.toFixed(0)}</td><td><div class="rg"><div class="rg-f" style="width:${Math.min(100,p/sl*100)}%;background:${p>sl?'var(--red)':'var(--grn)'}"></div></div></td></tr>`;
+    h+=`<tr style="cursor:default"><td style="font-weight:600">${sym}</td><td class="mono" style="text-align:right">${d.n}</td><td class="mono" style="text-align:right">${d.c}</td><td class="mono" style="text-align:right;${p>sl?'color:var(--red);font-weight:600':''}">${fE(Math.round(d.r))}${d.u?' <span style="color:var(--amb)" title="enthält Strangle/Straddle mit unbegrenztem Risiko">+ unbegrenzt</span>':''}</td><td class="mono" style="text-align:right;${p>sl?'color:var(--red)':p>sl*.7?'color:var(--amb)':'color:var(--grn)'}">${fp(p)}</td><td class="mono" style="text-align:right;${d.d>0?'color:var(--grn)':d.d<0?'color:var(--red)':''}">${d.d>0?'+':''}${d.d.toFixed(0)}</td><td><div class="rg"><div class="rg-f" style="width:${Math.min(100,p/sl*100)}%;background:${p>sl?'var(--red)':'var(--grn)'}"></div></div></td></tr>`;
   });
   h+='</tbody></table></div></div>';
   setTimeout(calcPS,50);return h;
@@ -1309,7 +1319,7 @@ function createWheelCSP(sym){editId=null;fLegs=[{type:'PUT',side:'SELL',strike:n
 function addStockPosition(sym){editId=null;fLegs=[];tab='new';
   $('nav').innerHTML=TABS.map(x=>`<button class="nav-t ${x.id==='new'?'on':''}" onclick="go('${x.id}')">${x.l}</button>`).join('');
   $('main').innerHTML=rForm({underlying:sym||'',strategy:'STOCK',entryDate:today(),contracts:100,legs:[],premium:0,expiry:today(),underlyingPrice:'',commission:0,delta:'',theta:'',iv:'',ivRank:'',maxRisk:'',tags:['altbestand'],notes:'Aktien-Altbestand'});
-  toast('Kaufkurs im Feld "UL-Preis" eintragen','t-info');}
+  toast('Kaufkurs im Feld "Kaufkurs" eintragen','t-info');}
 
 // ═══ ANALYTICS ═══
 function rStats(){
