@@ -62,7 +62,7 @@ ctx.window = ctx; ctx.self = ctx; ctx.globalThis = ctx;
 vm.createContext(ctx);
 // Top-Level-const/let sind im vm nicht als Eigenschaften sichtbar — deshalb am Ende exportieren.
 const exporte = ['luedePhase','computeAmpel','ampelRegel','voreinstiegPruefung','trendUndRisiko','usBoersenStatus','xetraStatus','etNachBerlin','makroStufe','makroRegion',
-  'korrigiereZeit','wochenTermine','kreditAusCsv','folgeRenditen','datumAus','breitenWendePruefung','isoLokal','mrSyncWert','STATE','SK'];
+  'korrigiereZeit','wochenTermine','kreditAusCsv','folgeRenditen','datumAus','breitenWendePruefung','nachziehVorschlag','isoLokal','mrSyncWert','STATE','SK'];
 vm.runInContext(code + '\n;globalThis.__T={' + exporte.map(n => `${n}:(typeof ${n}!=='undefined'?${n}:undefined)`).join(',') + ',kpi:()=>KPIDAYS};',
   ctx, { filename: 'ferit_morgenroutine_v6.html' });
 const T = ctx.__T;
@@ -241,6 +241,22 @@ abschnitt('Breiten-Wende');
   T.STATE.aktienBreite = { US: { p3: 55, nh: 3, nl: 0.5 } };
   pruefe('ohne Kapitulation → kein Signal', T.breitenWendePruefung().liste[0].ok, false);
   Object.keys(K).forEach(k => delete K[k]);
+}
+
+// ── Positions-Monitor: Stopp nachziehen nach E4/E5 (T2) ───────────────────────
+abschnitt('Stopp nachziehen');
+{
+  const n = 60, times = [], closes = [], highs = [], lows = [];
+  for (let i = 0; i < n; i++) { times.push(Date.UTC(2026, 6, 1 + i, 20) / 1000); const c = 100 + i * 0.5; closes.push(c); highs.push(c + 1); lows.push(c - 1); }
+  const d = { closes, highs, lows, times, price: closes[n - 1] };
+  const ein = T.datumAus(times[20]);
+  const long = T.nachziehVorschlag({ direction: 'Long', slPrice: 105, dateOpened: ein }, d);
+  pruefe('E4 Long = tiefstes Tief der letzten 10 Tage', long.e4, Math.min(...lows.slice(-10)));
+  pruefe('E5 Long = höchster Schluss seit Einstieg − 3 × ATR', +long.e5.toFixed(4), +(closes[n - 1] - 3 * long.atr).toFixed(4));
+  const schonHoch = T.nachziehVorschlag({ direction: 'Long', slPrice: 128, dateOpened: ein }, d);
+  pruefe('kein Vorschlag, wenn er den Stopp nicht verbessert', [schonHoch.e4, schonHoch.e5], [null, null]);
+  const kurz = T.nachziehVorschlag({ direction: 'Short', slPrice: 140, dateOpened: ein }, d);
+  pruefe('Short: Vorschlag liegt über dem Kurs (hier keiner, Kurs steigt)', kurz.e4 === null || kurz.e4 > d.price, true);
 }
 
 // ── Ergebnis ─────────────────────────────────────────────────────────────────

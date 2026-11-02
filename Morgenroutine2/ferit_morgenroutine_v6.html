@@ -794,7 +794,9 @@ footer strong{color:var(--ink2)}
       <span style="margin-left:auto"><button class="cp-btn" onclick="ladeRegelcheck(true)" title="REGELCHECK erneut ausführen">↻ prüfen</button></span></div>
     <div class="sec-info" id="info-start" style="margin:0;border:none;border-bottom:1px solid var(--rule);border-radius:0"><b>Heute</b>: Börsenstatus USA und XETRA (Feiertage werden gerechnet, nicht gepflegt), Handelszeiten in deutscher Zeit, Termine des Tages aus FOMC-Liste, eigenen Terminen, Watchlist-Earnings und — falls geladen — den marktbewegenden Einträgen des KI-Kalenders. <b>Regelcheck</b>: dieselbe Prüfung wie <span class="mono">REGELCHECK.py</span> — Stopp vorhanden und auf der richtigen Seite, Risiko je Position, Slots, Phase gegen Richtung, Restlaufzeit der Optionen. Geprüft wird nur, was in den Journaldateien steht; der Abgleich mit CapTrader bleibt Handarbeit.</div>
     <div id="start-heute" class="ty-line">wird berechnet …</div>
-    <div id="start-regel" class="ty-line" style="border-bottom:none">Regelcheck wird geladen …</div>
+    <div id="start-regel" class="ty-line">Regelcheck wird geladen …</div>
+    <!-- v6.19 (T2): offene Positionen aus dem Journal -->
+    <div id="start-pos" class="ty-line" style="border-bottom:none"><b>Positionen:</b> werden nach dem Start geladen.</div>
   </section>
 
   <!-- ════ 02 MARKT ════ -->
@@ -3867,6 +3869,11 @@ const INFO_TEXTE = {
     warum:'Die Morgenroutine schreibt bei jedem Lauf den Tag in daten/archiv_JJJJ.json: Zustand, Regelversion, Gründe, Konsequenz, alle Index- und Sektorwerte, Sentiment-Rohwerte. Später werden automatisch die Folgerenditen des S&P 500 nachgetragen, genau wie in der Rückrechnung gerechnet. Mit den Rohwerten lassen sich auch künftige Regeln rückwirkend auf dieselben Tage rechnen.',
     lesen:'Datum wählen → „anzeigen“ zeigt den Tag und was danach geschah; ◀ ▶ blättern. „Bericht erstellen“ fasst alle Tage je Ampelzustand zusammen und listet die Lücken (grün vor Einbruch, rot vor Erholung); dazu entstehen archiv_ki_paket.csv und archiv_ki_frage.txt für eine KI. „Rückrechnung einspielen“ trägt einmalig die Jahre 2007–2026 als „nachgerechnet“ ein, Live-Tage bleiben unberührt.',
     bsp:'Aus der Rückrechnung: Am 20.02.2020 stand die Ampel auf GO — VIX 15,6, 9 Sektoren über EMA200, Contango. In den 20 Tagen danach fiel der S&P 500 um 31 %. Solche Tage zeigt der Bericht als „Lücke 1“: Mit diesen Eingangswerten war der Einbruch nicht zu sehen.'},
+  positionen: {t:'Positions-Monitor (T2)',
+    ziel:'Jeden Morgen auf einen Blick: Wie stehen deine offenen Trades, und wo ist etwas zu tun?',
+    warum:'Die offenen Trades kommen aus dem Journal (Laufwerk, sonst Browser). Je Position: Kurs, Ergebnis in R, Abstand zum Stopp in R und in ATR, Phase des Titels heute. Der Vorschlag zum Nachziehen folgt den beiden Ausstiegen, die im Systemtest vorn lagen: 10-Tage-Tief (E4) und höchster Schluss seit Einstieg minus 3 × ATR (E5). Feste Ziele bei CRV 2 oder 3 waren 2022–2026 negativ, EMA20-Ausstieg ebenso.',
+    lesen:'Gelber Rand = Hinweis: nah am Stopp (unter 0,3 R), Phase gegen die Richtung (Long in P5/P6, Short in P2/P3) oder Quartalszahlen in den nächsten 7 Tagen. „Stopp nachziehen möglich“ erscheint nur, wenn der Vorschlag über dem aktuellen Stopp (Short: darunter) und unter dem Kurs liegt. Die Seite ändert nichts im Journal.',
+    bsp:'Typischer Fall: AAPL Long, Einstieg 180, Stopp 172, Kurs 195 → +1,9 R, 2,9 R über dem Stopp. Das 10-Tage-Tief liegt bei 186 → „Stopp nachziehen möglich: 186,00 (10-Tage-Tief)“.'},
   aktienbreite: {t:'Aktien-Breite und Breiten-Wende (T1, B4)',
     ziel:'Wie viele Einzelaktien tragen den Markt? Die Sektor-Breite zählt 11 ETFs, hier zählen rund 500 S&P-500-Aktien und die DAX-Werte.',
     warum:'In der Rückrechnung (S&P 500, 2017–2026) wirkte extreme Breitenschwäche konträr: Netto-Hochs im 10-Tage-Schnitt unter −5 → danach im Schnitt +5,6 % in 20 Tagen (83 % positiv); unter 20 % der Aktien in P3 → +4,6 % (78 % positiv). Als Ampel-Regel hat keine Breitenregel bestanden (B1–B3), deshalb ändert sie die Ampel nicht. Die Breiten-Wende (B4: erst Kapitulation, dann halbierte neue Tiefs und drehende Breite) war knapp nicht bestanden und ist ein Hinweis.',
@@ -4756,6 +4763,86 @@ async function archivBefuellen(){
   }catch(e){ out.innerHTML='<span style="color:var(--gold)">Server nicht erreichbar.</span>'; }
 }
 
+// ═══ v6.19 (T2): POSITIONS-MONITOR ═══════════════════════════════════════════
+// Offene Trades aus dem Journal mit aktuellem Stand. Der Hinweis „Stopp nachziehen
+// möglich“ folgt den beiden Ausstiegsregeln, die im Systemtest (Phase 2b) vorn lagen:
+//   E4 = tiefstes Tief der letzten 10 Tage (Short: höchstes Hoch)
+//   E5 = höchster Schluss seit Einstieg − 3 × ATR14 (Short: tiefster Schluss + 3 × ATR)
+// Der Hinweis erscheint nur, wenn der Vorschlag den Stopp VERBESSERT. Entscheidung und
+// Order bleiben bei dir — die Seite ändert nichts im Journal.
+function nachziehVorschlag(t, d){
+  const n=d.closes.length; if(n<15) return null;
+  const long = t.direction!=='Short';
+  const stop = +t.slPrice;
+  const a = atr(d.highs, d.lows, d.closes, 14);
+  const ein = String(t.dateOpened||'').slice(0,10);
+  const seit = d.times.map((x,i)=>({i,dt:datumAus(x)})).filter(x=>x.dt && x.dt>=ein).map(x=>x.i);
+  const ab = seit.length ? seit[0] : Math.max(0,n-10);
+  const lows10 = d.lows.slice(-10).filter(isFinite), highs10 = d.highs.slice(-10).filter(isFinite);
+  const e4 = long ? Math.min(...lows10) : Math.max(...highs10);
+  const cl = d.closes.slice(ab).filter(isFinite);
+  const e5 = (a!=null && cl.length) ? (long ? Math.max(...cl)-3*a : Math.min(...cl)+3*a) : null;
+  const besser = x => x!=null && isFinite(x) && (long ? x>stop : x<stop) && (long ? x<d.price : x>d.price);
+  return { e4: besser(e4)?e4:null, e5: besser(e5)?e5:null, atr:a };
+}
+function earningsBald(sym){
+  const t = STATE.earnings && STATE.earnings[sym]; if(!t) return null;
+  const tage = (t*1000 - Date.now())/864e5;
+  return (tage > -0.5 && tage <= 7) ? {datum:new Date(t*1000), tage} : null;
+}
+async function ladeJournalOffen(){
+  let trades=null;
+  try{ const r=await fetchOnce('http://localhost:8765/data/load?name=trading_journal', 6000); if(r.ok){ const j=await r.json(); trades=j&&j.trades; } }catch(e){}
+  if(!Array.isArray(trades)){ try{ trades=JSON.parse(localStorage.getItem('localTrades_v2')||'[]'); }catch(e){ trades=[]; } }
+  return (trades||[]).filter(t=>t && t.status==='Open' && !['Langfrist','Altbestand'].includes(t.category||'Trading'));
+}
+async function positionsMonitor(){
+  const el=$('start-pos'); if(!el) return;
+  const offen = await ladeJournalOffen();
+  if(!offen.length){ el.innerHTML='<b>Positionen:</b> keine offenen Trading-Positionen im Journal.'; return; }
+  el.innerHTML='<b>Positionen:</b> '+offen.length+' offen, Kurse werden geladen …';
+  const zeilen=[]; let warn=0;
+  await mapLimit(offen.slice(0,25), localProxyAlive?4:2, async t=>{
+    const sym=String(t.productName||'').trim().toUpperCase();
+    const z={t, sym};
+    if(t.instrumentType==='future'){ z.info='Future — Kurs hier nicht abgefragt'; zeilen.push(z); return; }
+    try{
+      const d=await fetchYahoo(sym,'1y');
+      const long=t.direction!=='Short', ein=+t.entryPrice, stop=+t.slPrice, rps=Math.abs(ein-stop);
+      z.kurs=d.price; z.r = rps>0 ? (long? d.price-ein : ein-d.price)/rps : null;
+      z.abstandR = rps>0 ? (long? d.price-stop : stop-d.price)/rps : null;
+      const e20=ema(d.closes,20), e50=ema(d.closes,50), e200=ema(d.closes,200);
+      z.phase = luedePhase(d.price,e20,e50,e200).code;
+      z.nz = nachziehVorschlag(t, d);
+      z.abstandATR = (z.nz&&z.nz.atr) ? (long? d.price-stop : stop-d.price)/z.nz.atr : null;
+      z.zahlen = earningsBald(sym);
+      const phaseGegen = long ? (z.phase==='P6'||z.phase==='P5') : (z.phase==='P3'||z.phase==='P2');
+      z.warn = (z.abstandR!=null && z.abstandR<0.3) || !!z.zahlen || phaseGegen;
+      z.phaseGegen = phaseGegen;
+      if(z.warn) warn++;
+    }catch(e){ z.info='Kurs nicht gefunden — Symbol im Journal für Yahoo prüfen (z. B. SAP.DE)'; }
+    zeilen.push(z);
+  });
+  zeilen.sort((a,b)=>(b.warn?1:0)-(a.warn?1:0) || String(a.sym).localeCompare(String(b.sym)));
+  const f=(x,n=2)=>x==null||!isFinite(x)?'–':(+x).toFixed(n).replace('.',',');
+  const html = zeilen.map(z=>{
+    const t=z.t, long=t.direction!=='Short';
+    if(z.info) return `<div>· <b>${esc(z.sym)}</b> ${long?'Long':'Short'} — <span style="color:var(--steel)">${esc(z.info)}</span></div>`;
+    const teile=[`Kurs ${f(z.kurs)}`, `${z.r>=0?'+':''}${f(z.r,1)} R`, `Stopp ${f(+t.slPrice)} (${f(z.abstandR,1)} R / ${f(z.abstandATR,1)} ATR entfernt)`, `Phase heute ${z.phase}`];
+    const hinweise=[];
+    if(z.abstandR!=null && z.abstandR<0.3) hinweise.push('<b style="color:var(--red)">nah am Stopp</b>');
+    if(z.phaseGegen) hinweise.push(`<b style="color:var(--red)">Phase ${z.phase} gegen die Richtung</b>`);
+    if(z.zahlen) hinweise.push(`<b style="color:var(--amber)">📅 Zahlen ${z.zahlen.datum.toLocaleDateString('de-DE')}</b>`);
+    if(z.nz && (z.nz.e4!=null || z.nz.e5!=null)){
+      const v=[]; if(z.nz.e4!=null) v.push(`${f(z.nz.e4)} (10-Tage-${long?'Tief':'Hoch'})`); if(z.nz.e5!=null) v.push(`${f(z.nz.e5)} (3 × ATR)`);
+      hinweise.push(`<span style="color:var(--green)">Stopp nachziehen möglich: ${v.join(' oder ')}</span>`);
+    }
+    return `<div style="${z.warn?'border-left:3px solid var(--amber);padding-left:6px':''}">· <b>${esc(z.sym)}</b> ${long?'Long':'Short'} — ${teile.join(' · ')}${hinweise.length?'<br>&nbsp;&nbsp;'+hinweise.join(' · '):''}</div>`;
+  }).join('');
+  el.innerHTML = `<b>Positionen</b> (${offen.length} offen${warn?`, <span style="color:var(--amber)">${warn} mit Hinweis</span>`:''}) <span class="info-i" onclick="infoPop('positionen')" title="Positions-Monitor">i</span>`
+    + (offen.length>25?' <span style="color:var(--steel)">— die ersten 25</span>':'') + `<div style="margin-top:4px">${html}</div>`;
+}
+
 function saveSnapshot(auto){
   if(!STATE.ampel || STATE.ampel.label==='WARTE'){
     if(!auto) toast('Erst Morgenroutine laufen lassen','err');
@@ -5020,6 +5107,7 @@ async function runMorning(){
     const kursOk = (STATE.indices||[]).some(i=>!i.err && !i.stale);
     if(kursOk) setDatenStand(Date.now());       // v6.3
     try{ renderHeute(); ladeRegelcheck(false); }catch(e){}   // v6.17
+    try{ positionsMonitor(); }catch(e){}                      // v6.19 (T2)
     // v6.10: Tages-Snapshot automatisch anlegen — legt nichts an, wenn für heute
     // schon einer existiert. Nach dem vollständigen Lauf, damit alle Werte drin sind.
     try{ if(saveSnapshot(true)) toast('Tages-Snapshot angelegt','ok'); }catch(e){ console.warn('Snapshot',e); }
