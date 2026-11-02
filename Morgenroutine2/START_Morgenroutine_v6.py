@@ -319,6 +319,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._regelcheck()
         if self.path.startswith("/archiv/bericht"):
             return self._archiv_werkzeug("bericht")
+        # v6.19 (N1): Sektorzuordnung fuer Cockpit und Scanner
+        if self.path == "/sektoren":
+            try:
+                with open(os.path.join(DIRECTORY, "sektoren.json"), "r", encoding="utf-8") as f:
+                    return self._send_json({"ok": True, "sektor": json.load(f).get("sektor", {})})
+            except Exception as e:
+                return self._send_json({"ok": False, "fehler": "sektoren.json: %s" % e})
         # v6.19 (W1): Handelsplan als Datei - alle Werkzeuge lesen dieselben Regeln
         if self.path == "/handelsplan" or self.path.startswith("/handelsplan?"):
             fp = os.path.join(DIRECTORY, "handelsplan.json")

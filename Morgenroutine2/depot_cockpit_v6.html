@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Depot-Cockpit v6.2</title>
+<title>Depot-Cockpit v6.3</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -39,7 +39,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
   <div style="max-width:1480px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;justify-content:space-between">
     <div style="display:flex;align-items:center;gap:10px">
       <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--vio));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.88rem">Σ</div>
-      <div><div style="font-size:.92rem;font-weight:700;line-height:1.2">Depot-Cockpit</div><div class="mono" style="font-size:.57rem;color:var(--t3)">v6.2 · Server-Lesen · Live-Lesen · Steuerjahr · Portfolio-DD · Pro-Trade-FX</div></div>
+      <div><div style="font-size:.92rem;font-weight:700;line-height:1.2">Depot-Cockpit</div><div class="mono" style="font-size:.57rem;color:var(--t3)">v6.3 · Server-Lesen · Live-Lesen · Steuerjahr · Portfolio-DD · Pro-Trade-FX</div></div>
     </div>
     <div class="mono" style="font-size:.6rem;color:var(--t3)" id="dataAge"></div>
   </div>
@@ -225,18 +225,123 @@ function aggregate(){
 // ════════════════════════════════════════════════════════════════
 // NAVIGATION
 // ════════════════════════════════════════════════════════════════
-const TABS=[{id:'depot',l:'Σ Depot-Gesamt'},{id:'underlying',l:'Pro Underlying'},{id:'tax',l:'Steuer-Töpfe'},{id:'dir',l:'Richtung'},{id:'sh',l:'Stillhalter'}];
+const TABS=[{id:'depot',l:'Σ Depot-Gesamt'},{id:'risiko',l:'⚖ Gesamtrisiko'},{id:'underlying',l:'Pro Underlying'},{id:'tax',l:'Steuer-Töpfe'},{id:'dir',l:'Richtung'},{id:'sh',l:'Stillhalter'}];
 let tab='depot';
 function go(t){tab=t;$('nav').innerHTML=TABS.map(x=>`<button class="nav-t ${x.id===t?'on':''}" onclick="go('${x.id}')">${x.l}</button>`).join('');render();}
 function render(){
   const m=$('main');
   if(tab==='depot'){m.innerHTML=rDepot();setTimeout(initChart,60);}
+  else if(tab==='risiko')m.innerHTML=rRisiko();   // v6.2 (N1)
   else if(tab==='underlying')m.innerHTML=rUnderlying();
   else if(tab==='tax')m.innerHTML=rTax();
   else if(tab==='dir')m.innerHTML=rFrame('Richtungs-Journal (v6.0)',J_DIR);
   else if(tab==='sh')m.innerHTML=rFrame('Stillhalter-Journal (v6.0)',J_SH);
   updDataAge();
 }
+// ═══ v6.2 (N1): GESAMTRISIKO ÜBER ALLE WERKZEUGE + SONSTIGE BESTÄNDE ══════════
+// Frage: Wie viel steht heute insgesamt auf dem Spiel, und hängt alles am selben Thema?
+// Trading-Risiko = offenes Risiko aus Richtungs- und Stillhalter-Journal (wie oben).
+// Kapitalbindung = gebundenes Kapital aller offenen Positionen + Sonstige Bestände
+// (z. B. Gold- und Silber-ETFs bei CapTrader, die in keinem Journal stehen).
+// Sonstige Bestände zählen bei Kapital und Konzentration, NICHT beim Trading-Risiko.
+let SONSTIGE=[]; let SEKTOREN={};
+const SONST_ARTEN=['Edelmetall','Rohstoff','ETF','Aktie','Anleihe','Sonstiges'];
+async function ladeSonstige(){
+  try{ const r=await fetch('http://localhost:8765/data/load?name=sonstige_bestaende',{cache:'no-store'});
+       if(r.ok){ const j=await r.json(); if(Array.isArray(j.bestaende)){ SONSTIGE=j.bestaende; try{localStorage.setItem('cockpit_sonstige',JSON.stringify(SONSTIGE));}catch(e){} return; } } }catch(e){}
+  try{ SONSTIGE=JSON.parse(localStorage.getItem('cockpit_sonstige')||'[]')||[]; }catch(e){ SONSTIGE=[]; }
+}
+async function speichereSonstige(){
+  try{localStorage.setItem('cockpit_sonstige',JSON.stringify(SONSTIGE));}catch(e){}
+  try{ const r=await fetch('http://localhost:8765/data/save?name=sonstige_bestaende',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ts:Date.now(),bestaende:SONSTIGE})});
+       toast(r.ok?'Sonstige Bestände gespeichert':'Nur im Browser gespeichert (Server nicht erreichbar)', r.ok?'t-ok':'t-info'); }
+  catch(e){ toast('Nur im Browser gespeichert (Server nicht erreichbar)','t-info'); }
+}
+async function ladeSektoren(){
+  try{ const r=await fetch('http://localhost:8765/sektoren',{cache:'no-store'}); const j=await r.json(); if(j.ok) SEKTOREN=j.sektor||{}; }catch(e){}
+}
+const ETF_NAME={XLK:'Technologie',XLC:'Kommunikation',XLY:'Zykl. Konsum',XLF:'Finanzen',XLV:'Gesundheit',XLI:'Industrie',XLP:'Basiskonsum',XLE:'Energie',XLB:'Grundstoffe',XLU:'Versorger',XLRE:'Immobilien'};
+function sektorVon(sym, eigen){
+  if(eigen) return eigen;
+  const s=String(sym||'').toUpperCase();
+  if(SEKTOREN[s]) return ETF_NAME[SEKTOREN[s]]||SEKTOREN[s];
+  if(/\.DE$/.test(s)) return 'Deutschland (ohne Sektor)';
+  return 'ohne Sektor';
+}
+function sonstigeHinzu(){
+  const g=id=>($(id)||{}).value||'';
+  const sym=g('so-sym').trim().toUpperCase(), st=parseFloat(String(g('so-st')).replace(',','.'));
+  if(!sym||!(st>0)){ toast('Symbol und Stückzahl eingeben','t-err'); return; }
+  SONSTIGE.push({sym, name:g('so-name').trim(), stueck:st, art:g('so-art')||'Sonstiges', ccy:g('so-ccy')||'EUR'});
+  speichereSonstige(); render();
+}
+function sonstigeWeg(i){ if(!confirm('Eintrag entfernen?'))return; SONSTIGE.splice(i,1); speichereSonstige(); render(); }
+function gesamtRisiko(){
+  const a=aggregate(), Q=S.quotes||{};
+  const zeilen=[];   // {quelle, sym, risiko, kapital, sektor}
+  if(S.dir&&Array.isArray(S.dir.trades)) S.dir.trades.filter(t=>t.status==='Open').forEach(t=>{
+    const ccy=dirCcyOf(t);
+    const kap = (+t.boundCapital>0) ? eurDir(+t.boundCapital, null, ccy) : null;
+    zeilen.push({quelle:'Richtung', sym:ticker(t.productName), risiko:eurDir(t.maxRiskEuro||0, t.sizeFx, ccy), kapital:kap, sektor:sektorVon(t.productName, t.sector)});
+  });
+  if(S.sh&&Array.isArray(S.sh.trades)) S.sh.trades.filter(t=>t.status==='OPEN').forEach(t=>{
+    const ccy=t.currency||'USD';
+    let kap=null;
+    if(t.strategy==='STOCK') kap=eur((+t.underlyingPrice||0)*(+t.contracts||0),ccy);
+    else if(t.strategy==='CSP'){ const s=(t.legs||[]).find(x=>x.side==='SELL'); if(s&&s.strike) kap=eur(s.strike*MUL*(t.contracts||0),ccy); }
+    else kap=eur(shRisk(t),ccy);
+    zeilen.push({quelle:'Stillhalter', sym:ticker(t.underlying), risiko:eur(shRisk(t),ccy), kapital:kap, sektor:sektorVon(t.underlying)});
+  });
+  SONSTIGE.forEach(b=>{
+    const q=Q[b.sym]; const wert = q&&q.price ? eur(q.price*b.stueck, q.ccy||b.ccy) : null;
+    zeilen.push({quelle:'Sonstige', sym:b.sym, risiko:0, kapital:wert, sektor:b.art, ohneKurs:!q});
+  });
+  const sum=(f)=>zeilen.reduce((s,z)=>s+(+f(z)||0),0);
+  const risiko=sum(z=>z.risiko), kapital=sum(z=>z.kapital);
+  const grp=(key,wert)=>{ const g={}; zeilen.forEach(z=>{ const k=z[key]||'–'; g[k]=(g[k]||0)+(+wert(z)||0); }); return Object.entries(g).filter(([,v])=>v>0).sort((x,y)=>y[1]-x[1]); };
+  return {a, zeilen, risiko, kapital, nachSektorRisiko:grp('sektor',z=>z.risiko), nachSektorKapital:grp('sektor',z=>z.kapital), nachTitelRisiko:grp('sym',z=>z.risiko)};
+}
+function rRisiko(){
+  const G=gesamtRisiko(); const dep=S.depot;
+  const pct=(x,t)=>t>0?(x/t*100):null;
+  const balken=(liste,tot,farbe)=>liste.slice(0,8).map(([k,v])=>{ const p=pct(v,tot);
+    return `<div style="display:flex;align-items:center;gap:8px;font-size:.72rem;margin:3px 0"><span style="width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(k)}</span>`
+      +`<div class="rg" style="flex:1;height:8px"><div class="rg-f" style="width:${Math.min(100,p||0)}%;background:${p>40?'var(--red)':farbe}"></div></div><span class="mono" style="width:120px;text-align:right">${fE(Math.round(v))} · ${p!=null?p.toFixed(0):'–'} %</span></div>`; }).join('') || '<div style="font-size:.72rem;color:var(--t3)">keine</div>';
+  const topS=G.nachSektorRisiko[0], topT=G.nachTitelRisiko[0];
+  const warn=[];
+  if(topS && pct(topS[1],G.risiko)>40) warn.push(`${pct(topS[1],G.risiko).toFixed(0)} % des offenen Risikos in „${escH(topS[0])}“ — fällt dieses Thema, fallen die meisten Positionen gemeinsam.`);
+  if(topT && pct(topT[1],G.risiko)>25) warn.push(`${pct(topT[1],G.risiko).toFixed(0)} % des offenen Risikos in einem einzigen Titel (${escH(topT[0])}).`);
+  const sonstOhneKurs=G.zeilen.filter(z=>z.quelle==='Sonstige'&&z.ohneKurs).length;
+  let h='<div class="fu">';
+  h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px">`;
+  h+=kpi('Trading-Risiko gesamt',fE(Math.round(G.risiko)),dep?(pct(G.risiko,dep).toFixed(1)+' % vom Depot'):'Depot setzen für %','--amb');
+  h+=kpi('Gebundenes Kapital',fE(Math.round(G.kapital)),dep?(pct(G.kapital,dep).toFixed(0)+' % vom Depot'):'inkl. Sonstige Bestände','--acc');
+  h+=kpi('Positionen',G.zeilen.length,`${G.zeilen.filter(z=>z.quelle==='Richtung').length} Richtung · ${G.zeilen.filter(z=>z.quelle==='Stillhalter').length} Stillhalter · ${G.zeilen.filter(z=>z.quelle==='Sonstige').length} Sonstige`,'--vio');
+  h+='</div>';
+  if(warn.length) h+=`<div class="card" style="padding:10px 14px;margin-bottom:12px;border-left:3px solid var(--red);font-size:.76rem">⚠ ${warn.join('<br>⚠ ')}</div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:14px">
+    <div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:6px">Offenes Risiko nach Sektor</div>${balken(G.nachSektorRisiko,G.risiko,'var(--amb)')}</div>
+    <div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:6px">Gebundenes Kapital nach Sektor / Art</div>${balken(G.nachSektorKapital,G.kapital,'var(--acc)')}</div>
+    <div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:6px">Offenes Risiko nach Titel</div>${balken(G.nachTitelRisiko,G.risiko,'var(--amb)')}</div>
+  </div>`;
+  h+=`<div class="card" style="padding:14px"><div class="lbl" style="margin-bottom:6px">Sonstige Bestände (nicht in den Journalen, z. B. Gold- und Silber-ETFs)</div>
+    <div style="font-size:.66rem;color:var(--t3);margin-bottom:8px">Zählen bei Kapitalbindung und Konzentration, nicht beim Trading-Risiko. Bewertung mit „Kurse laden“ (Σ Depot-Gesamt) — Yahoo-Symbol verwenden, z. B. 4GLD.DE.${sonstOhneKurs?` <b style="color:var(--amb)">${sonstOhneKurs} ohne Kurs.</b>`:''}</div>
+    <table class="dtb" style="width:100%"><thead><tr><th>Symbol</th><th>Bezeichnung</th><th style="text-align:right">Stück</th><th>Art</th><th style="text-align:right">Wert</th><th></th></tr></thead><tbody>`
+    + SONSTIGE.map((b,i)=>{ const z=G.zeilen.find(x=>x.quelle==='Sonstige'&&x.sym===b.sym); return `<tr><td class="mono">${escH(b.sym)}</td><td>${escH(b.name||'')}</td><td class="mono" style="text-align:right">${b.stueck}</td><td>${escH(b.art)}</td><td class="mono" style="text-align:right">${z&&z.kapital!=null?fE(Math.round(z.kapital)):'–'}</td><td><button class="btn btn-g btn-s" onclick="sonstigeWeg(${i})">✕</button></td></tr>`; }).join('')
+    + `</tbody></table>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+      <input id="so-sym" class="inp" placeholder="Symbol (z. B. 4GLD.DE)" style="width:150px">
+      <input id="so-name" class="inp" placeholder="Bezeichnung" style="width:170px">
+      <input id="so-st" class="inp" placeholder="Stück" style="width:90px">
+      <select id="so-art" class="inp" style="width:120px">${SONST_ARTEN.map(x=>`<option>${x}</option>`).join('')}</select>
+      <select id="so-ccy" class="inp" style="width:80px"><option>EUR</option><option>USD</option></select>
+      <button class="btn btn-p btn-s" onclick="sonstigeHinzu()">+ hinzufügen</button>
+    </div></div>`;
+  h+=`<div style="font-size:.64rem;color:var(--t3);margin-top:10px">Sektor aus dem Journal-Feld, sonst aus der GICS-Liste (sektoren.json). Gebundenes Kapital: Aktien Kurs × Stück, Futures Margin, Cash-Secured-Puts Strike × 100, sonst das Risiko. Gleichlauf (Korrelation) der Positionen ist noch nicht berechnet.</div>`;
+  h+='</div>';
+  return h;
+}
+
 function updDataAge(){
   const parts=[];
   if(S.dir)parts.push('Richtung: '+(S.dir.timestamp?S.dir.timestamp.slice(0,16).replace('T',' '):'?'));
@@ -401,6 +506,7 @@ async function fetchQuote(base,sym){
 }
 async function loadQuotes(){
   const a=aggregate(); const syms=Object.keys(a.ul).filter(k=>k&&k!=='—');
+  SONSTIGE.forEach(b=>{ if(b.sym && !syms.includes(b.sym)) syms.push(b.sym); });   // v6.2 (N1)
   if(!syms.length){toast('Keine Underlyings vorhanden.','t-info');return;}
   const base=(S.qbase||'').replace(/\/+$/,'');
   try{const pr=await fetch(base+'/ping',{cache:'no-store'});if(!pr.ok)throw 0;}
@@ -590,9 +696,9 @@ async function loadServer(silent){
   return false;
 }
 // Opt②/v3.4: Start-Reihenfolge — 1) Server (Laufwerk), 2) localStorage-Live, 3) manuelle Backups
-(async()=>{ const ok=await loadServer(true); if(!ok && liveAvailable()) loadLive(true); render(); })();
+(async()=>{ const ok=await loadServer(true); if(!ok && liveAvailable()) loadLive(true); await ladeSonstige(); await ladeSektoren(); render(); })();
 go('depot');
-console.log('Depot-Cockpit v6.2 geladen (FX-Fix · Server-Lesen · Steuerjahr · Live-Lesen · Portfolio-DD · Pro-Trade-FX). Journals erwartet im selben Ordner:', J_DIR, '·', J_SH);
+console.log('Depot-Cockpit v6.3 geladen (FX-Fix · Server-Lesen · Steuerjahr · Live-Lesen · Portfolio-DD · Pro-Trade-FX). Journals erwartet im selben Ordner:', J_DIR, '·', J_SH);
 </script>
 </body>
 </html>
