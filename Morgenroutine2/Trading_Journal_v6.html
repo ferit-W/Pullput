@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ferit's Trading Dashboard+Journal v6.6</title>
+<title>Ferit's Trading Dashboard+Journal v6.7</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- v6.4: auf 4.4.0 gepinnt wie Cockpit/Stillhalter — ohne Version kaeme automatisch die naechste Major (5.x) und die Charts braechen ungefragt -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -580,7 +580,7 @@ body.dark-mode .ampel-bg-green { background-color: #14532d; color: #86efac; }
 
 <div class="container mx-auto p-4 md:p-8 pt-10 max-w-screen-2xl">
   <header class="text-center mb-6">
-    <h1 id="main-header" class="text-3xl font-extrabold text-black mb-1">Ferit's Trading Dashboard+Journal v6.6</h1>
+    <h1 id="main-header" class="text-3xl font-extrabold text-black mb-1">Ferit's Trading Dashboard+Journal v6.7</h1>
     <!-- v6.1: Anzeige, woher der aktuell sichtbare Datenstand stammt. Bei zwei Rechnern
          mit geteiltem Cloud-Ordner ist das die wichtigste Information auf der Seite. -->
     <div class="mb-2"><span id="syncStatus" title="Datenstand wird geprüft …"
@@ -4448,8 +4448,39 @@ function closeSetupModal(){ document.getElementById('setupManagementModal').clas
 function openExitReasonModal(){ document.getElementById('exitReasonManagementModal').classList.remove('hidden'); renderExitReasons(); }
 function closeExitReasonModal(){ document.getElementById('exitReasonManagementModal').classList.add('hidden'); }
 
+// ═══ v6.7 (W3): „TRADE VORBEREITEN“ AUS DER MORGENROUTINE ═══════════════════
+// Die Morgenroutine öffnet das Journal mit Angaben in der Adresse
+// (?vorbereiten=1&sym=…&dir=Long&entry=…&stop=…&setup=…&notiz=…). Das Formular
+// wird damit vorausgefüllt — angelegt wird erst, wenn du „Trade eröffnen“ drückst.
+// Das Marktbild des Tages kommt beim Eröffnen automatisch dazu (A5).
+function tradeVorbereitenAusAdresse() {
+  try {
+    const q = new URLSearchParams(location.search);
+    if (q.get('vorbereiten') !== '1') return false;
+    const setze = (id, wert) => { const el = document.getElementById(id); if (el && wert != null && wert !== '') el.value = wert; };
+    const zahl = x => { const v = parseFloat(String(x || '').replace(',', '.')); return isFinite(v) ? String(v) : ''; };
+    setze('productName', (q.get('sym') || '').toUpperCase().slice(0, 30));
+    const dir = q.get('dir'); if (dir === 'Long' || dir === 'Short') setze('direction', dir);
+    setze('entryPrice', zahl(q.get('entry')));
+    setze('slPrice', zahl(q.get('stop')));
+    const setup = q.get('setup');
+    const sel = document.getElementById('entrySetup');
+    if (sel && setup) {
+      if (![...sel.options].some(o => o.value === setup)) { const o = document.createElement('option'); o.value = setup; o.textContent = setup; sel.appendChild(o); }
+      sel.value = setup;
+    }
+    const notiz = q.get('notiz'); if (notiz) setze('entryNotes', notiz.slice(0, 500));
+    if (typeof debouncedCalculatePosition === 'function') debouncedCalculatePosition();
+    history.replaceState(null, '', location.pathname);   // nicht bei jedem Neuladen wiederholen
+    showToast('Trade vorbereitet aus der Morgenroutine — Werte prüfen, dann „Trade eröffnen“.');
+    const f = document.getElementById('productName'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return true;
+  } catch (e) { return false; }
+}
+
 /* Init DOMContentLoaded */
 document.addEventListener('DOMContentLoaded', ()=>{
+ setTimeout(tradeVorbereitenAusAdresse, 1500);   // v6.7 (W3): nach dem Laden der Setups
  // v5.3.1: Init-Absicherung — JEDER Fehler beim Start wird sichtbar angezeigt
  // (statt endlosem "Initialisiere App..."-Spinner) und der Schleier verschwindet IMMER.
  try {
@@ -4658,7 +4689,7 @@ function _marktKurz(e, quelle, datum) {
   if (!e || !e.label) return null;
   return { datum: datum || e.tag || null, quelle, label: e.label, basis: e.basis || null, trend: e.trend || null,
     risiko: e.risiko || null, version: e.version || null, vix: e.vix ?? null, breite200: e.breite200 ?? e.breite ?? null,
-    term: e.term || null, panik: e.panik ?? null, richtung: e.richtung || null, groesse: e.groesse || null,
+    term: e.term || null, panik: e.panik ?? null, richtung: e.richtung || null, groesse: e.groesse || null, woche: e.woche || null,
     phasen: Array.isArray(e.phasen) ? e.phasen : null };
 }
 async function marktbildZum(datum) {
@@ -4735,6 +4766,15 @@ async function langzeitAuswertung() {
     + gruppe('Je Setup', t => t.setup)
     + gruppe('Je Marktphase (eigene Angabe)', t => t.marketPhase)
     + gruppe('Je Ampel beim Einstieg (Marktbild)', t => t.markt && t.markt.label)
+    // v6.7 (T6): Regeltreue — passte der Trade zur Konsequenz-Zeile des Tages?
+    + gruppe('Regeltreue: Trade gegen die Konsequenz-Zeile', t => {
+        const r = t.markt && t.markt.richtung; if (!r) return null;
+        const d = t.direction === 'Short' ? 'SHORT' : 'LONG';
+        if (/keine neuen/i.test(r)) return 'gegen den Plan (Ampel: keine neuen Positionen)';
+        if (/gaps/i.test(r)) return (t.setup && /gap|news|akj/i.test(t.setup)) ? 'passend (Gap/News an einem Gap-Tag)' : 'gegen den Plan (nur Gaps & News erlaubt)';
+        return r.toUpperCase().indexOf(d) >= 0 ? 'passend zur Richtung' : 'gegen die Richtung';
+      })
+    + gruppe('Terminwoche beim Einstieg', t => t.markt && t.markt.woche ? ('Woche ' + t.markt.woche) : null)
     + gruppe('Je Richtung', t => t.direction);
   let m = document.getElementById('langzeitModal');
   if (!m) {

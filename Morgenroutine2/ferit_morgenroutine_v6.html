@@ -3818,6 +3818,23 @@ function wochenTermine(){
     if(inFenster(iso)) eintraege.push({d:iso, was:'US-Arbeitsmarktdaten', gew:2});
   });
 
+  // v6.19 (W2): regelbasierte Termine — großer Verfall (3. Freitag), Quartalsverfall mit
+  // Index-Anpassung (März/Juni/Sept./Dez.), US-Wahl (Dienstag nach dem 1. Montag im
+  // November, gerade Jahre) und verkürzte US-Handelstage.
+  [0,1].forEach(off=>{
+    const m = new Date(heute.getFullYear(), heute.getMonth()+off, 1);
+    let fr=0; while(true){ if(m.getDay()===5 && ++fr===3) break; m.setDate(m.getDate()+1); }
+    const iso=isoLokal(m), quartal=[2,5,8,11].includes(m.getMonth());
+    if(inFenster(iso)) eintraege.push({d:iso, was: quartal?'Hexensabbat (Quartalsverfall, Index-Anpassung)':'Großer Verfall', gew: quartal?2:1});
+  });
+  if(heute.getFullYear()%2===0){
+    const w=new Date(heute.getFullYear(),10,1); while(w.getDay()!==1) w.setDate(w.getDate()+1); w.setDate(w.getDate()+1);
+    if(inFenster(isoLokal(w))) eintraege.push({d:isoLokal(w), was:'US-Wahl', gew:2});
+  }
+  for(let x=new Date(heute); x<=bis; x.setDate(x.getDate()+1)){
+    try{ const st=usBoersenStatus(new Date(x)); if(st.offen && st.halb) eintraege.push({d:isoLokal(x), was:'US halber Handelstag ('+st.grund+')', gew:1}); }catch(e){}
+  }
+
   // Eigene Termine aus dem Feld (ein Datum je Zeile, optional " Text")
   (loadLS(SK.termine, []) || []).forEach(t=>{
     if(t && t.d && inFenster(t.d)) eintraege.push({d:t.d, was:t.was||'eigener Termin', gew:2});
@@ -3926,7 +3943,9 @@ function renderAmpelZusatz(v){
   const datumDE = d => d ? new Date(d+'T12:00:00').toLocaleDateString('de-DE') : '–';
   const tf = v.trend==='Long'?'var(--green)':v.trend==='Short'?'var(--red)':'var(--steel)';
   const rf = v.risiko==='hoch'?'var(--red)':v.risiko==='erhöht'?'var(--amber)':'var(--green)';
-  let h = `<div class="az-zeile"><span class="az-chip" style="color:${tf}">Trend: ${esc(v.trend)}</span>`
+  // v6.19 (V4): Während der US-Handelszeit ist die letzte Tageskerze noch nicht fertig
+  let vorl=false; try{ const n=new Date(), ny=minuteIn('America/New_York',n); vorl = usBoersenStatus(n).offen && ny>=570 && ny<960; }catch(e){}
+  let h = `<div class="az-zeile">${vorl?'<span class="az-chip" style="color:var(--amber)" title="US-Börse offen: Phasen und Ampel rechnen mit dem laufenden Kurs. Getestet wurde zum Tagesschluss — vor Börsenschluss kann sich das noch ändern.">⏳ vorläufig (Handel läuft)</span>':''}<span class="az-chip" style="color:${tf}">Trend: ${esc(v.trend)}</span>`
         + `<span class="az-chip" style="color:${rf}">Risiko: ${esc(v.risiko)}</span><span class="info-i" onclick="infoPop('trendrisiko')" title="Trend und Risiko">i</span>`;
   if(v.wechsel) h += `<span class="az-chip" style="color:var(--gold)">🆕 Wechsel: ${esc(v.wechsel.von)} → ${esc(v.label)}</span><span class="info-i" onclick="infoPop('wechsel')" title="Wechsel">i</span>`;
   if(STATE.kredit && STATE.kredit.wert!=null){
@@ -3977,6 +3996,32 @@ function renderAmpelZusatz(v){
   el.innerHTML = h;
 }
 
+// ── v6.19 (V2): Wie weit ist die nächste Schwelle entfernt? ───────────────────
+function abstandSchwellen(v){
+  if(!v || !v.label || v.label==='WARTE') return '';
+  const f=x=>x==null?'–':String(typeof x==='number'?(Math.round(x*10)/10):x).replace('.',',');
+  const term=(STATE.vixTerm&&STATE.vixTerm.regime)||null;
+  if(v.label==='GO'){
+    const t=[`CAUTION ab VIX 20 (jetzt ${f(v.vix)})`, `oder Breite unter 6 (jetzt ${f(v.part)})`, `oder unter 3 Indizes in P3 (jetzt ${v.p3})`];
+    return 'Nächste Schwelle: '+t.join(' · ');
+  }
+  if(v.label==='STOP' || v.label==='REVERSE'){
+    const fehlt=[];
+    if(v.p6>=2) fehlt.push(`höchstens 1 Index in P6 (jetzt ${v.p6})`);
+    if(v.vix!=null && v.vix>28) fehlt.push(`VIX bis 28 (jetzt ${f(v.vix)})`);
+    if(v.part!=null && v.part<3 && v.p3<2) fehlt.push(`Breite ab 3 oder 2 Indizes in P3 (jetzt ${f(v.part)} / ${v.p3})`);
+    return fehlt.length ? 'Raus aus STOP: '+fehlt.join(' · ') : '';
+  }
+  const fehlt=[];
+  if(v.p3<3) fehlt.push(`3 Indizes in P3 (jetzt ${v.p3})`);
+  if(v.p6>0) fehlt.push(`kein Index in P6 (jetzt ${v.p6})`);
+  if(v.vix!=null && v.vix>=20) fehlt.push(`VIX unter 20 (jetzt ${f(v.vix)})`);
+  if(v.part!=null && v.part<6) fehlt.push(`Breite ab 6 (jetzt ${f(v.part)})`);
+  if(v.rsBeat!=null && v.rsTot>=6 && v.rsBeat<3) fehlt.push(`Führung ab 3 Sektoren (jetzt ${v.rsBeat})`);
+  if(term==='back-light'||term==='back-strong') fehlt.push('Termstruktur zurück in Contango/flach');
+  return fehlt.length ? 'Für GO fehlt: '+fehlt.join(' · ') : '';
+}
+
 function renderRegime(v){
   // v6.17: Ampel im Tab-Titel — sichtbar, auch wenn die Seite im Hintergrund-Tab liegt
   try{ document.title = v.icon+' '+v.label+' · Morgenroutine v6.19'; }catch(e){}
@@ -4008,7 +4053,8 @@ function renderRegime(v){
   try{ renderAmpelZusatz(v); }catch(e){ console.error(e); }   // v6.19
   $('k-breadth').textContent = v.part==null?'–':`${v.part}/${v.partTot}`;
   $('k-breadth-s').innerHTML = (v.rsBeat!=null ? `über EMA200 · ${v.rsBeat}/${v.rsTot} schlagen SPY` : 'über EMA200')+(v.part50!=null?` · EMA50: ${v.part50}`:'') + dTxt(v.dPart,'',0,true);
-  $('regime-reason').innerHTML = `<strong>Begründung:</strong> ${v.reasons.map(r=>`<span class="rr-line">→ ${r}</span>`).join('')}`;
+  $('regime-reason').innerHTML = `<strong>Begründung:</strong> ${v.reasons.map(r=>`<span class="rr-line">→ ${r}</span>`).join('')}`
+    + (()=>{ const a=abstandSchwellen(v); return a?`<span class="rr-line" style="opacity:.8">↔ ${a}</span>`:''; })();   // v6.19 (V2)
   // KPI-Alarm-Ringe
   const ring=(id,on)=>{ const el=$(id); const k=el&&el.closest('.kpi'); if(k) k.classList.toggle('kpi-alert',!!on); };
   ring('k-breadth', v.part!=null && v.part<3);
@@ -4884,12 +4930,19 @@ async function setupScan(neu){
         + `<td title="Platz bis zum 52-Wochen-Hoch im Verhältnis zum Stoppabstand">${t.am_hoch?'am Hoch':f(t.platz_x,1)+' ×'}</td>`
         + `<td title="63 Tage gegen ${esc(t.vergleich)}" style="color:${t.rs63_pct>0?'var(--green)':'var(--red)'}">${t.rs63_pct==null?'–':(t.rs63_pct>0?'+':'')+f(t.rs63_pct,1)+' %'}${t.vergleich==='SPY'?' <span title="kein Sektor hinterlegt — gegen SPY">*</span>':''}</td>`
         + `<td>${f(t.abstand_hoch_pct,1)} %</td><td>${mio(t.umsatz20)}</td>`
-        + `<td>${t.earnings_bald?`<b style="color:var(--amber)" title="Quartalszahlen innerhalb von 10 Tagen">📅 ${new Date(t.earnings*1000).toLocaleDateString('de-DE')}</b>`:''} <button class="cp-btn" style="padding:0 5px" onclick="addWatchSym('${sym}')" title="in die Watchlist">+</button></td></tr>`;
+        + `<td>${t.earnings_bald?`<b style="color:var(--amber)" title="Quartalszahlen innerhalb von 10 Tagen">📅 ${new Date(t.earnings*1000).toLocaleDateString('de-DE')}</b>`:''} <button class="cp-btn" style="padding:0 5px" onclick="addWatchSym('${sym}')" title="in die Watchlist">+</button>`
+        + ` <button class="cp-btn" style="padding:0 5px" onclick="tradeVorbereiten('${sym}','Long',${t.kurs},${t.stopp},'Rücksetzer P3','Setup-Scanner: Platz ${t.am_hoch?'am Hoch':f(t.platz_x,1)+'×'}, RS Sektor ${t.rs63_pct==null?'–':f(t.rs63_pct,1)+' %'}${t.earnings_bald?', Zahlen in Kürze!':''}')" title="Journal mit vorausgefülltem Formular öffnen">📝</button></td></tr>`;
     });
     h+='</table>';
   });
   h+='<div style="font-size:.66rem;color:var(--steel);margin-top:6px">Vorauswahl nach festen Regeln, sortiert nach relativer Stärke gegen den Sektor. Chartbild, Allzeithoch und Entscheidung prüfst du in TradingView. Nur Long-Seite (getestet).</div>';
   body.innerHTML=h;
+}
+// v6.19 (W3): Journal mit vorausgefülltem Formular öffnen. Einstieg = letzter Kurs als
+// Schätzung (gekauft wird zur nächsten Eröffnung), Stopp = 10-Tage-Tief aus dem Scanner.
+function tradeVorbereiten(sym, dir, kurs, stopp, setup, notiz){
+  const q=new URLSearchParams({vorbereiten:'1', sym, dir, entry:String(kurs), stop:String(stopp), setup:setup||'', notiz:notiz||''});
+  window.open('Trading_Journal_v6.html?'+q.toString(), '_blank');
 }
 function addWatchSym(sym){
   if(!SYM_RE.test(sym)) return;
@@ -4968,7 +5021,11 @@ function renderHist(){
   // v6.10: Mehr Inhalt je Karte. Ältere Einträge haben die neuen Felder nicht —
   // dort wird die Zeile einfach weggelassen statt "undefined" anzuzeigen.
   const z = (txt) => txt ? `<br>${txt}` : '';
-  $('hist-body').innerHTML='<div class="hist-list">'+STATE.hist.map(h=>{
+  // v6.19 (V12): Farbstreifen der letzten bis zu 60 Tage (alt → neu)
+  const farbeH={go:'var(--green)',pre:'#7aa83a',caution:'var(--amber)',stop:'var(--red)',reverse:'var(--violet)'};
+  const streifen='<div title="Ampel der letzten Snapshots, links alt, rechts neu" style="display:flex;gap:1px;height:10px;margin-bottom:8px">'
+    + STATE.hist.slice(0,60).slice().reverse().map(h=>`<div title="${esc(h.tag||'')} ${esc(h.label||'')}" style="flex:1;background:${farbeH[h.color]||'var(--rule)'}"></div>`).join('') + '</div>';
+  $('hist-body').innerHTML=streifen+'<div class="hist-list">'+STATE.hist.map(h=>{
     const phasen = Array.isArray(h.phasen) && h.phasen.length
       ? h.phasen.map(x=>`${esc(x.s)} ${esc(x.p)}`).join(' · ') : '';
     const kons = h.richtung ? `<b>${esc(h.richtung)}</b>${h.groesse&&h.groesse!=='—'?' · '+esc(h.groesse):''}` : '';

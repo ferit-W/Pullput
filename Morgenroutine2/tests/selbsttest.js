@@ -259,6 +259,22 @@ abschnitt('Stopp nachziehen');
   pruefe('Short: Vorschlag liegt über dem Kurs (hier keiner, Kurs steigt)', kurz.e4 === null || kurz.e4 > d.price, true);
 }
 
+// ── Regelbasierte Termine (W2) mit festem Datum ────────────────────────────────
+abschnitt('Regelbasierte Termine');
+{
+  const echt = ctx.Date;
+  const mitDatum = (iso, fn) => { const fest = new echt(iso + 'T08:00:00');
+    ctx.Date = class extends echt { constructor(...a) { if (a.length) super(...a); else super(fest.getTime()); } static now() { return fest.getTime(); } };
+    try { return fn(); } finally { ctx.Date = echt; } };
+  const w1 = mitDatum('2026-11-02', () => T.wochenTermine().eintraege.map(e => e.d + ' ' + e.was));
+  pruefe('US-Wahl am 03.11.2026 erkannt', w1.some(x => x.startsWith('2026-11-03 US-Wahl')), true);
+  const w2 = mitDatum('2026-12-14', () => T.wochenTermine().eintraege.map(e => e.d + ' ' + e.was));
+  pruefe('Hexensabbat 18.12.2026 erkannt', w2.some(x => x.startsWith('2026-12-18 Hexensabbat')), true);
+  const w3 = mitDatum('2026-11-16', () => T.wochenTermine().eintraege.map(e => e.d + ' ' + e.was));
+  pruefe('Großer Verfall 20.11.2026 erkannt', w3.some(x => x.startsWith('2026-11-20 Großer Verfall')), true);
+  pruefe('Tag nach Thanksgiving als halber Tag', mitDatum('2026-11-23', () => T.wochenTermine().eintraege.some(e => e.d === '2026-11-27' && /halber/.test(e.was))), true);
+}
+
 // ── Ergebnis ─────────────────────────────────────────────────────────────────
 console.log(`\n${ok} bestanden, ${fehl} fehlgeschlagen`);
 process.exit(fehl ? 1 : 0);
