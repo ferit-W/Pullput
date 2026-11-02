@@ -649,6 +649,7 @@ footer strong{color:var(--ink2)}
       <div class="field-grid">
         <div class="field"><label>VIX-Alarm ab</label><input type="number" step="1" id="al-vix" placeholder="25"><span class="hint">Ring um VIX-KPI + Banner</span></div>
         <div class="field"><label>Panik-Score-Alarm ab</label><input type="number" step="1" id="al-panik" placeholder="55"><span class="hint">0–100</span></div>
+        <div class="field"><label>Desktop-Mitteilungen</label><button class="cp-btn" type="button" onclick="desktopErlauben()" id="al-desk">🔔 erlauben</button><span class="hint">Alarm auch bei Tab im Hintergrund (T8)</span></div>
         <div class="field"><label class="chk-inline"><input type="checkbox" id="al-flip"> Alarm bei Phasenwechsel P3→raus</label></div>
       </div>
       <div class="dw-actions">
@@ -794,6 +795,7 @@ footer strong{color:var(--ink2)}
       <span style="margin-left:auto"><button class="cp-btn" onclick="ladeRegelcheck(true)" title="REGELCHECK erneut ausführen">↻ prüfen</button></span></div>
     <div class="sec-info" id="info-start" style="margin:0;border:none;border-bottom:1px solid var(--rule);border-radius:0"><b>Heute</b>: Börsenstatus USA und XETRA (Feiertage werden gerechnet, nicht gepflegt), Handelszeiten in deutscher Zeit, Termine des Tages aus FOMC-Liste, eigenen Terminen, Watchlist-Earnings und — falls geladen — den marktbewegenden Einträgen des KI-Kalenders. <b>Regelcheck</b>: dieselbe Prüfung wie <span class="mono">REGELCHECK.py</span> — Stopp vorhanden und auf der richtigen Seite, Risiko je Position, Slots, Phase gegen Richtung, Restlaufzeit der Optionen. Geprüft wird nur, was in den Journaldateien steht; der Abgleich mit CapTrader bleibt Handarbeit.</div>
     <div id="start-heute" class="ty-line">wird berechnet …</div>
+    <div id="start-nacht" class="ty-line"><b>Über Nacht:</b> wird nach dem Start geladen.</div>
     <div id="start-regel" class="ty-line">Regelcheck wird geladen …</div>
     <!-- v6.19 (T2): offene Positionen aus dem Journal -->
     <div id="start-pos" class="ty-line" style="border-bottom:none"><b>Positionen:</b> werden nach dem Start geladen.</div>
@@ -4656,6 +4658,7 @@ function archivEintrag(){
     aktien_ueber200: STATE.aktienBreite&&STATE.aktienBreite.US ? STATE.aktienBreite.US.ueber200 : null,
     aktien_de: STATE.aktienBreite ? STATE.aktienBreite.DE || null : null,
     breitenWende: v.breitenWende ? v.breitenWende.aktiv : null,
+    uebernacht: STATE.uebernacht || null,
     spySchluss: (()=>{ const s=(STATE.indices||[]).find(i=>i.key==='SPY'&&i.closes); return s? r2(s.closes[s.closes.length-1]) : null; })(),
   });
 }
@@ -4895,6 +4898,58 @@ function addWatchSym(sym){
   toast(sym+' in die Watchlist','ok');
 }
 
+// ═══ v6.19 (T4): ÜBER NACHT ═══════════════════════════════════════════════════
+// Was ist passiert, während Europa schlief? Futures auf S&P 500 und Nasdaq, Asien,
+// Öl, Gold, Bitcoin und Euro — Veränderung gegen den letzten Schluss.
+const NACHT = [
+  {y:'ES=F', n:'S&P-Future'}, {y:'NQ=F', n:'Nasdaq-Future'}, {y:'^N225', n:'Nikkei'}, {y:'^HSI', n:'Hang Seng'},
+  {y:'CL=F', n:'Öl WTI'}, {y:'GC=F', n:'Gold'}, {y:'BTC-USD', n:'Bitcoin'}, {y:'EURUSD=X', n:'EUR/USD'}
+];
+async function ueberNacht(){
+  const el=$('start-nacht'); if(!el) return;
+  const out=[];
+  await mapLimit(NACHT, localProxyAlive?4:2, async m=>{
+    try{ const d=await fetchYahoo(m.y,'5d'); const chg=(d.price&&d.prev)?(d.price/d.prev-1)*100:null; out.push({...m, kurs:d.price, chg}); }
+    catch(e){ out.push({...m, fehler:true}); }
+  });
+  const reihen = NACHT.map(m=>out.find(x=>x.y===m.y)).filter(Boolean);
+  el.innerHTML = '<b>Über Nacht:</b> ' + reihen.map(x=>{
+    if(x.fehler||x.chg==null) return `${esc(x.n)} –`;
+    const farbe = Math.abs(x.chg)<0.3?'var(--steel)':(x.chg>0?'var(--green)':'var(--red)');
+    const wert = x.y==='EURUSD=X' ? ` ${fmtPx(x.kurs,4)}` : '';
+    return `${esc(x.n)}${wert} <span style="color:${farbe};font-weight:${Math.abs(x.chg)>=1?700:400}">${x.chg>0?'+':''}${x.chg.toFixed(1).replace('.',',')} %</span>`;
+  }).join(' · ') + ' <span style="color:var(--steel);font-size:.66rem">(gegen letzten Schluss)</span>';
+  STATE.uebernacht = reihen.filter(x=>x.chg!=null).map(x=>({k:x.y, chg:+x.chg.toFixed(2)}));
+}
+
+// ═══ v6.19 (T8): DESKTOP-MITTEILUNGEN ═════════════════════════════════════════
+// Nur wenn du es erlaubst. Jede Meldung höchstens einmal je Tag, damit nichts nervt.
+function desktopErlauben(){
+  if(!('Notification' in window)){ toast('Dieser Browser kann keine Desktop-Mitteilungen','err'); return; }
+  Notification.requestPermission().then(p=>{
+    toast(p==='granted'?'Desktop-Mitteilungen erlaubt':'Desktop-Mitteilungen nicht erlaubt', p==='granted'?'ok':'err');
+    const b=$('al-desk'); if(b) b.textContent = p==='granted'?'🔔 erlaubt':'🔕 blockiert';
+  });
+}
+function desktopMeldung(schluessel, titel, text){
+  try{
+    if(!('Notification' in window) || Notification.permission!=='granted') return false;
+    const k='ferit_mr13_desk_'+todayKey(); const schon=JSON.parse(localStorage.getItem(k)||'[]');
+    if(schon.includes(schluessel)) return false;
+    new Notification(titel, {body:text, tag:schluessel});
+    schon.push(schluessel); localStorage.setItem(k, JSON.stringify(schon));
+    return true;
+  }catch(e){ return false; }
+}
+function desktopAlarmePruefen(v){
+  if(!v) return;
+  (STATE.alertsFired||[]).forEach((a,i)=>desktopMeldung('alarm'+i+'_'+a, '⚠ Morgenroutine-Alarm', a));
+  if(v.wechsel) desktopMeldung('wechsel_'+v.label, 'Ampel: '+v.wechsel.von+' → '+v.label, v.sub||'');
+  if(v.voreinstieg && v.voreinstieg.aktiv) desktopMeldung('voreinstieg', '🌱 Voreinstieg erfüllt', 'Alle vier Bedingungen erfüllt — Prüfliste in der Morgenroutine');
+  if(v.panikWende && v.panikWende.aktiv) desktopMeldung('panikwende', '⚡ Panik-Wende möglich', 'Hinweis, kein Ampelzustand — Prüfliste ansehen');
+  if(v.breitenWende && v.breitenWende.aktiv) desktopMeldung('breitenwende', '⚡ Breiten-Wende möglich', 'Hinweis, kein Ampelzustand — Prüfliste ansehen');
+}
+
 function saveSnapshot(auto){
   if(!STATE.ampel || STATE.ampel.label==='WARTE'){
     if(!auto) toast('Erst Morgenroutine laufen lassen','err');
@@ -5098,7 +5153,7 @@ async function ladeRegelcheck(manuell){
     const zeile=b=>`<div style="padding:2px 0"><span class="mono" style="color:var(--steel)">[${esc(b.bereich)}]</span> ${esc(b.text)}${b.hinweis?`<div style="font-size:10px;color:var(--steel);padding-left:14px">${esc(b.hinweis)}</div>`:''}</div>`;
     const kr=d.befunde.filter(b=>b.stufe==='kritisch'), wa=d.befunde.filter(b=>b.stufe==='warnung'), hi=d.befunde.filter(b=>b.stufe==='hinweis');
     let kopf;
-    if(kr.length) kopf=`<b style="color:var(--red)">⚠ ${kr.length} kritisch</b> — vor dem nächsten Einstieg klären`;
+    if(kr.length){ kopf=`<b style="color:var(--red)">⚠ ${kr.length} kritisch</b> — vor dem nächsten Einstieg klären`; try{ desktopMeldung("regelcheck_kritisch", "⚠ REGELCHECK: "+kr.length+" kritisch", kr.slice(0,2).map(b=>b.text).join(" · ")); }catch(e){} }
     else if(wa.length) kopf=`<b style="color:var(--amber)">${wa.length} Warnung${wa.length===1?'':'en'}</b> · nichts Kritisches`;
     else kopf=`<b style="color:var(--green)">✓ Positionen regelkonform</b>`;
     let html=kopf+(wa.length&&kr.length?` · ${wa.length} Warnung${wa.length===1?'':'en'}`:'')
@@ -5160,6 +5215,8 @@ async function runMorning(){
     if(kursOk) setDatenStand(Date.now());       // v6.3
     try{ renderHeute(); ladeRegelcheck(false); }catch(e){}   // v6.17
     try{ positionsMonitor(); }catch(e){}                      // v6.19 (T2)
+    try{ await Promise.race([ueberNacht(), sleep(15000)]); }catch(e){}   // v6.19 (T4) — vor dem Archiv-Eintrag
+    try{ desktopAlarmePruefen(STATE.ampel); }catch(e){}       // v6.19 (T8)
     // v6.10: Tages-Snapshot automatisch anlegen — legt nichts an, wenn für heute
     // schon einer existiert. Nach dem vollständigen Lauf, damit alle Werte drin sind.
     try{ if(saveSnapshot(true)) toast('Tages-Snapshot angelegt','ok'); }catch(e){ console.warn('Snapshot',e); }
