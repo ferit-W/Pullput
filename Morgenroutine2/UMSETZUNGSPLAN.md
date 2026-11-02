@@ -188,6 +188,20 @@ Wird nach jeder Phase hier fortgeschrieben.
   - **A4** Journal v6.6: „Archivieren“ verschiebt alte Trades nach `daten/trading_journal_archiv.json` statt sie zu löschen. Scheitert das Speichern, wird nichts entfernt. Dazu „📚 Langzeit“: Auswertung über Journal und Archiv je Jahr, Setup, Marktphase, Ampel beim Einstieg und Richtung
   - **A5** Jeder neue Trade speichert das Marktbild des Einstiegstags (Morgenroutine oder Archiv). Fehlt es, bleibt das Feld leer
   - **Offen bei dir:** einmal „⏪ Rückrechnung einspielen“ drücken. Nach ein paar Läufen prüfen, ob im Rückblick Live-Tage erscheinen
-- [ ] Phase 4
+- [x] Phase 4 — erledigt und in der Prüfumgebung getestet (02.11.2026), Morgenroutine v6.19, Journal v6.7, Cockpit v6.3:
+  - **T1** Aktien-Breite aus rund 500 S&P-500- und 40 DAX-Werten (über SMA50/200, Anteil in P3, neue Hochs/Tiefs), täglich im Archiv. Daraus die **Breiten-Wende (B4)** als Hinweis, exakt nach der Testregel
+  - **T2** Positions-Monitor im Tagesstart: Kurs, R, Abstand zum Stopp in R und ATR, Phase heute, Zahlen in den nächsten 7 Tagen. „Stopp nachziehen möglich“ nach den im Systemtest besten Ausstiegen
+  - **T3/N2/N3/N5** Setup-Scanner mit der getesteten Regel (Rücksetzer + Platz bis Widerstand, RS Sektor zur Sortierung), gegen den Testcode geprüft (353 Vergleiche identisch). Liquiditätsfilter, Mindestkurs, höchstens 20, Zahlen-Warnung, MDAX/SDAX als eigene Liste in `handelsplan.json`
+  - **N1** Cockpit „⚖ Gesamtrisiko“: Risiko und Kapital über beide Journale plus „Sonstige Bestände“ (Gold-/Silber-ETFs), Konzentration nach Sektor und Titel mit Warnung
+  - **T4** Über-Nacht-Block · **T8** Desktop-Mitteilungen · **T5** Tagesplan und Abendrückblick · **T6** Regeltreue in der Langzeit-Auswertung · **T7** Wochenvorbereitung
+  - **W2** Verfall, Hexensabbat, US-Wahl, halbe Tage · **W3** „📝 Trade vorbereiten“ öffnet das Journal vorausgefüllt
+  - **V1** Sentiment mit Datum · **V2** Abstand zur nächsten Schwelle · **V4** „vorläufig“ während der Handelszeit · **V5** YTD gegen Vorjahresschluss · **V9** ✓✓ doppelte Bestätigung · **V11** KI-Check 24 h gespeichert · **V12** Farbstreifen · **V13** Pflege-Übersicht · **V8** war mit F18 erledigt
+  - Selbsttest: 61 Prüfungen
+  - **Nicht umgesetzt:**
+    - **N4** zweite Datenquelle: Aus der Prüfumgebung ließ sich keine freie Alternative zu Yahoo verlässlich prüfen. Ein ungeprüfter Ersatz würde im Ernstfall still versagen. Bleibt offen für einen Live-Test bei dir
+    - **N7** Recherche historischer Earnings-Termine und einer Datenquelle ohne Survivorship-Verzerrung: offen
+    - Short-Seite im Scanner: nicht getestet, deshalb nur Long
+    - Gleichlauf (Korrelation) im Gesamtrisiko: noch nicht berechnet
+  - **Offen bei dir (Live):** einmal „🎯 Setup-Scanner ▶ Scannen“ (1–3 Minuten). Prüfen, ob unter der Ampel die Aktien-Breite mit rund 500 Werten erscheint. Im Cockpit die Gold- und Silber-ETFs eintragen
 - [ ] Phase 5
 - [ ] Phase 6
