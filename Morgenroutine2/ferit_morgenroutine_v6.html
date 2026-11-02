@@ -795,6 +795,7 @@ footer strong{color:var(--ink2)}
       <span style="margin-left:auto"><button class="cp-btn" onclick="ladeRegelcheck(true)" title="REGELCHECK erneut ausführen">↻ prüfen</button></span></div>
     <div class="sec-info" id="info-start" style="margin:0;border:none;border-bottom:1px solid var(--rule);border-radius:0"><b>Heute</b>: Börsenstatus USA und XETRA (Feiertage werden gerechnet, nicht gepflegt), Handelszeiten in deutscher Zeit, Termine des Tages aus FOMC-Liste, eigenen Terminen, Watchlist-Earnings und — falls geladen — den marktbewegenden Einträgen des KI-Kalenders. <b>Regelcheck</b>: dieselbe Prüfung wie <span class="mono">REGELCHECK.py</span> — Stopp vorhanden und auf der richtigen Seite, Risiko je Position, Slots, Phase gegen Richtung, Restlaufzeit der Optionen. Geprüft wird nur, was in den Journaldateien steht; der Abgleich mit CapTrader bleibt Handarbeit.</div>
     <div id="start-heute" class="ty-line">wird berechnet …</div>
+    <div id="start-plan" class="ty-line"></div>
     <div id="start-nacht" class="ty-line"><b>Über Nacht:</b> wird nach dem Start geladen.</div>
     <div id="start-regel" class="ty-line">Regelcheck wird geladen …</div>
     <!-- v6.19 (T2): offene Positionen aus dem Journal -->
@@ -879,6 +880,14 @@ footer strong{color:var(--ink2)}
       </div>
       <div class="watch-list" id="watch-list"></div>
     </div></div>
+  </section>
+  <!-- v6.19 (T7): Wochenvorbereitung -->
+  <section class="subpanel collapsed" id="sp-woche">
+    <div class="sp-head" onclick="toggleSub('sp-woche',event)">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="sp-t">🗓 Wochenvorbereitung</span><span class="sp-meta">Wochenphasen · Termine · Bilanz der Woche</span></div>
+      <div class="sp-right"><button class="sp-btn" onclick="event.stopPropagation();wochenVorbereitung()">▶ erstellen</button></div>
+    </div>
+    <div class="sp-body" id="woche-body"><div class="init">Am Wochenende öffnet sich dieser Bereich von selbst.</div></div>
   </section>
   <section class="subpanel collapsed" id="sp-hist">
     <div class="sp-head" onclick="toggleSub('sp-hist',event)">
@@ -5074,6 +5083,104 @@ function clearHist(){ if(!confirm('History löschen?'))return; STATE.hist=[]; sa
 
 // ═══════════════════ DATENSTATUS / CHECKLISTE / EXPORT / DRUCK / ALERTS ═══════════════════
 function fmtAgo(d){ if(!d) return '–'; const ms=Date.now()-(d instanceof Date?d.getTime():d); const m=Math.floor(ms/60000); if(m<1)return 'gerade eben'; if(m<60)return m+' Min'; const h=Math.floor(m/60); if(h<24)return h+' Std'; return Math.floor(h/24)+' Tg'; }
+// ═══ v6.19 (V13): PFLEGE-ÜBERSICHT ═══════════════════════════════════════════
+// Alles, was von Hand gepflegt wird oder veraltet, mit Stand und nächstem Handlungsbedarf.
+function pflegeUebersicht(){
+  const z=[]; const heute=new Date();
+  const tageBis = iso => Math.round((new Date(iso+'T12:00:00')-heute)/864e5);
+  const tageSeit = iso => Math.round((heute-new Date(String(iso).slice(0,10)+'T12:00:00'))/864e5);
+  try{ const l=fomcListe(); const letzte=l[l.length-1]; const t=tageBis(letzte);
+       z.push({n:'FOMC-Termine', ok:t>60, txt:`letzter Termin ${letzte}`, hint:t>60?'':'Liste für das nächste Jahr eintragen (Einstellungen)'}); }catch(e){}
+  try{ const b=fedBand(); z.push({n:'Fed-Zielband', ok:b.quelle==='live', txt:`${b.lo}–${b.hi} % · Quelle ${b.quelle==='live'?'New Yorker Fed (live)':b.quelle==='gemerkt'?'zuletzt live geholt':'im Code hinterlegt'} · Stand ${b.datum||'–'}`, hint:b.quelle==='live'?'':'Abruf prüfen'}); }catch(e){}
+  { const d=MANUAL.datum; const t=d?tageSeit(d):null; const leer=[MANUAL.pcr,MANUAL.bear,MANUAL.naaim].every(x=>x==null);
+    z.push({n:'Sentiment von Hand (PCR, AAII, NAAIM)', ok:!leer&&t!=null&&t<=10,
+      txt: leer?'keine Werte eingetragen (optional, erhöht die Abdeckung des Panik-Scores)': d?`eingegeben am ${d} (${t} Tage)`:'kein Datum — vor v6.19 eingegeben',
+      hint: (!leer&&(t==null||t>10))?'neu eintragen — die Werte erscheinen wöchentlich':''}); }
+  { const n=(loadLS(SK.termine,[])||[]).length; z.push({n:'Eigene Termine', ok:true, txt:`${n} eingetragen`, hint:''}); }
+  { const hp=STATE.handelsplan; z.push({n:'Handelsplan', ok:!!(hp&&!hp.fehler&&!(hp.abweichungen||[]).length), txt:hp?(hp.fehler||('Version '+hp.version+((hp.abweichungen||[]).length?' · ungetestete Ampel-Werte!':''))):'nicht geladen', hint:''}); }
+  { const k=STATE.kredit; z.push({n:'Kreditspread (FRED)', ok:!!(k&&!k.alt), txt:k?`Stand ${k.datum}${k.alt?' (gespeichert, Abruf gescheitert)':''}`:'nicht geladen', hint:''}); }
+  { const ab=STATE.aktienBreite; z.push({n:'Aktien-Breite', ok:!!(ab&&ab.US&&ab.US.n>400), txt:ab&&ab.US?`${ab.US.n} S&P-Aktien · ${ab.DE?ab.DE.n:0} DAX`:'nicht geladen', hint:ab&&ab.US&&ab.US.n<400?'weniger als 400 Aktien — Abruf unvollständig':''}); }
+  z.push({n:'Tagesarchiv', ok:STATE.archivOk===true, txt:STATE.archivOk===true?'heute geschrieben':STATE.archivOk===false?'Schreiben gescheitert':'noch kein Lauf', hint:STATE.archivOk===false?'Server/Datenordner prüfen':''});
+  z.push({n:'Desktop-Mitteilungen', ok:('Notification' in window)&&Notification.permission==='granted', txt:('Notification' in window)?Notification.permission:'nicht unterstützt', hint:''});
+  z.push({n:'Sektor-Liste S&P 500 (sektoren.json)', ok:true, txt:'Stand 02.11.2026', hint:'bei Indexänderungen neu erzeugen'});
+  return '<div class="diag-proxy"><b>Pflege-Übersicht</b>'+z.map(x=>`<br>${x.ok?'✓':'⚠'} <b>${esc(x.n)}:</b> ${esc(x.txt)}${x.hint?` — <span style="color:var(--amber)">${esc(x.hint)}</span>`:''}`).join('')+'</div>';
+}
+
+// ═══ v6.19 (T5): TAGESPLAN AM MORGEN, RÜCKBLICK AM ABEND ═══════════════════════
+// Ein kurzes Tagebuch: morgens Fokus, was ich heute NICHT tue, höchstens N neue
+// Positionen; abends Plan eingehalten?, eröffnete Trades (aus dem Journal), Lehre.
+// Gespeichert im Browser und im Tagesarchiv unter dem Kalendertag.
+function tagesplanLaden(){ try{ return JSON.parse(localStorage.getItem('ferit_mr13_plan_'+todayKey())||'{}'); }catch(e){ return {}; } }
+function renderTagesplan(){
+  const el=$('start-plan'); if(!el) return;
+  const p=tagesplanLaden(), abend=new Date().getHours()>=17;
+  const feld=(id,ph,w)=>`<input id="${id}" value="${esc(p[id]||'')}" placeholder="${ph}" style="width:${w};font-size:.72rem;padding:2px 6px;border:1px solid var(--rule);background:transparent;color:var(--ink)">`;
+  el.innerHTML = `<b>Tagesplan:</b> ${feld('tp-fokus','Fokus heute','34%')} ${feld('tp-nicht','Was ich heute NICHT tue','30%')} ${feld('tp-max','max. neue Pos.','11%')}`
+    + (abend ? `<br><b>Rückblick:</b> <select id="tp-ok" style="font-size:.72rem"><option value="">Plan eingehalten?</option>${['ja','teilweise','nein'].map(x=>`<option ${p['tp-ok']===x?'selected':''}>${x}</option>`).join('')}</select> ${feld('tp-lehre','Lehre des Tages','52%')} <span id="tp-trades" style="color:var(--steel)"></span>` : '')
+    + ` <button class="cp-btn" onclick="tagesplanSpeichern()">speichern</button> <span id="tp-msg" style="color:var(--steel);font-size:.66rem">${p.gespeichert?'gespeichert '+p.gespeichert:''}</span>`;
+  if(abend) ladeJournalHeute().then(n=>{ const t=$('tp-trades'); if(t) t.textContent = n==null ? '' : `· heute ${n} Trade(s) eröffnet laut Journal`; });
+}
+async function ladeJournalHeute(){
+  try{ let tr=null; const r=await fetchOnce('http://localhost:8765/data/load?name=trading_journal',5000); if(r.ok){ tr=(await r.json()).trades; }
+       if(!Array.isArray(tr)) tr=JSON.parse(localStorage.getItem('localTrades_v2')||'[]');
+       const h=todayKey(); return tr.filter(t=>String(t.dateOpened||'').slice(0,10)===h).length; }catch(e){ return null; }
+}
+async function tagesplanSpeichern(){
+  const g=id=>{ const e=$(id); return e?e.value.trim():undefined; };
+  const p=Object.assign(tagesplanLaden(), {'tp-fokus':g('tp-fokus'),'tp-nicht':g('tp-nicht'),'tp-max':g('tp-max')});
+  if($('tp-ok')) Object.assign(p, {'tp-ok':g('tp-ok'),'tp-lehre':g('tp-lehre')});
+  p.gespeichert=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  try{ localStorage.setItem('ferit_mr13_plan_'+todayKey(), JSON.stringify(p)); }catch(e){}
+  let ok=false;
+  try{ const n=await ladeJournalHeute();
+       const r=await fetchOnce('http://localhost:8765/archiv/tage?jahr='+todayKey().slice(0,4), 6000, {method:'POST', headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({tage:{[todayKey()]:{tagesplan:{fokus:p['tp-fokus']||'', nicht:p['tp-nicht']||'', maxNeu:p['tp-max']||''},
+           rueckblick: p['tp-ok']!=null ? {eingehalten:p['tp-ok']||'', lehre:p['tp-lehre']||'', tradesEroeffnet:n} : undefined}}})});
+       ok=!!(r&&r.ok); }catch(e){}
+  const m=$('tp-msg'); if(m) m.textContent = ok ? 'gespeichert (Laufwerk) '+p.gespeichert : 'gespeichert (nur Browser) '+p.gespeichert;
+}
+
+// ═══ v6.19 (T7): WOCHENVORBEREITUNG ═══════════════════════════════════════════
+// Am Wochenende: Wochenphasen der Indizes und Sektoren (Wochenkerzen, 5 Jahre Daten),
+// Termine der kommenden Woche, Bilanz der vergangenen Woche, Zahlen offener Positionen.
+function wochenSchluss(closes, times){
+  const out=[]; let letzteWoche=null;
+  times.forEach((t,i)=>{ if(t==null||!isFinite(closes[i])) return; const d=new Date(t*1000);
+    const mo=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-((d.getUTCDay()+6)%7))).toISOString().slice(0,10);
+    if(mo===letzteWoche) out[out.length-1]=closes[i]; else { out.push(closes[i]); letzteWoche=mo; } });
+  return out;
+}
+async function wochenVorbereitung(){
+  const el=$('woche-body'); if(!el) return;
+  const p=$('sp-woche'); if(p) p.classList.remove('collapsed');
+  el.innerHTML='<div class="loading"><div class="spinner"></div>Wochenkerzen werden geladen …</div>';
+  const liste = INDICES.map(m=>({k:m.key, y:m.y})).concat(SECTORS.map(s=>({k:s.etf, y:s.etf})));
+  const erg=[];
+  await mapLimit(liste, localProxyAlive?4:2, async m=>{
+    try{ const d=await fetchYahoo(m.y,'5y'); const w=wochenSchluss(d.closes,d.times);
+         const ph = w.length>=200 ? luedePhase(w[w.length-1], ema(w,20), ema(w,50), ema(w,200)).code : (w.length>=50?'(zu kurz für EMA200)':'–');
+         erg.push({k:m.k, ph, w:w.length}); }catch(e){ erg.push({k:m.k, ph:'–'}); }
+  });
+  const ordnung=liste.map(x=>x.k); erg.sort((a,b)=>ordnung.indexOf(a.k)-ordnung.indexOf(b.k));
+  const pcl=p=>p==='P3'?'var(--green)':p==='P6'?'var(--red)':'var(--steel)';
+  // vergangene Woche aus dem Journal
+  let bilanz='–';
+  try{ let tr=null; const r=await fetchOnce('http://localhost:8765/data/load?name=trading_journal',5000); if(r.ok) tr=(await r.json()).trades;
+       if(!Array.isArray(tr)) tr=JSON.parse(localStorage.getItem('localTrades_v2')||'[]');
+       const grenze=Date.now()-7*864e5; const zu=tr.filter(t=>t.status==='Closed' && new Date(t.dateClosed||0).getTime()>=grenze);
+       const R=zu.reduce((s,t)=>s+(+t.profitR||0),0), win=zu.filter(t=>(+t.profitR||0)>0).length;
+       bilanz = zu.length ? `${zu.length} Trades geschlossen · ${R>=0?'+':''}${R.toFixed(1).replace('.',',')} R · ${win} Gewinner` : 'keine Trades geschlossen'; }catch(e){}
+  const W=wochenTermine();
+  const offen=await ladeJournalOffen().catch(()=>[]);
+  const zahlen=offen.map(t=>String(t.productName||'').toUpperCase()).filter(s=>{ const e=STATE.earnings&&STATE.earnings[s]; return e && (e*1000-Date.now())/864e5<=9 && e*1000>Date.now(); });
+  el.innerHTML = `<div style="font-size:.74rem;line-height:1.7">`
+    + `<b>Wochenphasen</b> (Wochenkerzen, EMA 20/50/200): ` + erg.map(x=>`<span style="color:${pcl(x.ph)}">${esc(x.k)} ${esc(x.ph)}</span>`).join(' · ')
+    + `<br><b>Termine der kommenden Woche:</b> ${W.eintraege.length?W.eintraege.map(e=>esc(e.d.slice(5).split('-').reverse().join('.')+' '+e.was)).join(' · '):'keine'} (Wochenampel: ${esc(W.stufe)})`
+    + `<br><b>Vergangene 7 Tage:</b> ${esc(bilanz)}`
+    + `<br><b>Offene Positionen mit Zahlen in der neuen Woche:</b> ${zahlen.length?zahlen.map(esc).join(', '):'keine bekannt'}`
+    + `<div style="color:var(--steel);font-size:.66rem;margin-top:4px">Wochenphasen mit 5 Jahren Kursdaten; „zu kurz“ heißt weniger als 200 Wochen Historie.</div></div>`;
+}
+
 function renderDiag(){
   const el=$('diag-body'); if(!el) return;
   const idxOk=(STATE.indices||[]).filter(i=>!i.err).length, idxStale=(STATE.indices||[]).filter(i=>i.stale).length;
@@ -5090,6 +5197,7 @@ function renderDiag(){
   let html='<div class="diag-grid">';
   rows.forEach(r=>{ const cls=!r.ok?'d-off':r.warn?'d-warn':'d-ok'; html+=`<div class="diag-row ${cls}"><div class="d-dot"></div><div class="d-main"><div class="d-name">${r.n}</div><div class="d-txt">${r.txt}</div>${r.sub?`<div class="d-sub">${r.sub}</div>`:''}</div><div class="d-age">${r.ts?fmtAgo(r.ts):''}</div></div>`; });
   html+='</div>';
+  try{ html+=pflegeUebersicht(); }catch(e){}   // v6.19 (V13)
   html+=`<div class="diag-proxy"><b>Proxy:</b> ${localProxyAlive?'lokal aktiv':'öffentlich'} · lokal ${PROXY_DIAG.local} · direkt ${PROXY_DIAG.direct} · öffentlich ${PROXY_DIAG.public} · Fehlschläge ${PROXY_DIAG.fail}${PROXY_DIAG.lastMs!=null?` · letzte Antwort ${PROXY_DIAG.lastMs} ms (${PROXY_DIAG.lastVia})`:''}<br><span style="opacity:.7">*Alter approximiert über Kalendertage — Mo/nach Feiertagen normal höher.</span></div>`;
   el.innerHTML=html;
 }
@@ -5324,6 +5432,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
     }
   }).catch(()=>{}).then(()=>{ try{ autostartPruefen(); }catch(e){} });   // v6.17: erst NACH dem Sync entscheiden
   initTheme(); initCollapse(); initSettings(); initClock(); initAlerts(); initSeasCache(); renderSeasonPanel();
+  try{ renderTagesplan(); if([0,6].includes(new Date().getDay())) setTimeout(wochenVorbereitung, 3000); }catch(e){}   // v6.19 (T5, T7)
   renderWatch(); renderHist(); renderDiag();
   initAutostart(); renderHeute(); ladeRegelcheck(false);   // v6.17
   if(location.protocol==='file:'){ const b=$('proto-banner'); if(b) b.style.display='block'; }
