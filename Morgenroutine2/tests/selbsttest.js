@@ -63,7 +63,7 @@ vm.createContext(ctx);
 // Top-Level-const/let sind im vm nicht als Eigenschaften sichtbar — deshalb am Ende exportieren.
 const exporte = ['luedePhase','computeAmpel','ampelRegel','voreinstiegPruefung','trendUndRisiko','usBoersenStatus','xetraStatus','etNachBerlin','makroStufe','makroRegion',
   'korrigiereZeit','wochenTermine','kreditAusCsv','folgeRenditen','datumAus','breitenWendePruefung','nachziehVorschlag','isoLokal','mrSyncWert','STATE','SK'];
-vm.runInContext(code + '\n;globalThis.__T={' + exporte.map(n => `${n}:(typeof ${n}!=='undefined'?${n}:undefined)`).join(',') + ',kpi:()=>KPIDAYS};',
+vm.runInContext(code + '\n;globalThis.__T={' + exporte.map(n => `${n}:(typeof ${n}!=='undefined'?${n}:undefined)`).join(',') + ',kpi:()=>KPIDAYS,manual:()=>MANUAL,panik:()=>panikComponents()};',
   ctx, { filename: 'ferit_morgenroutine_v6.html' });
 const T = ctx.__T;
 
@@ -273,6 +273,21 @@ abschnitt('Regelbasierte Termine');
   const w3 = mitDatum('2026-11-16', () => T.wochenTermine().eintraege.map(e => e.d + ' ' + e.was));
   pruefe('Großer Verfall 20.11.2026 erkannt', w3.some(x => x.startsWith('2026-11-20 Großer Verfall')), true);
   pruefe('Tag nach Thanksgiving als halber Tag', mitDatum('2026-11-23', () => T.wochenTermine().eintraege.some(e => e.d === '2026-11-27' && /halber/.test(e.was))), true);
+}
+
+// ── Handeingaben mit Datum (V1) ────────────────────────────────────────────────
+abschnitt('Sentiment-Handeingaben');
+{
+  const M = T.manual();
+  const tag = n => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
+  Object.assign(M, { pcr: 1.3, bear: 55, naaim: 15, datum: tag(3) });
+  const frisch = T.panik().C.filter(c => ['PCR-Equity', 'AAII-Bear', 'NAAIM'].includes(c.k)).map(c => c.pts);
+  M.datum = tag(14);
+  const alt = T.panik().C.filter(c => ['PCR-Equity', 'AAII-Bear', 'NAAIM'].includes(c.k));
+  pruefe('frische Werte zählen', frisch, [14, 12, 10]);
+  pruefe('Werte älter als 10 Tage zählen nicht', alt.map(c => c.pts), [null, null, null]);
+  pruefe('… und sind als veraltet markiert', alt.every(c => /veraltet/.test(c.v)), true);
+  ['pcr', 'bear', 'naaim', 'datum'].forEach(k => delete M[k]);
 }
 
 // ── Ergebnis ─────────────────────────────────────────────────────────────────

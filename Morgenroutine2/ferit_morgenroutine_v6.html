@@ -1700,7 +1700,8 @@ function saveManual(){
     bull: numOrNull($('m-bull').value),
     bear: numOrNull($('m-bear').value),
     naaim: numOrNull($('m-naaim').value),
-    term: $('m-term').value
+    term: $('m-term').value,
+    datum: todayKey()      // v6.19 (V1): Stand der Eingabe
   };
   saveLS(SK.manual, MANUAL);
   $('dw-sent-msg').textContent='✓ Gespeichert. Beim nächsten Lauf im Score berücksichtigt.';
@@ -1826,8 +1827,9 @@ async function loadTreasuryCMT(){
   const n=rows.length, at=b=>(n-1-b>=0)?rows[n-1-b].v:null;
   const cur=rows[n-1].v, prev=rows[n-2].v, d5=at(5), d20=at(20);
   // YTD = erster Handelstag des LAUFENDEN Jahres (nicht rows[0] — das wäre nach Merge das Vorjahr)
-  let ytd=null;
-  for(let i=0;i<n;i++){ if(new Date(rows[i].t).getFullYear()===yr){ ytd=rows[i].v; break; } }
+  let ytd=null;   // v6.19 (V5): letzter Schluss des Vorjahrs, sonst erster Tag des Jahres
+  for(let i=n-1;i>=0;i--){ if(new Date(rows[i].t).getFullYear()<yr){ ytd=rows[i].v; break; } }
+  if(ytd==null) for(let i=0;i<n;i++){ if(new Date(rows[i].t).getFullYear()===yr){ ytd=rows[i].v; break; } }
   const bp=(a,b)=>(a!=null&&b!=null)?(a-b)*100:null;
   const asofTs=rows[n-1].t;
   const asof=new Date(asofTs).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
@@ -2188,8 +2190,11 @@ async function loadPrices(){
     if(!r||r.err) return {...m, err:(r&&r.err)||'Fehler'};
     const d=r.data, c=d.closes, n=c.length, at=b=>(n-1-b>=0)?c[n-1-b]:null;
     const cur=d.price, prev=d.prev, d5=at(5), d20=at(20);
+    // v6.19 (V5): YTD gegen den letzten Schluss des VORJAHRS (übliche Definition), sonst
+    // ersten Handelstag des Jahres, falls das Vorjahr nicht in den Daten ist.
     const yr=new Date().getFullYear(); let ytd=null;
-    for(let i=0;i<d.times.length;i++){ if(d.times[i] && new Date(d.times[i]*1000).getFullYear()===yr){ ytd=c[i]; break; } }
+    for(let i=d.times.length-1;i>=0;i--){ if(d.times[i] && new Date(d.times[i]*1000).getFullYear()<yr){ ytd=c[i]; break; } }
+    if(ytd==null) for(let i=0;i<d.times.length;i++){ if(d.times[i] && new Date(d.times[i]*1000).getFullYear()===yr){ ytd=c[i]; break; } }
     const bp=(a,b)=>(a!=null&&b!=null)?(a-b)*100:null;
     // v6.6: closes/times mitführen — bisher weggeworfen, dadurch war für die
     // Laufzeiten kein Chart zeichenbar. Renditen brauchen 2 Nachkommastellen.
@@ -2801,7 +2806,10 @@ async function scanSectorStocks(){
   const top=okr.slice(0,nTop), bot=okr.slice(okr.length-nBot).reverse();
   const failed=res.filter(r=>r.err).length;
   const pcl=p=>p==='P3'?'pt-p3':p==='P6'?'pt-p6':'pt-n';
-  const row=r=>`<div class="scan-stock"><span><b>${r.t}</b> <span class="phase-tag ${pcl(r.phase)}">${r.phase}</span></span><span class="v tabnum">1M <span class="${r.p1>0?'up':'down'}">${fmtPct(r.p1,1)}</span> · EMA200 ${fmtPct(r.dist200,0)} · Score <b>${r.score>0?'+':''}${r.score.toFixed(1)}</b></span></div>`;
+  // v6.19 (V9): doppelte Bestätigung — Aktie UND Sektor-ETF in derselben handelbaren Phase
+  const sekPh = ((STATE.sectors||[]).find(x=>x.etf===etf)||{}).phase; const sekCode = sekPh&&sekPh.code;
+  const doppelt = p => (p==='P3'||p==='P6') && p===sekCode;
+  const row=r=>`<div class="scan-stock"><span><b>${r.t}</b> <span class="phase-tag ${pcl(r.phase)}">${r.phase}</span>${doppelt(r.phase)?` <span title="Aktie und Sektor ${etf} beide in ${r.phase} — doppelte Bestätigung" style="color:var(--gold);font-weight:700">✓✓</span>`:''}</span><span class="v tabnum">1M <span class="${r.p1>0?'up':'down'}">${fmtPct(r.p1,1)}</span> · EMA200 ${fmtPct(r.dist200,0)} · Score <b>${r.score>0?'+':''}${r.score.toFixed(1)}</b></span></div>`;
   // ── v6.3: Titel zum Kopieren für TradingView ──────────────────────────────
   // Getrennt nach Long und Short, weil je nach Indexphase nur eine Richtung
   // gehandelt wird. Das Format ist die TradingView-Watchlist-Syntax:
@@ -3245,7 +3253,11 @@ function renderGaps(d){
 // ═══════════════════ PANIK-SCORE (gewichtet, je Signal einmal) ═══════════════════
 function panikComponents(){
   const vix=STATE.vix, vvix=STATE.vvix, fg=STATE.fg?.score ?? null;
-  const pcr=MANUAL.pcr ?? null, bear=MANUAL.bear ?? null, naaim=MANUAL.naaim ?? null, term=effTerm(), termAuto=!!(STATE.vixTerm&&STATE.vixTerm.regime);
+  // v6.19 (V1): Handeingaben älter als 10 Tage zählen nicht mehr — sonst rechnet der
+  // Score wochenlang mit einer alten AAII-Umfrage, ohne dass man es sieht.
+  const manAlter = MANUAL.datum ? Math.floor((Date.now()-new Date(MANUAL.datum+'T12:00:00'))/864e5) : null;
+  const manAlt = manAlter!=null && manAlter>10;
+  const pcr=manAlt?null:(MANUAL.pcr ?? null), bear=manAlt?null:(MANUAL.bear ?? null), naaim=manAlt?null:(MANUAL.naaim ?? null), term=effTerm(), termAuto=!!(STATE.vixTerm&&STATE.vixTerm.regime);
   // Gewichte summieren auf 100
   const C=[];
   // VIX 24
@@ -3259,13 +3271,14 @@ function panikComponents(){
   C.push({k:'Fear&Greed',w:20,v:fg==null?'n/a':String(fg),pts:pf,sev:pf==null?'na':pf===0?'ok':pf<10?'mid':'hi'});
   // PCR-Eq 14
   let pp; if(pcr==null)pp=null; else if(pcr<0.7)pp=0; else if(pcr<1.0)pp=4; else if(pcr<1.2)pp=9; else pp=14;
-  C.push({k:'PCR-Equity',w:14,v:pcr==null?'n/a':fmtPx(pcr,2),pts:pp,sev:pp==null?'na':pp===0?'ok':pp<9?'mid':'hi'});
+  const altTxt = x => manAlt && x!=null ? fmtPx(x, 0)+' (veraltet, '+manAlter+' T.)' : 'n/a';
+  C.push({k:'PCR-Equity',w:14,v:pcr==null?(manAlt&&MANUAL.pcr!=null?fmtPx(MANUAL.pcr,2)+' (veraltet)':'n/a'):fmtPx(pcr,2)+(manAlter!=null?' · '+manAlter+' T.':''),pts:pp,sev:pp==null?'na':pp===0?'ok':pp<9?'mid':'hi'});
   // AAII-Bear 12
   let pa; if(bear==null)pa=null; else if(bear<30)pa=0; else if(bear<40)pa=4; else if(bear<50)pa=8; else pa=12;
-  C.push({k:'AAII-Bear',w:12,v:bear==null?'n/a':fmtPx(bear,0)+'%',pts:pa,sev:pa==null?'na':pa===0?'ok':pa<8?'mid':'hi'});
+  C.push({k:'AAII-Bear',w:12,v:bear==null?(manAlt&&MANUAL.bear!=null?altTxt(MANUAL.bear)+'%':'n/a'):fmtPx(bear,0)+'%',pts:pa,sev:pa==null?'na':pa===0?'ok':pa<8?'mid':'hi'});
   // NAAIM 10 (niedrig = defensiv = Panik)
   let pn; if(naaim==null)pn=null; else if(naaim>60)pn=0; else if(naaim>40)pn=3; else if(naaim>20)pn=7; else pn=10;
-  C.push({k:'NAAIM',w:10,v:naaim==null?'n/a':fmtPx(naaim,0),pts:pn,sev:pn==null?'na':pn===0?'ok':pn<7?'mid':'hi'});
+  C.push({k:'NAAIM',w:10,v:naaim==null?(manAlt&&MANUAL.naaim!=null?altTxt(MANUAL.naaim):'n/a'):fmtPx(naaim,0),pts:pn,sev:pn==null?'na':pn===0?'ok':pn<7?'mid':'hi'});
   // VIX-Term 10
   let pt; const tl={contango:'Contango',flat:'Flach',['back-light']:'Backw. leicht',['back-strong']:'Backw. stark'};
   if(!term)pt=null; else if(term==='contango')pt=0; else if(term==='flat')pt=3; else if(term==='back-light')pt=6; else pt=10;
@@ -4535,10 +4548,12 @@ const SYM_RE=/^[A-Za-z0-9.\^=\-]{1,20}$/;  // identisch zur Server-Allowlist (_S
 function addWatch(){ const i=$('watch-inp'); const t=i.value.trim().toUpperCase(); if(!t)return; if(!SYM_RE.test(t)){toast('Ungültiges Symbol: nur A-Z 0-9 . ^ = - (max 20 Zeichen)','err');return;} if(STATE.watch.find(w=>w.ticker===t)){toast(t+' bereits drin','err');return;} STATE.watch.push({ticker:t,price:null,pct:null}); saveLS(SK.watch,STATE.watch); i.value=''; renderWatch(); refreshWatch(); }
 function removeWatch(t){ STATE.watch=STATE.watch.filter(w=>w.ticker!==t); saveLS(SK.watch,STATE.watch); renderWatch(); }
 function aiBlock(tic){
+  if(!STATE.watchAI[tic]){ try{ const c=JSON.parse(localStorage.getItem('ferit_mr13_watchai')||'{}')[tic];   // v6.19 (V11)
+    if(c && Date.now()-c.ts<864e5) STATE.watchAI[tic]={state:'done', html:c.html, ts:c.ts}; }catch(e){} }
   const a=STATE.watchAI[tic];
   if(a&&a.state==='loading') return `<div class="wc-ai-load"><div class="spinner"></div>KI bewertet…</div>`;
   if(a&&a.state==='err') return `<button class="wc-ai-btn" onclick="aiWatch('${tic}')">🤖 KI-Check</button><div class="wc-ai-err">⚠ ${a.text}</div>`;
-  if(a&&a.state==='done') return `<div class="wc-ai"><span class="wc-ai-tag">🤖 KI-Einordnung · Gemini · verifizieren</span>${a.html}</div><button class="wc-ai-btn" onclick="aiWatch('${tic}')">↻ neu bewerten</button>`;
+  if(a&&a.state==='done') return `<div class="wc-ai"><span class="wc-ai-tag">🤖 KI-Einordnung · Gemini · verifizieren${a.ts?' · Stand '+new Date(a.ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</span>${a.html}</div><button class="wc-ai-btn" onclick="aiWatch('${tic}')">↻ neu bewerten</button>`;
   return `<button class="wc-ai-btn" onclick="aiWatch('${tic}')">🤖 KI-Check</button>`;
 }
 async function aiWatch(tic){
@@ -4571,6 +4586,9 @@ async function aiWatch(tic){
       .replace(/Einordnung:\s*(STARK|NEUTRAL|SCHWACH)/i,(m,g)=>`<br><strong style="color:${/stark/i.test(g)?'var(--green)':/schwach/i.test(g)?'var(--red)':'var(--amber)'}">Einordnung: ${g.toUpperCase()}</strong>`)
       .replace(/\n/g,'<br>');
     STATE.watchAI[tic]={state:'done', html, ts:Date.now()};
+    // v6.19 (V11): 24 Stunden aufheben — nach dem Neuladen wieder da, ohne neue Token-Kosten
+    try{ const c=JSON.parse(localStorage.getItem('ferit_mr13_watchai')||'{}'); c[tic]={html, ts:Date.now()};
+         Object.keys(c).forEach(k=>{ if(Date.now()-c[k].ts>864e5) delete c[k]; }); localStorage.setItem('ferit_mr13_watchai', JSON.stringify(c)); }catch(e){}
   }catch(e){
     STATE.watchAI[tic]={state:'err', text: e.message==='NO_KEY'?'kein Key':e.message==='KEY_INVALID'?'Key ungültig':e.message};
   }
