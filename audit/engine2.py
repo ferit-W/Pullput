@@ -37,6 +37,9 @@ STANDARD = dict(
     zins_cash=0.04, zins_basis='equity',
     slip=0.25, fee_kontrakt_seite=1.80, fee_abrechnung=0.0,
     raster=5.0, ganze=False, t_legacy=False, stress='drei', vx_lag=0,
+    zyklus=None,          # None | 'woche' (Mo–Do, Verfall Freitag derselben Woche) | 'monat' (Mo–Do nach Monatsverfall)
+    strike_modus='delta', # 'delta' | 'atm' (K1 = Kurs auf Raster gerundet)
+    breite_fest=None,     # feste Breite in Punkten des Produkts (None = 100*S/2750)
 )
 
 LEGACY = dict(STANDARD, verfaelle='synthetisch', t_legacy=True, raster=0.0, ganze=False, stress='legacy',
@@ -153,6 +156,25 @@ class Kalender:
                     out[v] = 'PM'
         return sorted(out.items())
 
+    def zyklus_verfall(self, heute, zyklus):
+        """Verfall für den festen Einstiegsrhythmus (VORAB_REGELN_ATM.md) oder None, wenn heute kein Einstiegstag ist."""
+        wd = heute.weekday()
+        if wd > 3:
+            return None
+        if zyklus == 'woche':
+            f = heute + pd.Timedelta(days=4 - wd)
+            abr = 'AM' if f == self.dritter_freitag(f.year, f.month) else 'PM'
+        elif zyklus == 'monat':
+            f_vor = heute - pd.Timedelta(days=wd + 3)          # Freitag der Vorwoche
+            if f_vor != self.dritter_freitag(f_vor.year, f_vor.month):
+                return None
+            j, m = (f_vor.year, f_vor.month + 1) if f_vor.month < 12 else (f_vor.year + 1, 1)
+            f, abr = self.dritter_freitag(j, m), 'AM'
+        else:
+            raise ValueError(zyklus)
+        v = self.vorheriger(f)
+        return (v, abr) if v > heute else None
+
 
 def runden(x, g):
     return round(x / g) * g if g > 0 else x
@@ -253,7 +275,11 @@ def backtest(d, **kw):
         elif len(pos) >= c['max_pos']:
             zaehl['voll'] += 1
         else:
-            if c['verfaelle'] == 'synthetisch':
+            if c['zyklus']:
+                ziel = None
+                zv = kal.zyklus_verfall(t, c['zyklus'])
+                kand = [zv] if zv else []
+            elif c['verfaelle'] == 'synthetisch':
                 ziel = t + pd.Timedelta(days=c['tage_ziel'])
                 v = kal.vorheriger(ziel)
                 kand = [(v, 'PM')] if v > t else []
@@ -269,13 +295,19 @@ def backtest(d, **kw):
                          verfall_idx=pos_idx.get(verfall, 10**9) if abr == 'PM' or c['t_legacy'] else -1)
                 T = T_bis(q, t)
                 S = C[i]
-                K1r, ok = mod.strike_fuer_delta(S, T, vx_e, c['delta'])
+                if c['strike_modus'] == 'atm':
+                    K1r, ok = S, True
+                else:
+                    K1r, ok = mod.strike_fuer_delta(S, T, vx_e, c['delta'])
                 if not ok:
                     zaehl['delta_nicht_gefunden'] += 1
                 else:
                     g = c['raster']
                     K1 = runden(K1r, g)
-                    w = max(g, runden(c['breite'] * (S / sk) / c['breite_ref'] * sk, g)) if g else c['breite'] * (S / sk) / c['breite_ref'] * sk
+                    if c['breite_fest']:
+                        w = float(c['breite_fest'])
+                    else:
+                        w = max(g, runden(c['breite'] * (S / sk) / c['breite_ref'] * sk, g)) if g else c['breite'] * (S / sk) / c['breite_ref'] * sk
                     K2 = K1 - w
                     mid = mod.put(S, K1, T, vx_e) - mod.put(S, K2, T, vx_e)
                     kredit = mid - c['slip']

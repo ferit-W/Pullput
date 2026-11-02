@@ -74,3 +74,8 @@ tage 21, delta 0,8, breite 100 (Ref. 2.750), max_pos 4, ema 200, einsatz 0,85 %,
   Regelwerk `audit/REGELWERK.md`. 11 bestätigte Fehler, 5 widerlegte Verdachtsfälle.
 - Strategie unverändert. Mit belegbar verfügbaren Monatsverfällen: H1 11,4 % / 19,3 %, H2 18,6 % / 22,6 %.
   SPX mit ganzen Kontrakten bei 100.000 USD ab 2017 nicht handelbar.
+
+## Schritt 13 – ATM-Variante mit festem Einstiegsrhythmus (02.11.2026)
+- Regeln vorab: `audit/VORAB_REGELN_ATM.md`. 8 Varianten (Woche/Monat × SPX/XSP × 5/10 Pkt), ganze Kontrakte.
+- Ergebnis und Empfindlichkeiten: `audit/ERGEBNIS_ATM.md`. Monatszyklus mit niedrigem Drawdown (3,6–11,3 %),
+  Rendite stark modellabhängig; Wochenzyklus kostenempfindlich und schlecht durch VX1 abgebildet. Keine Auswahl.

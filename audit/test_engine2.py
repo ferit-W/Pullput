@@ -162,6 +162,39 @@ class XSP(unittest.TestCase):
         self.assertGreater(r['kennzahlen']['tage_konto_zu_klein'], 0)
 
 
+class ZyklusATM(unittest.TestCase):
+    k = E2.Kalender(D.index)
+    T = staticmethod(pd.Timestamp)
+
+    def test_woche_normal(self):
+        for tag in ('2017-01-09', '2017-01-10', '2017-01-11', '2017-01-12'):
+            self.assertEqual(self.k.zyklus_verfall(self.T(tag), 'woche'), (self.T('2017-01-13'), 'PM'))
+        self.assertIsNone(self.k.zyklus_verfall(self.T('2017-01-13'), 'woche'))
+
+    def test_woche_dritter_freitag_am(self):
+        self.assertEqual(self.k.zyklus_verfall(self.T('2017-01-17'), 'woche'), (self.T('2017-01-20'), 'AM'))
+
+    def test_woche_karfreitag(self):
+        self.assertEqual(self.k.zyklus_verfall(self.T('2014-04-16'), 'woche'), (self.T('2014-04-17'), 'AM'))
+        self.assertIsNone(self.k.zyklus_verfall(self.T('2014-04-17'), 'woche'))
+
+    def test_monat(self):
+        for tag in ('2017-01-23', '2017-01-26'):
+            self.assertEqual(self.k.zyklus_verfall(self.T(tag), 'monat'), (self.T('2017-02-17'), 'AM'))
+        self.assertIsNone(self.k.zyklus_verfall(self.T('2017-01-30'), 'monat'))
+        self.assertIsNone(self.k.zyklus_verfall(self.T('2017-01-17'), 'monat'))
+
+    def test_atm_strikes_und_breite(self):
+        r = E2.backtest(D, start='2017-01-01', ende='2017-03-31', zyklus='woche', strike_modus='atm', breite_fest=10, ganze=True)
+        self.assertGreater(len(r['trades']), 0)
+        for q in r['trades']:
+            self.assertEqual(q['K1'], round(q['S_ein'] / 5) * 5)
+            self.assertEqual(q['K1'] - q['K2'], 10)
+            self.assertLess(q['ein_datum'], q['verfall'])
+            self.assertTrue(q['ein_datum'].weekday() <= 3)
+            self.assertEqual(q['n'], int(q['n']))
+
+
 class Bewertung(unittest.TestCase):
     def test_verfall_innerer_wert_und_grenzen(self):
         m = E2.Modell(E2.STANDARD)
