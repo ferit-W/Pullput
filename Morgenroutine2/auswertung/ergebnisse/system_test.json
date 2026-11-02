@@ -1,0 +1,842 @@
+{
+ "regeln": "siehe Kopf von system_test.py",
+ "aktien": 488,
+ "zeitraeume": {
+  "A": [
+   "2017-11-01",
+   "2021-12-31"
+  ],
+  "B": [
+   "2022-01-01",
+   "2026-09-30"
+  ]
+ },
+ "S1": {
+  "T": {
+   "signale": 128381,
+   "ohne Ampel": {
+    "A": {
+     "trades": 621.25,
+     "erwartung_R": 0.221,
+     "treffer_pct": 39.335,
+     "gewinnfaktor": 1.47,
+     "rendite_pa_pct": 8.687,
+     "max_verlust_pct": -13.37,
+     "sharpe": 0.931
+    },
+    "B": {
+     "trades": 750.3,
+     "erwartung_R": 0.098,
+     "treffer_pct": 33.82,
+     "gewinnfaktor": 1.194,
+     "rendite_pa_pct": 3.166,
+     "max_verlust_pct": -12.558,
+     "sharpe": 0.392
+    },
+    "gesamt": {
+     "trades": 1371.55,
+     "erwartung_R": 0.153,
+     "treffer_pct": 36.305,
+     "gewinnfaktor": 1.311,
+     "rendite_pa_pct": 5.7,
+     "max_verlust_pct": -14.673,
+     "sharpe": 0.656
+    }
+   },
+   "mit Ampel": {
+    "A": {
+     "trades": 558.7,
+     "erwartung_R": 0.175,
+     "treffer_pct": 40.13,
+     "gewinnfaktor": 1.389,
+     "rendite_pa_pct": 6.22,
+     "max_verlust_pct": -9.006,
+     "sharpe": 0.82
+    },
+    "B": {
+     "trades": 685.8,
+     "erwartung_R": 0.036,
+     "treffer_pct": 32.18,
+     "gewinnfaktor": 1.074,
+     "rendite_pa_pct": 0.633,
+     "max_verlust_pct": -14.329,
+     "sharpe": 0.111
+    },
+    "gesamt": {
+     "trades": 1244.5,
+     "erwartung_R": 0.098,
+     "treffer_pct": 35.73,
+     "gewinnfaktor": 1.207,
+     "rendite_pa_pct": 3.204,
+     "max_verlust_pct": -15.428,
+     "sharpe": 0.447
+    }
+   }
+  },
+  "T+K3": {
+   "signale": 84301,
+   "ohne Ampel": {
+    "A": {
+     "trades": 618.85,
+     "erwartung_R": 0.201,
+     "treffer_pct": 39.325,
+     "gewinnfaktor": 1.419,
+     "rendite_pa_pct": 7.856,
+     "max_verlust_pct": -13.678,
+     "sharpe": 0.848
+    },
+    "B": {
+     "trades": 751.05,
+     "erwartung_R": 0.08,
+     "treffer_pct": 33.2,
+     "gewinnfaktor": 1.157,
+     "rendite_pa_pct": 2.291,
+     "max_verlust_pct": -14.559,
+     "sharpe": 0.297
+    },
+    "gesamt": {
+     "trades": 1369.9,
+     "erwartung_R": 0.134,
+     "treffer_pct": 35.955,
+     "gewinnfaktor": 1.269,
+     "rendite_pa_pct": 4.849,
+     "max_verlust_pct": -16.289,
+     "sharpe": 0.567
+    }
+   },
+   "mit Ampel": {
+    "A": {
+     "trades": 559.6,
+     "erwartung_R": 0.173,
+     "treffer_pct": 39.74,
+     "gewinnfaktor": 1.377,
+     "rendite_pa_pct": 6.157,
+     "max_verlust_pct": -10.122,
+     "sharpe": 0.782
+    },
+    "B": {
+     "trades": 687.35,
+     "erwartung_R": 0.062,
+     "treffer_pct": 32.06,
+     "gewinnfaktor": 1.126,
+     "rendite_pa_pct": 1.542,
+     "max_verlust_pct": -13.619,
+     "sharpe": 0.22
+    },
+    "gesamt": {
+     "trades": 1246.95,
+     "erwartung_R": 0.112,
+     "treffer_pct": 35.5,
+     "gewinnfaktor": 1.233,
+     "rendite_pa_pct": 3.669,
+     "max_verlust_pct": -15.488,
+     "sharpe": 0.489
+    }
+   }
+  },
+  "T+K2": {
+   "signale": 73055,
+   "ohne Ampel": {
+    "A": {
+     "trades": 649.85,
+     "erwartung_R": 0.278,
+     "treffer_pct": 37.685,
+     "gewinnfaktor": 1.538,
+     "rendite_pa_pct": 11.53,
+     "max_verlust_pct": -13.34,
+     "sharpe": 1.095
+    },
+    "B": {
+     "trades": 785.7,
+     "erwartung_R": 0.089,
+     "treffer_pct": 32.62,
+     "gewinnfaktor": 1.164,
+     "rendite_pa_pct": 2.823,
+     "max_verlust_pct": -15.752,
+     "sharpe": 0.332
+    },
+    "gesamt": {
+     "trades": 1435.55,
+     "erwartung_R": 0.174,
+     "treffer_pct": 34.89,
+     "gewinnfaktor": 1.325,
+     "rendite_pa_pct": 6.788,
+     "max_verlust_pct": -17.183,
+     "sharpe": 0.706
+    }
+   },
+   "mit Ampel": {
+    "A": {
+     "trades": 585.45,
+     "erwartung_R": 0.232,
+     "treffer_pct": 38.595,
+     "gewinnfaktor": 1.467,
+     "rendite_pa_pct": 8.537,
+     "max_verlust_pct": -9.906,
+     "sharpe": 0.935
+    },
+    "B": {
+     "trades": 711.85,
+     "erwartung_R": 0.06,
+     "treffer_pct": 31.93,
+     "gewinnfaktor": 1.113,
+     "rendite_pa_pct": 1.529,
+     "max_verlust_pct": -15.698,
+     "sharpe": 0.211
+    },
+    "gesamt": {
+     "trades": 1297.3,
+     "erwartung_R": 0.137,
+     "treffer_pct": 34.92,
+     "gewinnfaktor": 1.265,
+     "rendite_pa_pct": 4.744,
+     "max_verlust_pct": -17.985,
+     "sharpe": 0.563
+    }
+   }
+  },
+  "T+K2+K3": {
+   "signale": 42867,
+   "ohne Ampel": {
+    "A": {
+     "trades": 663.6,
+     "erwartung_R": 0.269,
+     "treffer_pct": 37.36,
+     "gewinnfaktor": 1.499,
+     "rendite_pa_pct": 11.273,
+     "max_verlust_pct": -13.149,
+     "sharpe": 1.036
+    },
+    "B": {
+     "trades": 792.55,
+     "erwartung_R": 0.092,
+     "treffer_pct": 31.645,
+     "gewinnfaktor": 1.163,
+     "rendite_pa_pct": 2.83,
+     "max_verlust_pct": -17.697,
+     "sharpe": 0.316
+    },
+    "gesamt": {
+     "trades": 1456.15,
+     "erwartung_R": 0.172,
+     "treffer_pct": 34.24,
+     "gewinnfaktor": 1.31,
+     "rendite_pa_pct": 6.672,
+     "max_verlust_pct": -18.416,
+     "sharpe": 0.673
+    }
+   },
+   "mit Ampel": {
+    "A": {
+     "trades": 603.0,
+     "erwartung_R": 0.239,
+     "treffer_pct": 37.325,
+     "gewinnfaktor": 1.459,
+     "rendite_pa_pct": 8.997,
+     "max_verlust_pct": -11.136,
+     "sharpe": 0.922
+    },
+    "B": {
+     "trades": 720.05,
+     "erwartung_R": 0.094,
+     "treffer_pct": 31.71,
+     "gewinnfaktor": 1.174,
+     "rendite_pa_pct": 2.634,
+     "max_verlust_pct": -15.834,
+     "sharpe": 0.318
+    },
+    "gesamt": {
+     "trades": 1323.05,
+     "erwartung_R": 0.159,
+     "treffer_pct": 34.26,
+     "gewinnfaktor": 1.297,
+     "rendite_pa_pct": 5.549,
+     "max_verlust_pct": -17.615,
+     "sharpe": 0.611
+    }
+   }
+  },
+  "T+K1": {
+   "signale": 62036,
+   "ohne Ampel": {
+    "A": {
+     "trades": 623.9,
+     "erwartung_R": 0.143,
+     "treffer_pct": 38.025,
+     "gewinnfaktor": 1.286,
+     "rendite_pa_pct": 5.717,
+     "max_verlust_pct": -12.933,
+     "sharpe": 0.622
+    },
+    "B": {
+     "trades": 779.3,
+     "erwartung_R": 0.015,
+     "treffer_pct": 31.0,
+     "gewinnfaktor": 1.029,
+     "rendite_pa_pct": -0.394,
+     "max_verlust_pct": -16.066,
+     "sharpe": -0.004
+    },
+    "gesamt": {
+     "trades": 1403.2,
+     "erwartung_R": 0.071,
+     "treffer_pct": 34.11,
+     "gewinnfaktor": 1.139,
+     "rendite_pa_pct": 2.411,
+     "max_verlust_pct": -18.844,
+     "sharpe": 0.299
+    }
+   },
+   "mit Ampel": {
+    "A": {
+     "trades": 566.5,
+     "erwartung_R": 0.086,
+     "treffer_pct": 38.36,
+     "gewinnfaktor": 1.181,
+     "rendite_pa_pct": 3.236,
+     "max_verlust_pct": -10.828,
+     "sharpe": 0.432
+    },
+    "B": {
+     "trades": 716.0,
+     "erwartung_R": -0.014,
+     "treffer_pct": 30.08,
+     "gewinnfaktor": 0.974,
+     "rendite_pa_pct": -1.374,
+     "max_verlust_pct": -17.23,
+     "sharpe": -0.146
+    },
+    "gesamt": {
+     "trades": 1282.5,
+     "erwartung_R": 0.03,
+     "treffer_pct": 33.735,
+     "gewinnfaktor": 1.06,
+     "rendite_pa_pct": 0.753,
+     "max_verlust_pct": -21.236,
+     "sharpe": 0.125
+    }
+   }
+  },
+  "T+K1+K3": {
+   "signale": 48567,
+   "ohne Ampel": {
+    "A": {
+     "trades": 615.2,
+     "erwartung_R": 0.158,
+     "treffer_pct": 39.08,
+     "gewinnfaktor": 1.321,
+     "rendite_pa_pct": 6.172,
+     "max_verlust_pct": -13.665,
+     "sharpe": 0.668
+    },
+    "B": {
+     "trades": 771.55,
+     "erwartung_R": 0.04,
+     "treffer_pct": 31.74,
+     "gewinnfaktor": 1.076,
+     "rendite_pa_pct": 0.533,
+     "max_verlust_pct": -16.672,
+     "sharpe": 0.1
+    },
+    "gesamt": {
+     "trades": 1386.75,
+     "erwartung_R": 0.092,
+     "treffer_pct": 34.995,
+     "gewinnfaktor": 1.18,
+     "rendite_pa_pct": 3.129,
+     "max_verlust_pct": -19.265,
+     "sharpe": 0.374
+    }
+   },
+   "mit Ampel": {
+    "A": {
+     "trades": 567.05,
+     "erwartung_R": 0.089,
+     "treffer_pct": 38.72,
+     "gewinnfaktor": 1.184,
+     "rendite_pa_pct": 3.305,
+     "max_verlust_pct": -11.619,
+     "sharpe": 0.439
+    },
+    "B": {
+     "trades": 708.2,
+     "erwartung_R": 0.024,
+     "treffer_pct": 31.155,
+     "gewinnfaktor": 1.049,
+     "rendite_pa_pct": 0.031,
+     "max_verlust_pct": -16.657,
+     "sharpe": 0.03
+    },
+    "gesamt": {
+     "trades": 1275.25,
+     "erwartung_R": 0.053,
+     "treffer_pct": 34.515,
+     "gewinnfaktor": 1.105,
+     "rendite_pa_pct": 1.544,
+     "max_verlust_pct": -21.264,
+     "sharpe": 0.223
+    }
+   }
+  },
+  "T+K1+K2": {
+   "signale": 24174,
+   "ohne Ampel": {
+    "A": {
+     "trades": 671.55,
+     "erwartung_R": 0.231,
+     "treffer_pct": 36.125,
+     "gewinnfaktor": 1.405,
+     "rendite_pa_pct": 9.815,
+     "max_verlust_pct": -12.87,
+     "sharpe": 0.87
+    },
+    "B": {
+     "trades": 841.45,
+     "erwartung_R": 0.036,
+     "treffer_pct": 29.145,
+     "gewinnfaktor": 1.062,
+     "rendite_pa_pct": 0.465,
+     "max_verlust_pct": -20.642,
+     "sharpe": 0.091
+    },
+    "gesamt": {
+     "trades": 1513.0,
+     "erwartung_R": 0.122,
+     "treffer_pct": 32.245,
+     "gewinnfaktor": 1.208,
+     "rendite_pa_pct": 4.731,
+     "max_verlust_pct": -25.154,
+     "sharpe": 0.466
+    }
+   },
+   "mit Ampel": {
+    "A": {
+     "trades": 618.55,
+     "erwartung_R": 0.185,
+     "treffer_pct": 36.565,
+     "gewinnfaktor": 1.33,
+     "rendite_pa_pct": 7.266,
+     "max_verlust_pct": -11.865,
+     "sharpe": 0.733
+    },
+    "B": {
+     "trades": 769.3,
+     "erwartung_R": 0.036,
+     "treffer_pct": 29.18,
+     "gewinnfaktor": 1.06,
+     "rendite_pa_pct": 0.329,
+     "max_verlust_pct": -20.169,
+     "sharpe": 0.079
+    },
+    "gesamt": {
+     "trades": 1387.85,
+     "erwartung_R": 0.102,
+     "treffer_pct": 32.46,
+     "gewinnfaktor": 1.176,
+     "rendite_pa_pct": 3.51,
+     "max_verlust_pct": -25.862,
+     "sharpe": 0.387
+    }
+   }
+  },
+  "T+K1+K2+K3": {
+   "signale": 17983,
+   "ohne Ampel": {
+    "A": {
+     "trades": 674.7,
+     "erwartung_R": 0.24,
+     "treffer_pct": 36.245,
+     "gewinnfaktor": 1.412,
+     "rendite_pa_pct": 10.29,
+     "max_verlust_pct": -12.452,
+     "sharpe": 0.894
+    },
+    "B": {
+     "trades": 835.8,
+     "erwartung_R": 0.079,
+     "treffer_pct": 29.415,
+     "gewinnfaktor": 1.131,
+     "rendite_pa_pct": 2.161,
+     "max_verlust_pct": -20.759,
+     "sharpe": 0.241
+    },
+    "gesamt": {
+     "trades": 1510.5,
+     "erwartung_R": 0.151,
+     "treffer_pct": 32.465,
+     "gewinnfaktor": 1.253,
+     "rendite_pa_pct": 5.884,
+     "max_verlust_pct": -25.076,
+     "sharpe": 0.552
+    }
+   },
+   "mit Ampel": {
+    "A": {
+     "trades": 618.15,
+     "erwartung_R": 0.174,
+     "treffer_pct": 36.185,
+     "gewinnfaktor": 1.305,
+     "rendite_pa_pct": 6.854,
+     "max_verlust_pct": -11.484,
+     "sharpe": 0.689
+    },
+    "B": {
+     "trades": 763.85,
+     "erwartung_R": 0.069,
+     "treffer_pct": 29.75,
+     "gewinnfaktor": 1.116,
+     "rendite_pa_pct": 1.689,
+     "max_verlust_pct": -19.813,
+     "sharpe": 0.201
+    },
+    "gesamt": {
+     "trades": 1382.0,
+     "erwartung_R": 0.116,
+     "treffer_pct": 32.625,
+     "gewinnfaktor": 1.197,
+     "rendite_pa_pct": 4.059,
+     "max_verlust_pct": -24.517,
+     "sharpe": 0.431
+    }
+   }
+  }
+ },
+ "S2": {
+  "E1": {
+   "A": {
+    "trades": 651.4,
+    "erwartung_R": 0.181,
+    "treffer_pct": 40.225,
+    "gewinnfaktor": 1.282,
+    "rendite_pa_pct": 7.537,
+    "max_verlust_pct": -8.612,
+    "sharpe": 0.926
+   },
+   "B": {
+    "trades": 782.3,
+    "erwartung_R": -0.004,
+    "treffer_pct": 34.65,
+    "gewinnfaktor": 0.996,
+    "rendite_pa_pct": -1.105,
+    "max_verlust_pct": -17.855,
+    "sharpe": -0.111
+   },
+   "gesamt": {
+    "trades": 1433.7,
+    "erwartung_R": 0.08,
+    "treffer_pct": 37.17,
+    "gewinnfaktor": 1.12,
+    "rendite_pa_pct": 2.848,
+    "max_verlust_pct": -19.759,
+    "sharpe": 0.396
+   }
+  },
+  "E2": {
+   "A": {
+    "trades": 448.8,
+    "erwartung_R": 0.25,
+    "treffer_pct": 32.86,
+    "gewinnfaktor": 1.345,
+    "rendite_pa_pct": 7.505,
+    "max_verlust_pct": -9.088,
+    "sharpe": 0.901
+   },
+   "B": {
+    "trades": 579.6,
+    "erwartung_R": -0.035,
+    "treffer_pct": 26.06,
+    "gewinnfaktor": 0.957,
+    "rendite_pa_pct": -2.22,
+    "max_verlust_pct": -19.556,
+    "sharpe": -0.239
+   },
+   "gesamt": {
+    "trades": 1028.4,
+    "erwartung_R": 0.089,
+    "treffer_pct": 28.99,
+    "gewinnfaktor": 1.115,
+    "rendite_pa_pct": 2.213,
+    "max_verlust_pct": -20.984,
+    "sharpe": 0.305
+   }
+  },
+  "E3": {
+   "A": {
+    "trades": 869.8,
+    "erwartung_R": 0.11,
+    "treffer_pct": 32.275,
+    "gewinnfaktor": 1.27,
+    "rendite_pa_pct": 6.02,
+    "max_verlust_pct": -11.206,
+    "sharpe": 0.672
+   },
+   "B": {
+    "trades": 1111.35,
+    "erwartung_R": -0.031,
+    "treffer_pct": 28.25,
+    "gewinnfaktor": 0.927,
+    "rendite_pa_pct": -2.763,
+    "max_verlust_pct": -18.547,
+    "sharpe": -0.255
+   },
+   "gesamt": {
+    "trades": 1981.15,
+    "erwartung_R": 0.031,
+    "treffer_pct": 30.015,
+    "gewinnfaktor": 1.073,
+    "rendite_pa_pct": 1.252,
+    "max_verlust_pct": -21.696,
+    "sharpe": 0.179
+   }
+  },
+  "E4": {
+   "A": {
+    "trades": 618.15,
+    "erwartung_R": 0.174,
+    "treffer_pct": 36.185,
+    "gewinnfaktor": 1.305,
+    "rendite_pa_pct": 6.854,
+    "max_verlust_pct": -11.484,
+    "sharpe": 0.689
+   },
+   "B": {
+    "trades": 763.85,
+    "erwartung_R": 0.069,
+    "treffer_pct": 29.75,
+    "gewinnfaktor": 1.116,
+    "rendite_pa_pct": 1.689,
+    "max_verlust_pct": -19.813,
+    "sharpe": 0.201
+   },
+   "gesamt": {
+    "trades": 1382.0,
+    "erwartung_R": 0.116,
+    "treffer_pct": 32.625,
+    "gewinnfaktor": 1.197,
+    "rendite_pa_pct": 4.059,
+    "max_verlust_pct": -24.517,
+    "sharpe": 0.431
+   }
+  },
+  "E5": {
+   "A": {
+    "trades": 472.3,
+    "erwartung_R": 0.314,
+    "treffer_pct": 37.74,
+    "gewinnfaktor": 1.522,
+    "rendite_pa_pct": 9.652,
+    "max_verlust_pct": -10.954,
+    "sharpe": 0.92
+   },
+   "B": {
+    "trades": 628.4,
+    "erwartung_R": 0.069,
+    "treffer_pct": 29.76,
+    "gewinnfaktor": 1.11,
+    "rendite_pa_pct": 0.874,
+    "max_verlust_pct": -21.748,
+    "sharpe": 0.127
+   },
+   "gesamt": {
+    "trades": 1100.7,
+    "erwartung_R": 0.173,
+    "treffer_pct": 33.16,
+    "gewinnfaktor": 1.278,
+    "rendite_pa_pct": 4.88,
+    "max_verlust_pct": -24.894,
+    "sharpe": 0.5
+   }
+  }
+ },
+ "S3": {
+  "trades": 1379,
+  "laengste_verlustserie": 33,
+  "schlechteste_serie_R": -31.72,
+  "mc95_laengste_serie": 22,
+  "mc95_schlechteste_serie_R": -20.83,
+  "mc95_max_verlust_pct": -14.42,
+  "hinweis": "Max. Verlust in der Monte-Carlo-Rechnung aus abgeschlossenen Trades, ohne Gleichzeitigkeit; Tageswerte siehe S1."
+ },
+ "S4": {
+  "Ausbruch": {
+   "A": {
+    "trades": 469.15,
+    "erwartung_R": 0.085,
+    "treffer_pct": 43.095,
+    "gewinnfaktor": 1.284,
+    "rendite_pa_pct": 2.705,
+    "max_verlust_pct": -6.033,
+    "sharpe": 0.604
+   },
+   "B": {
+    "trades": 596.65,
+    "erwartung_R": -0.02,
+    "treffer_pct": 33.465,
+    "gewinnfaktor": 0.939,
+    "rendite_pa_pct": -1.038,
+    "max_verlust_pct": -8.94,
+    "sharpe": -0.213
+   },
+   "gesamt": {
+    "trades": 1065.8,
+    "erwartung_R": 0.026,
+    "treffer_pct": 37.695,
+    "gewinnfaktor": 1.086,
+    "rendite_pa_pct": 0.698,
+    "max_verlust_pct": -9.423,
+    "sharpe": 0.174
+   }
+  },
+  "Ausbruch+K3": {
+   "A": {
+    "trades": 479.65,
+    "erwartung_R": 0.057,
+    "treffer_pct": 41.705,
+    "gewinnfaktor": 1.187,
+    "rendite_pa_pct": 1.911,
+    "max_verlust_pct": -6.18,
+    "sharpe": 0.435
+   },
+   "B": {
+    "trades": 594.45,
+    "erwartung_R": -0.019,
+    "treffer_pct": 33.17,
+    "gewinnfaktor": 0.942,
+    "rendite_pa_pct": -0.98,
+    "max_verlust_pct": -8.991,
+    "sharpe": -0.204
+   },
+   "gesamt": {
+    "trades": 1074.1,
+    "erwartung_R": 0.015,
+    "treffer_pct": 36.985,
+    "gewinnfaktor": 1.047,
+    "rendite_pa_pct": 0.361,
+    "max_verlust_pct": -9.771,
+    "sharpe": 0.1
+   }
+  }
+ },
+ "S1_beitrag": {
+  "K1": {
+   "A": 0,
+   "B": 0,
+   "vergleiche": 4
+  },
+  "K2": {
+   "A": 4,
+   "B": 4,
+   "vergleiche": 4
+  },
+  "K3": {
+   "A": 2,
+   "B": 4,
+   "vergleiche": 4
+  }
+ },
+ "S4_aufteilung_alle_signale": {
+  "S1 T+K1+K2+K3": {
+   "Ampel CAUTION": {
+    "signale": 5504,
+    "erwartung_R": 0.09,
+    "treffer_pct": 33.6
+   },
+   "Ampel GO": {
+    "signale": 8896,
+    "erwartung_R": 0.026,
+    "treffer_pct": 29.2
+   },
+   "Ampel REVERSE": {
+    "signale": 84,
+    "erwartung_R": -0.226,
+    "treffer_pct": 32.1
+   },
+   "Ampel STOP": {
+    "signale": 1500,
+    "erwartung_R": 0.043,
+    "treffer_pct": 32.6
+   },
+   "Ampel VOREINSTIEG": {
+    "signale": 1999,
+    "erwartung_R": 0.083,
+    "treffer_pct": 34.3
+   },
+   "Breite ab 50 %": {
+    "signale": 8904,
+    "erwartung_R": 0.078,
+    "treffer_pct": 30.6
+   },
+   "Breite unter 50 %": {
+    "signale": 9079,
+    "erwartung_R": 0.027,
+    "treffer_pct": 32.1
+   }
+  },
+  "S4 Ausbruch": {
+   "Ampel CAUTION": {
+    "signale": 5880,
+    "erwartung_R": 0.049,
+    "treffer_pct": 39.7
+   },
+   "Ampel GO": {
+    "signale": 22045,
+    "erwartung_R": -0.003,
+    "treffer_pct": 36.0
+   },
+   "Ampel REVERSE": {
+    "signale": 49,
+    "erwartung_R": -0.801,
+    "treffer_pct": 4.1
+   },
+   "Ampel STOP": {
+    "signale": 868,
+    "erwartung_R": -0.087,
+    "treffer_pct": 33.6
+   },
+   "Ampel VOREINSTIEG": {
+    "signale": 3113,
+    "erwartung_R": -0.038,
+    "treffer_pct": 33.5
+   },
+   "Breite ab 50 %": {
+    "signale": 23289,
+    "erwartung_R": -0.006,
+    "treffer_pct": 35.5
+   },
+   "Breite unter 50 %": {
+    "signale": 8666,
+    "erwartung_R": 0.015,
+    "treffer_pct": 38.5
+   }
+  }
+ },
+ "SPY_halten": {
+  "A": {
+   "trades": 0,
+   "erwartung_R": null,
+   "treffer_pct": null,
+   "gewinnfaktor": null,
+   "rendite_pa_pct": 15.88,
+   "max_verlust_pct": -34.1,
+   "sharpe": 0.82
+  },
+  "B": {
+   "trades": 0,
+   "erwartung_R": null,
+   "treffer_pct": null,
+   "gewinnfaktor": null,
+   "rendite_pa_pct": 10.55,
+   "max_verlust_pct": -25.36,
+   "sharpe": 0.66
+  },
+  "gesamt": {
+   "trades": 0,
+   "erwartung_R": null,
+   "treffer_pct": null,
+   "gewinnfaktor": null,
+   "rendite_pa_pct": 13.02,
+   "max_verlust_pct": -34.1,
+   "sharpe": 0.74
+  }
+ }
+}
