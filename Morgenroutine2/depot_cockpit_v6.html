@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Depot-Cockpit v6.1</title>
+<title>Depot-Cockpit v6.2</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -39,7 +39,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
   <div style="max-width:1480px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;justify-content:space-between">
     <div style="display:flex;align-items:center;gap:10px">
       <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--vio));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.88rem">Σ</div>
-      <div><div style="font-size:.92rem;font-weight:700;line-height:1.2">Depot-Cockpit</div><div class="mono" style="font-size:.57rem;color:var(--t3)">v3.4 · Server-Lesen · Live-Lesen · Steuerjahr · Portfolio-DD · Pro-Trade-FX</div></div>
+      <div><div style="font-size:.92rem;font-weight:700;line-height:1.2">Depot-Cockpit</div><div class="mono" style="font-size:.57rem;color:var(--t3)">v6.2 · Server-Lesen · Live-Lesen · Steuerjahr · Portfolio-DD · Pro-Trade-FX</div></div>
     </div>
     <div class="mono" style="font-size:.6rem;color:var(--t3)" id="dataAge"></div>
   </div>
@@ -62,7 +62,10 @@ let S={dir:null,sh:null,rate:1.0850,dirCcy:'USD',depot:null,qbase:'http://localh
 try{const raw=JSON.parse(localStorage.getItem(LSK));if(raw)S={...S,...raw};}catch(e){}
 
 const $=id=>document.getElementById(id);
-const persist=()=>{try{localStorage.setItem(LSK,JSON.stringify(S));}catch(e){toast('Speicher voll – Cockpit speichert die Backups nicht.','t-err');}};
+// v6.2 FIX (C2): Live- oder vom Server gelesene Journale NICHT noch einmal im Browser
+// ablegen — sie stehen dort bzw. auf dem Laufwerk schon. Die doppelte Kopie konkurrierte
+// mit dem Journal um dieselben rund 5 MB. Nur manuell geladene Backup-Dateien bleiben gespeichert.
+const persist=()=>{try{const k={...S,dir:(S.dir&&S.dir._live)?null:S.dir,sh:(S.sh&&S.sh._live)?null:S.sh};localStorage.setItem(LSK,JSON.stringify(k));}catch(e){toast('Speicher voll – Cockpit speichert die Backups nicht.','t-err');}};
 const fE=(v,d=0)=>(Number(v)||0).toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d})+' €';
 const f$=(v,d=0)=>'$'+(Number(v)||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 const pnlC=v=>v>=0?'color:var(--grn)':'color:var(--red)';
@@ -87,7 +90,34 @@ const eur=(v,ccy,fx)=>(!ccy||ccy==='EUR')?(+v||0):((+v||0)/fxOf(fx));
 // und der Fehler wechselte das Vorzeichen, je nachdem ob ein Kurs erfasst war oder nicht.
 //   fxClose vorhanden und != 1 -> Journal hat schon in EUR gerechnet -> NICHT nochmal rechnen.
 //   fxClose fehlt oder == 1    -> Journal hat nicht umgerechnet -> bisherige Logik greift.
-const eurDir=(v,fx)=>((+fx>0 && +fx!==1) ? (+v||0) : eur(v,S.dirCcy,fx));
+// ── v6.2 FIX (C1): WÄHRUNG JE TRADE STATT FÜR DAS GANZE JOURNAL ─────────────
+// Bisher galt S.dirCcy (Standard USD) für jeden Trade. Ein DAX-Wert oder ein
+// Eurex-Future ohne FX-Eintrag wurde dadurch durch EUR/USD geteilt (≈8 % zu wenig),
+// und das Mark-to-Market scheiterte am Währungskonflikt Kurs EUR ≠ Position USD.
+// Das Journal speichert keine Währung je Trade — sie wird abgeleitet:
+//   1. Feld currency, falls vorhanden
+//   2. Vermerk des IB-Imports in den Notizen („Import · EUR ·“)
+//   3. Börsenkürzel eines Euro-Handelsplatzes (.DE, .F, .PA, .AS, .MI, .MC, .BR, .VI …)
+//   4. Eurex-Futures (FDAX, FDXM, FDXS, FESX, FGBL …)
+//   sonst die Journal-Einstellung S.dirCcy.
+const EUR_BOERSE=/\.(DE|F|XETRA|ETR|PA|AS|MI|MC|BR|VI|LS|HE|IR)$/i;
+const EUREX_FUT=/^(FDAX|FDXM|FDXS|FESX|FSXE|FGBL|FGBM|FGBS|FGBX|FDIV|FMDX|F2MX)/i;
+function dirCcyOf(t){
+  if(t && t.currency) return String(t.currency).toUpperCase();
+  const m=/Import · ([A-Z]{3}) ·/.exec(String((t&&t.entryNotes)||''));
+  if(m) return m[1];
+  const n=String((t&&t.productName)||'').trim();
+  if(EUR_BOERSE.test(n) || EUREX_FUT.test(n)) return 'EUR';
+  return S.dirCcy;
+}
+// v6.2 FIX: fx == 1 heißt im Journal „kein Kurs erfasst“ — dann wurde NICHT umgerechnet.
+// Vorher teilte eur() in diesem Fall durch 1 statt durch den Snapshot-Kurs, ein
+// Dollar-Gewinn ohne FX blieb also unverändert als Euro stehen.
+const eurDir=(v,fx,ccy)=>{
+  const w=ccy||S.dirCcy;
+  if(+fx>0 && +fx!==1) return +v||0;           // Journal hat schon in EUR gerechnet
+  return w==='EUR' ? (+v||0) : (+v||0)/(S.rate||1.085);
+};
 
 // ════════════════════════════════════════════════════════════════
 // RISIKO-REPLIK Stillhalter — MUSS synchron zu v4.2 calcRisk() bleiben!
@@ -136,7 +166,7 @@ function aggregate(){
     S.dir.trades.forEach(t=>{
       const cat=classDir(t), key=ticker(t.productName);
       if(t.status==='Closed'){
-        const v=eurDir(t.profitEuro||0,t.fxClose);
+        const v=eurDir(t.profitEuro||0,t.fxClose,dirCcyOf(t));
         out.trend.realizedEUR+=v; out.trend.closed++; if((t.profitEuro||0)>0)out.trend.wins++;
         const dt=t.dateClosed||t.dateOpened; if(dt)out.closedPts.push({date:dt,vEUR:v});
         addTax(cat,v); out.taxRows.push({year:String(dt||'').slice(0,4),cat,v}); const u=ulG(key); u.realizedEUR+=v; u.byType[cat]+=v; u.types[cat]=1; u.closed++;
@@ -150,7 +180,7 @@ function aggregate(){
         // 8,53 % statt 9,25 %. Die Unterschätzung von Risiko ist die gefährlichere
         // Richtung, deshalb zählt der Fehler schwerer als sein Betrag.
         // t.sizeFx entscheidet wie bei profitEuro: gesetzt und != 1 -> schon EUR.
-        out.trend.open++; const rk=eurDir(t.maxRiskEuro||0, t.sizeFx); out.trend.openRiskEUR+=rk;
+        out.trend.open++; const rk=eurDir(t.maxRiskEuro||0, t.sizeFx, dirCcyOf(t)); out.trend.openRiskEUR+=rk;
         const u=ulG(key); u.openRiskEUR+=rk; u.open++; u.types[cat]=1;
         // ── v6.1.1 FIX (SHORT-POSITIONEN MIT VERKEHRTEM VORZEICHEN) ──────────
         // Das Cockpit hat t.direction nie geprüft. Eine Short-Position erhöhte
@@ -163,7 +193,7 @@ function aggregate(){
         // 110·(−10) − (−1000) = −100.
         if(cat==='AKTIE'||cat==='ETF'){
           const sh=(+t.size||0)*(t.direction==='Short'?-1:1);
-          u.openShares+=sh; u.openCostNat+=sh*(+t.entryPrice||0); u.posCcy=S.dirCcy;
+          u.openShares+=sh; u.openCostNat+=sh*(+t.entryPrice||0); u.posCcy=dirCcyOf(t);
         }
       }
     });
@@ -562,7 +592,7 @@ async function loadServer(silent){
 // Opt②/v3.4: Start-Reihenfolge — 1) Server (Laufwerk), 2) localStorage-Live, 3) manuelle Backups
 (async()=>{ const ok=await loadServer(true); if(!ok && liveAvailable()) loadLive(true); render(); })();
 go('depot');
-console.log('Depot-Cockpit v6.1 geladen (FX-Fix · Server-Lesen · Steuerjahr · Live-Lesen · Portfolio-DD · Pro-Trade-FX). Journals erwartet im selben Ordner:', J_DIR, '·', J_SH);
+console.log('Depot-Cockpit v6.2 geladen (FX-Fix · Server-Lesen · Steuerjahr · Live-Lesen · Portfolio-DD · Pro-Trade-FX). Journals erwartet im selben Ordner:', J_DIR, '·', J_SH);
 </script>
 </body>
 </html>
