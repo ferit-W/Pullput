@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ferit's Trading Dashboard+Journal v6.4</title>
+<title>Ferit's Trading Dashboard+Journal v6.5</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- v6.4: auf 4.4.0 gepinnt wie Cockpit/Stillhalter — ohne Version kaeme automatisch die naechste Major (5.x) und die Charts braechen ungefragt -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -579,13 +579,13 @@ body.dark-mode .ampel-bg-green { background-color: #14532d; color: #86efac; }
 
 <div class="container mx-auto p-4 md:p-8 pt-10 max-w-screen-2xl">
   <header class="text-center mb-6">
-    <h1 id="main-header" class="text-3xl font-extrabold text-black mb-1">Ferit's Trading Dashboard+Journal v6.0</h1>
+    <h1 id="main-header" class="text-3xl font-extrabold text-black mb-1">Ferit's Trading Dashboard+Journal v6.5</h1>
     <!-- v6.1: Anzeige, woher der aktuell sichtbare Datenstand stammt. Bei zwei Rechnern
          mit geteiltem Cloud-Ordner ist das die wichtigste Information auf der Seite. -->
     <div class="mb-2"><span id="syncStatus" title="Datenstand wird geprüft …"
       style="display:inline-block;padding:3px 12px;border-radius:9999px;font-size:12px;font-weight:700;background:#e5e7eb;color:#374151">
       Datenstand wird geprüft …</span>
-      <button onclick="syncFromDrive().then(()=>applyFiltersAndRender())" class="ml-2 text-xs text-teal-700 underline"
+      <button onclick="syncFromDrive().then(()=>{applyFiltersAndRender(); if(typeof renderCashFlows==='function') renderCashFlows();})" class="ml-2 text-xs text-teal-700 underline"
         title="Erneut vom Laufwerk laden — nach einem Rechnerwechsel oder wenn die Cloud nachträglich synchronisiert hat">neu laden</button>
     </div>
     <p class="text-lg text-gray-700">Offline-Test / Backup & Restore</p>
@@ -801,7 +801,7 @@ body.dark-mode .ampel-bg-green { background-color: #14532d; color: #86efac; }
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-        <div><label class="block text-sm">Stopp Risiko (%)</label><input type="number" id="riskPerTrade" step="0.1" class="input-style w-full" value="1.0" oninput="debouncedCalculatePosition()" /></div>
+        <div><label class="block text-sm" title="Vorgabe nach deinen Regeln (wie REGELCHECK): 0,25 % für Trend-Trades, 0,40 % für Gap- und News-Trades. Wechselt automatisch mit dem Setup, solange du den Wert nicht selbst änderst.">Stopp Risiko (%)</label><input type="number" id="riskPerTrade" step="0.05" class="input-style w-full" value="0.25" oninput="this.dataset.manuell='1'; debouncedCalculatePosition()" /></div>
         <div><label class="block text-sm" title="v5.4.1: Für USD-Instrumente — Kontrakte = (Risiko_EUR × EURUSD) ÷ (Stopp-Ticks × TickValue_USD). Leer = 1 = keine Umrechnung (wie bisher).">EUR/USD (Sizing) <span class="opacity-60">(USD je EUR, ≈1,09)</span></label><input type="number" id="sizeFx" step="0.0001" placeholder="z.B. 1.0900" class="input-style w-full" oninput="debouncedCalculatePosition()" /></div>
         <div><label class="block text-sm">Max. Investitionsquote (%)</label><input type="number" id="maxInvestQuote" step="1" class="input-style w-full" value="10" oninput="debouncedCalculatePosition()" /></div>
         <div><label class="block text-sm">Produkt</label><input type="text" id="productName" class="input-style w-full" placeholder="DAX Future / Apple" oninput="autoDetectSector()" /></div>
@@ -906,7 +906,7 @@ body.dark-mode .ampel-bg-green { background-color: #14532d; color: #86efac; }
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 items-end">
           <div><label class="block text-sm">Schlusskurs</label><input type="number" id="closePrice" step="0.01" class="input-style w-full" oninput="calculateProfitOnClose()" /></div>
           <div><label class="block text-sm">Netto G/V (€)</label><input type="text" id="netProfit" class="input-style w-full bg-gray-100" readonly /></div>
-          <div><label class="block text-sm">Netto G/V (%)</label><input type="text" id="netProfitPercent" class="input-style w-full bg-gray-100" readonly /></div>
+          <div><label class="block text-sm" title="Bezogen auf den aktuellen Kontostand">Netto G/V (% Konto)</label><input type="text" id="netProfitPercent" class="input-style w-full bg-gray-100" readonly /></div>
           <div><label class="block text-sm">R-Wert</label><input type="text" id="rValue" class="input-style w-full bg-gray-100" readonly /></div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -1408,12 +1408,16 @@ body.dark-mode .ampel-bg-green { background-color: #14532d; color: #86efac; }
         <input type="number" id="partialSaleSize" class="input-style w-full mt-1" placeholder="z.B. 50">
       </div>
       <div>
-        <label class="block text-sm">Verkaufspreis (€)</label>
+        <label class="block text-sm">Verkaufspreis (in der Währung des Instruments)</label>
         <input type="number" id="partialSalePrice" step="0.01" class="input-style w-full mt-1" placeholder="z.B. 150.25">
       </div>
       <div class="mt-2">
         <label class="text-sm">FX→EUR <span class="opacity-60">(optional, für USD-Instrumente)</span></label>
         <input type="number" id="partialSaleFx" step="0.0001" class="input-style w-full mt-1" placeholder="z.B. 0.9250">
+      </div>
+      <div class="mt-2">
+        <label class="text-sm">Datum des Teilverkaufs <span class="opacity-60">(zum Nachtragen änderbar)</span></label>
+        <input type="datetime-local" id="partialSaleDate" class="input-style w-full mt-1">
       </div>
       <div class="border-t pt-4 flex justify-end">
         <button onclick="executePartialSale()" class="px-4 py-2 bg-blue-600 text-white rounded-md">Teilverkauf bestätigen</button>
@@ -3466,6 +3470,18 @@ function loadTradeForManagement(tId) {
 /* SCHLIESSEN / LÖSCHEN / TEILVERKAUF / VERSCHIEBEN */
 function getTradeById(id) { return allTrades.find(t => t.id === id); }
 
+// v6.4 FIX (J8): Das Formular startete mit 1,0 % Risiko, REGELCHECK prüft aber 0,25 % (Trend)
+// bzw. 0,40 % (Gap/News). Jetzt folgt die Vorgabe dem Setup — nur bei neuen Trades und nur,
+// solange der Wert nicht von Hand geändert wurde.
+document.addEventListener('change', e => {
+  if (!e.target || e.target.id !== 'entrySetup') return;
+  if ((document.getElementById('currentTradeId') || {}).value) return;
+  const f = document.getElementById('riskPerTrade');
+  if (!f || f.dataset.manuell) return;
+  f.value = /gap|news/i.test(e.target.value || '') ? '0.40' : '0.25';
+  if (typeof debouncedCalculatePosition === 'function') debouncedCalculatePosition();
+});
+
 async function closeTrade() {
   const tId = document.getElementById('currentTradeId').value;
   if (!tId) return;
@@ -3869,6 +3885,7 @@ function openPartialSaleModal() {
   document.getElementById('partialSaleTradeNumber').textContent = `#${t.tradeNumber}`;
   document.getElementById('partialSaleModal').classList.remove('hidden');
   document.getElementById('partialSaleSize').setAttribute('max', t.size);
+  const _pd = document.getElementById('partialSaleDate'); if (_pd) _pd.value = jetztLokal();   // v6.4 (J8)
 }
 function closePartialSaleModal() {
   document.getElementById('partialSaleModal').classList.add('hidden');
@@ -3935,7 +3952,8 @@ async function executePartialSale() {
       status: 'Closed', 
       tradeNumber: newTradeNumber, 
       closePrice: partialPrice, 
-      dateClosed: jetztLokal(), 
+      // v6.4 FIX (J8): Datum aus dem Dialog — vorher immer „jetzt“, Nachtragen unmöglich
+      dateClosed: (document.getElementById('partialSaleDate') || {}).value || jetztLokal(), 
       fees: partialFees, // v5.1: Anteilige Gebühren
       fxClose: pfx,      // v5.3
       profitEuro, 
@@ -4494,11 +4512,18 @@ function calculateProfitOnClose() {
     const entryPrice = parseFloat(document.getElementById('entryPrice').value);
     const size = parseInt(document.getElementById('requiredSize').value);
     const direction = document.getElementById('direction').value;
-    const maxRiskEuroText = document.getElementById('posSizeMaxLoss').textContent;
-    const maxRiskEuro = parseFloat(maxRiskEuroText.replace(' €', '')) || 0;
+    // v6.4 FIX (J7): Vorschau und Buchung teilen jetzt durch DASSELBE Risiko.
+    // closeTrade() nimmt das gespeicherte maxRiskEuro; die Vorschau nahm bisher das
+    // aus dem Formular neu berechnete — der angezeigte R-Wert wich vom gebuchten ab.
+    const _gespeichert = (typeof getTradeById === 'function') ? getTradeById(tradeId) : null;
+    const _formRisk = parseFloat(String(document.getElementById('posSizeMaxLoss').textContent).replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
+    const maxRiskEuro = (_gespeichert && +_gespeichert.maxRiskEuro > 0) ? +_gespeichert.maxRiskEuro : _formRisk;
     
+    // v6.4 FIX (J7): Prozent vom AKTUELLEN Kontostand (Startkapital + Gewinne + Kontobewegungen),
+    // nicht vom Startkapital. Fällt auf das Startkapital zurück, solange der Stand fehlt.
     const accObj = accounts.find(a => a.id === currentAccountId) || { balance: 0 };
-    const initialBalance = parseFloat(accObj.balance) || 0; 
+    const _aktuell = parseFloat((document.getElementById('currentAccountSize') || {}).value);
+    const initialBalance = (isFinite(_aktuell) && _aktuell > 0) ? _aktuell : (parseFloat(accObj.balance) || 0); 
     
     const closePrice = parseFloat(document.getElementById('closePrice').value);
     const fees = parseFloat(document.getElementById('fees').value) || 0;
@@ -4837,8 +4862,10 @@ function renderRiskAlerts(trades) {
   const riskPer = parseFloat(document.getElementById('riskPerTrade')?.value) || 1;
   const totalRiskPct = parseFloat(document.getElementById('maxTotalRisk')?.value) || 6;
   const recommended = Math.floor(totalRiskPct / riskPer);
-  if (openTrades.length > recommended && recommended > 0) {
-    alerts.push({ type: 'warning', icon: '⚡', text: `${openTrades.length} offene Positionen, empfohlen max. ${recommended}. Überexponiert!` });
+  // v6.4 FIX (J8): Langfrist und Altbestand belegen keinen Trading-Slot
+  const tradingOffen = openTrades.filter(t => !['Langfrist','Altbestand'].includes(t.category || 'Trading'));
+  if (tradingOffen.length > recommended && recommended > 0) {
+    alerts.push({ type: 'warning', icon: '⚡', text: `${tradingOffen.length} offene Trading-Positionen, empfohlen max. ${recommended}. Überexponiert!` });
   }
   
   if (alerts.length === 0) {
