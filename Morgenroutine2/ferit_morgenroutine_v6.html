@@ -827,7 +827,7 @@ footer strong{color:var(--ink2)}
        separat zu startende REGELCHECK.py; hier wird es beim Öffnen gleich mit geholt. -->
   <section class="card" id="c-start" style="margin-top:12px">
     <div class="ty-head">🧭 <b>Tagesstart</b> — Handelstag &amp; offene Positionen gegen die Regeln
-      <span class="info-i" onclick="toggleInfo('info-start')" title="Erklärung ein/aus">i</span>
+      <span class="info-i" onclick="infoPop('tagesstart')" title="Erklärung ein/aus">i</span>
       <span style="margin-left:auto"><button class="cp-btn" onclick="ladeRegelcheck(true)" title="REGELCHECK erneut ausführen">↻ prüfen</button></span></div>
     <div class="sec-info" id="info-start" style="margin:0;border:none;border-bottom:1px solid var(--rule);border-radius:0"><b>Heute</b>: Börsenstatus USA und XETRA (Feiertage werden gerechnet, nicht gepflegt), Handelszeiten in deutscher Zeit, Termine des Tages aus FOMC-Liste, eigenen Terminen, Watchlist-Earnings und — falls geladen — den marktbewegenden Einträgen des KI-Kalenders. <b>Regelcheck</b>: dieselbe Prüfung wie <span class="mono">REGELCHECK.py</span> — Stopp vorhanden und auf der richtigen Seite, Risiko je Position, Slots, Phase gegen Richtung, Restlaufzeit der Optionen. Geprüft wird nur, was in den Journaldateien steht; der Abgleich mit CapTrader bleibt Handarbeit.</div>
     <div id="start-heute" class="ty-line">wird berechnet …</div>
@@ -839,7 +839,7 @@ footer strong{color:var(--ink2)}
   </section>
 
   <!-- ════ 02 MARKT ════ -->
-  <div class="sec-label"><span class="sec-num">02</span><span class="sec-name">Markt</span><span class="pop-trigger" onclick="openPhasen()" title="6-Phasen-Modell als Schnellreferenz"><span class="hex">⬡</span> 6 Phasen</span><span class="sec-meta">Indizes + Rohstoffe &amp; FX · nach Trendstärke · P3 Long Kurs&gt;EMA50&gt;EMA200 · P6 Short Kurs&lt;EMA20&lt;EMA200</span><span class="info-i" onclick="toggleInfo('info-02')" title="Erklärung ein/aus">i</span></div>
+  <div class="sec-label"><span class="sec-num">02</span><span class="sec-name">Markt</span><span class="pop-trigger" onclick="openPhasen()" title="6-Phasen-Modell als Schnellreferenz"><span class="hex">⬡</span> 6 Phasen</span><span class="sec-meta">Indizes + Rohstoffe &amp; FX · nach Trendstärke · P3 Long Kurs&gt;EMA50&gt;EMA200 · P6 Short Kurs&lt;EMA20&lt;EMA200</span><span class="info-i" onclick="infoPop('markt')" title="Erklärung ein/aus">i</span></div>
   <div class="sec-info" id="info-02">Index-, Rohstoff- und FX-Trends nach <b>Lüddemann-Markttechnik</b>, lokal aus echten Kursen gerechnet. <b>P3 · Long</b> = Kurs &gt; EMA50 &gt; EMA200 (intakter Aufwärtstrend); <b>P6 · Short</b> = Kurs &lt; EMA20 &lt; EMA200 (intakter Abwärtstrend); die Übergangsphasen zeigen ihr Kürzel mit „kein Setup“ (z. B. „P4 · kein Setup“). Sortiert nach <b>Trend-Stärke</b> = Mischwert aus EMA50-Steigung, 0,25 × Abstand zur EMA200 und 0,25 × 1-Monats-Momentum. Ein <b>🎯/📉-Tag</b> markiert eine laufende Korrektur — die Zone für Bewegung-Korrektur-Bewegung. <b>Rohstoffe &amp; FX</b> (Gold, Silber, EUR/USD, DXY) nutzen dieselbe Phasenlogik.</div>
   <section class="card" id="c-idx">
     <div class="idx-grid" id="idx-grid"><div class="init">Indizes (inkl. MDAX/SDAX) — nach EMA-Trendstärke gerankt, Abstände in % statt Absolutwerten.</div></div>
@@ -861,7 +861,7 @@ footer strong{color:var(--ink2)}
   </section>
 
   <!-- ════ 03 NEWS ════ -->
-  <div class="sec-label"><span class="sec-num">03</span><span class="sec-name">News &amp; Termine</span><span class="sec-meta">Makro · Earnings · Fed/EZB · KI-Text, verifizieren</span><span class="info-i" onclick="toggleInfo('info-03')" title="Erklärung ein/aus">i</span></div>
+  <div class="sec-label"><span class="sec-num">03</span><span class="sec-name">News &amp; Termine</span><span class="sec-meta">Makro · Earnings · Fed/EZB · KI-Text, verifizieren</span><span class="info-i" onclick="infoPop('news')" title="Erklärung ein/aus">i</span></div>
   <div class="sec-info" id="info-03">Makro-Termine (Fed/EZB, CPI/NFP) und Earnings-Highlights der Woche, von Gemini mit Live-Suche zusammengefasst. <b>KI-Text — gegen den Primärkalender verifizieren</b>, besonders bei genauen Terminen und Uhrzeiten. Lädt automatisch beim Start (nur mit hinterlegtem Gemini-Key).</div>
   <section class="subpanel" id="sp-news">
     <div class="sp-head" onclick="toggleSub('sp-news',event)">
@@ -872,7 +872,7 @@ footer strong{color:var(--ink2)}
   </section>
 
   <!-- ════ 04 ACTION ════ -->
-  <div class="sec-label"><span class="sec-num">04</span><span class="sec-name">Action</span><span class="sec-meta">Stärkste Sektoren + Gaps — was heute handelbar ist</span><span class="info-i" onclick="toggleInfo('info-04')" title="Erklärung ein/aus">i</span></div>
+  <div class="sec-label"><span class="sec-num">04</span><span class="sec-name">Action</span><span class="sec-meta">Stärkste Sektoren + Gaps — was heute handelbar ist</span><span class="info-i" onclick="infoPop('action')" title="Erklärung ein/aus">i</span></div>
   <div class="sec-info" id="info-04">Was heute konkret handelbar ist. <b>Sektoren</b>: 11 S&amp;P-Sektoren als Heatmap nach EMA-Trendstärke, relative Stärke (RS) gegen SPY, Drilldown auf bis zu 10 stärkste/schwächste Titel je Sektor (überlappungsfrei aus ~20 Holdings) — für Top-Down vom starken Sektor zum starken Einzelwert. <b>Gap-Scanner</b>: Gaps ≥ Schwelle in S&amp;P 500 + NASDAQ-100 + DAX (Pre-Market bzw. Eröffnung). ▲ Up = P3-Long-Kandidat, ▼ Down = P6-Short. Zeile anklicken → <b>Gap/ATR</b>, Verlauf und <b>News der letzten 24 h</b>; der <b>🤖-Knopf</b> lässt Gemini die News + Continuation/Fade einordnen (mit Suche). Läuft über den lokalen Server.</div>
   <section class="card" id="c-sekt" style="margin-top:12px">
     <div id="sekt-body"><div class="init">11 S&amp;P-Sektoren — Heatmap nach EMA-Trendstärke; Drilldown 10 stärkste/schwächste je Sektor.</div></div>
@@ -901,7 +901,7 @@ footer strong{color:var(--ink2)}
   </section>
 
   <!-- ════ 05 WERKZEUGE ════ -->
-  <div class="sec-label"><span class="sec-num">05</span><span class="sec-name">Werkzeuge</span><span class="sec-meta">Watchlist · History · Diagnose — bei Bedarf</span><span class="info-i" onclick="toggleInfo('info-05')" title="Erklärung ein/aus">i</span></div>
+  <div class="sec-label"><span class="sec-num">05</span><span class="sec-name">Werkzeuge</span><span class="sec-meta">Watchlist · History · Diagnose — bei Bedarf</span><span class="info-i" onclick="infoPop('werkzeuge')" title="Erklärung ein/aus">i</span></div>
   <div class="sec-info" id="info-05">Sekundäres. <b>Watchlist</b>: eigene Ticker mit echten Yahoo-Kursen, im Browser und (Ticker und Gap-Kontext) auf dem Laufwerk gesichert. <b>History</b>: gespeicherte Ampel-Snapshots zum Vergleich über die Tage. <b>Diagnose</b>: Frische jeder Datenquelle und Proxy-Statistik — der erste Blick, wenn etwas nicht lädt.</div>
   <section class="subpanel collapsed" id="sp-watch">
     <div class="sp-head" onclick="toggleSub('sp-watch',event)">
@@ -4070,6 +4070,31 @@ const INFO_TEXTE = {
     warum:'Die Morgenroutine schreibt bei jedem Lauf den Tag in daten/archiv_JJJJ.json: Zustand, Regelversion, Gründe, Konsequenz, alle Index- und Sektorwerte, Sentiment-Rohwerte. Später werden automatisch die Folgerenditen des S&P 500 nachgetragen, genau wie in der Rückrechnung gerechnet. Mit den Rohwerten lassen sich auch künftige Regeln rückwirkend auf dieselben Tage rechnen.',
     lesen:'Datum wählen → „anzeigen“ zeigt den Tag und was danach geschah; ◀ ▶ blättern. „Bericht erstellen“ fasst alle Tage je Ampelzustand zusammen und listet die Lücken (grün vor Einbruch, rot vor Erholung); dazu entstehen archiv_ki_paket.csv und archiv_ki_frage.txt für eine KI. „Rückrechnung einspielen“ trägt einmalig die Jahre 2007–2026 als „nachgerechnet“ ein, Live-Tage bleiben unberührt.',
     bsp:'Aus der Rückrechnung: Am 20.02.2020 stand die Ampel auf GO — VIX 15,6, 9 Sektoren über EMA200, Contango. In den 20 Tagen danach fiel der S&P 500 um 31 %. Solche Tage zeigt der Bericht als „Lücke 1“: Mit diesen Eingangswerten war der Einbruch nicht zu sehen.'},
+  tagesstart: {t:'Tagesstart',
+    ziel:'Vor jeder Analyse klären: Wird heute gehandelt, was steht an, wie stehen meine Positionen, und halten sie meine Regeln ein?',
+    warum:'Börsenstatus USA und XETRA mit Feiertagen und halben Tagen (gerechnet, nicht gepflegt), Termine des Tages, dein Tagesplan, was über Nacht passiert ist, der REGELCHECK (Stopp vorhanden und richtig, Risiko je Position, Slots, Phase gegen Richtung, Optionslaufzeiten) und der Positions-Monitor. Alles an einer Stelle, damit nichts vergessen wird.',
+    lesen:'Rote Einträge im Regelcheck vor dem nächsten Einstieg klären. Gelb umrandete Positionen haben einen Hinweis (nah am Stopp, Phase gegen die Richtung, Zahlen in Kürze). Tagesplan morgens ausfüllen, ab 17 Uhr erscheint der Rückblick — beides geht ins Archiv.',
+    bsp:'Typischer Fall: „NYSE offen 15:30–22:00 · heute 14:30 US-Arbeitsmarktdaten“, Regelcheck „1 kritisch: Stopp fehlt bei SAP“, Positions-Monitor „NVDA nah am Stopp, Zahlen Mittwoch“.'},
+  markt: {t:'Markt — Indizes, Rohstoffe, Anleihen',
+    ziel:'Welche Märkte stehen in einem handelbaren Trend, welche korrigieren gerade?',
+    warum:'Lüddemann-Phasen, lokal aus echten Kursen gerechnet (Marktsammler, sonst Yahoo): P3 Long = Kurs über EMA50 über EMA200, P6 Short = Kurs unter EMA20 unter EMA200, alle anderen sind Übergänge ohne Setup. Sortiert nach Trendstärke (EMA50-Steigung, Abstand zur EMA200, 1-Monats-Momentum). Dazu Treasury-Renditen und das Fed-Zielband für den Zinskontext.',
+    lesen:'🎯/📉 markiert eine laufende Korrektur — die Zone für Bewegung–Korrektur–Bewegung. ✓✓ im Sektor-Drilldown heißt: Aktie und Sektor in derselben Phase. Rohstoffe und Devisen nutzen dieselbe Logik.',
+    bsp:'Typischer Fall: SPY P3 mit 🎯 „Korrektur an die EMA20“ — der Rücksetzer, den auch der Setup-Scanner sucht; IWM dagegen P4 · kein Setup.'},
+  news: {t:'News und Kalender (KI)',
+    ziel:'Was steht diese Woche an — Notenbanken, Inflation, Arbeitsmarkt, Quartalszahlen?',
+    warum:'Die KI (Gemini oder Claude, über den lokalen Server) sucht live und fasst die Woche zusammen. Die Einstufung „hoch/mittel/niedrig“ macht danach das Programm selbst nach festen Listen, nicht die KI — sonst wäre jede zweite Meldung „hoch“. Regelbasierte Termine (Verfall, Hexensabbat, US-Wahl, halbe Tage) kommen ohne KI aus.',
+    lesen:'KI-Text bleibt KI-Text: genaue Termine und Uhrzeiten gegen einen Primärkalender prüfen. Uhrzeiten von US-Daten werden in deutsche Zeit umgerechnet, Zeitumstellungswochen inklusive.',
+    bsp:'Typischer Fall: „Mi 14:30 USA: Verbraucherpreise (hoch)“ — die Wochenampel steht dann auf voll, die Konsequenz-Zeile nimmt eine Stufe kleiner.'},
+  action: {t:'Action — Sektoren, Setup-Scanner, Gaps',
+    ziel:'Was ist heute konkret handelbar — vom starken Sektor zur starken Aktie?',
+    warum:'Sektoren als Heatmap nach Trendstärke mit relativer Stärke gegen SPY und Drilldown auf die stärksten und schwächsten Titel. Der Setup-Scanner sucht im S&P 500, DAX, MDAX und SDAX genau den Rücksetzer-Einstieg aus dem Systemtest. Der Gap-Scanner findet Lücken ab der Schwelle vor- oder nachbörslich.',
+    lesen:'Scanner: Platz = Abstand zum 52-Wochen-Hoch geteilt durch den Stoppabstand, RS Sektor nur zur Sortierung, 📅 = Zahlen in 10 Tagen, 📝 öffnet das Journal vorausgefüllt. Gaps: ▲ = Long-Kandidat, ▼ = Short; Zeile anklicken für ATR, Verlauf und News.',
+    bsp:'Typischer Fall: XLI stärkster Sektor in P3, im Scanner drei Industrie-Werte mit Rücksetzer an die EMA20 und „Platz 2,4 ×“ — die Kandidaten für TradingView.'},
+  werkzeuge: {t:'Werkzeuge — Watchlist, Wochenvorbereitung, History, Archiv, Diagnose',
+    ziel:'Alles, was nicht täglich gebraucht wird, aber gepflegt sein will.',
+    warum:'Watchlist mit Phasen, ATR, Fundamentaldaten, IV-Rang und KI-Check. Wochenvorbereitung mit Wochenphasen, Terminen und Bilanz. History als Farbstreifen der Ampel. Archiv mit jedem Handelstag seit 2007 (Rückrechnung) und ab jetzt live, mit Rückblick und Bericht für die KI. Diagnose mit Frische jeder Datenquelle und der Pflege-Übersicht.',
+    lesen:'Die Pflege-Übersicht in der Diagnose sagt, was veraltet ist (FOMC-Liste, Sentiment, Marktsammler, Handelsplan). Das Archiv füllt sich mit jedem Lauf — nach ein paar Monaten lohnt der Bericht.',
+    bsp:'Typischer Fall: Pflege-Übersicht „⚠ Sentiment von Hand: eingegeben vor 14 Tagen — neu eintragen“ und „Marktsammler: dieser Lauf 38× Sammler, 6× Yahoo“.'},
   partner: {t:'Trading-Partner (KI, Phase 5)',
     ziel:'Eine zweite Meinung zur Lage: Wie sieht die KI den Markt, den Ausblick für 1–4 Wochen, und neigt sie eher zu Long, neutral, defensiv oder Short?',
     warum:'Die Ampel ist getestet, aber starr — sie kennt keine Wahl, keine Notenbank-Rede, keine Saison. Der Partner liest dieselben Daten (Ampel, Breite, VIX, Termstruktur, Kredit, Termine der Woche inkl. Wahlen und Verfall, Saison der Sektoren, Positionen, Ergebnisse des Systemtests) und darf auf Wunsch per Websuche aktuelle Ereignisse ergänzen. Vier feste Regeln: Meinung ist als Meinung markiert, keine erfundenen Zahlen, Widerspruch zur Regel wird offen benannt, jede Einschätzung kommt ins Archiv.',

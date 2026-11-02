@@ -62,7 +62,7 @@ ctx.window = ctx; ctx.self = ctx; ctx.globalThis = ctx;
 vm.createContext(ctx);
 // Top-Level-const/let sind im vm nicht als Eigenschaften sichtbar — deshalb am Ende exportieren.
 const exporte = ['luedePhase','computeAmpel','ampelRegel','voreinstiegPruefung','trendUndRisiko','usBoersenStatus','xetraStatus','etNachBerlin','makroStufe','makroRegion',
-  'korrigiereZeit','wochenTermine','kreditAusCsv','folgeRenditen','datumAus','breitenWendePruefung','nachziehVorschlag','isoLokal','mrSyncWert','STATE','SK'];
+  'korrigiereZeit','wochenTermine','kreditAusCsv','folgeRenditen','datumAus','breitenWendePruefung','nachziehVorschlag','INFO_TEXTE','isoLokal','mrSyncWert','STATE','SK'];
 vm.runInContext(code + '\n;globalThis.__T={' + exporte.map(n => `${n}:(typeof ${n}!=='undefined'?${n}:undefined)`).join(',') + ',kpi:()=>KPIDAYS,manual:()=>MANUAL,panik:()=>panikComponents()};',
   ctx, { filename: 'ferit_morgenroutine_v6.html' });
 const T = ctx.__T;
@@ -288,6 +288,16 @@ abschnitt('Sentiment-Handeingaben');
   pruefe('Werte älter als 10 Tage zählen nicht', alt.map(c => c.pts), [null, null, null]);
   pruefe('… und sind als veraltet markiert', alt.every(c => /veraltet/.test(c.v)), true);
   ['pcr', 'bear', 'naaim', 'datum'].forEach(k => delete M[k]);
+}
+
+// ── Info-Pop-ups: jedes „i“ hat einen Text mit vier Teilen ────────────────────
+abschnitt('Info-Pop-ups');
+{
+  const benutzt = [...new Set([...html.matchAll(/infoPop\('([a-z0-9_]+)'\)/g)].map(m => m[1]))];
+  const fehlen = benutzt.filter(k => !T.INFO_TEXTE[k]);
+  const unvollst = Object.entries(T.INFO_TEXTE).filter(([, x]) => !(x.t && x.ziel && x.warum && x.lesen && x.bsp)).map(([k]) => k);
+  pruefe(`alle ${benutzt.length} verwendeten Pop-ups vorhanden`, fehlen, []);
+  pruefe('alle Pop-ups haben Ziel / Warum / So liest du / Beispiel', unvollst, []);
 }
 
 // ── Ergebnis ─────────────────────────────────────────────────────────────────

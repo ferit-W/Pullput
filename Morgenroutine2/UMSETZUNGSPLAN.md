@@ -210,5 +210,22 @@ Wird nach jeder Phase hier fortgeschrieben.
   - Einstellung „Marktsammler-Ordner“ und Kursquelle in ⚙, Status in der Pflege-Übersicht
   - **Hinweis:** Laut README des Sammlers (v1.2.6) gibt es noch keine Historie der impliziten Volatilität, die ist für v1.3 geplant. Gespeichert wird bisher nur die SPX-Optionskette mit TWS-IV. Eine IV-Auswertung (z. B. IV-Rang im Stillhalter-Journal) folgt, sobald v1.3 das liefert
   - **Offen bei dir:** Ordner eintragen und in der Pflege-Übersicht prüfen: „dieser Lauf: x× Sammler, y× Yahoo“. Beim ersten Scan prüfen, ob „Volumen-Einheit ungeprüft“ erscheint
-- [ ] Phase 5
-- [ ] Phase 6
+- [x] **IV** (02.11.2026): Marktsammler v1.2.7 sammelt die implizite Volatilität als Tageswert (TWS `OPTION_IMPLIED_VOLATILITY`) für Aktien, ETFs und Indizes. Futures und Devisen sind ausgenommen, weil die TWS den Datentyp dafür nicht anbietet. Daraus kommen IV, IV-Rang, IV-Perzentil und HV20 im Stillhalter-Journal (Felder werden automatisch gefüllt, Spalte „IVR heute“), im Positions-Monitor und auf der Watchlist. Getestet in der Simulation des Sammlers
+- [x] Phase 5 — KI als Trading-Partner (02.11.2026):
+  - Schlüssel nur auf dem PC (`ki_schluessel.json`). Gemini (Standard) oder Claude (`claude-opus-5-5`, offizielles SDK, serverseitiger Ersatz bei Ablehnung, Websuche)
+  - Alle KI-Aufrufe laufen über den Server, auch in Journal und Stillhalter. Der Schlüssel steht nicht mehr in der Adresse, und der KI-Text im Journal wird nicht mehr ungefiltert als HTML eingesetzt (J8, SH7)
+  - „🧭 Trading-Partner“ mit Lage, Ausblick 1–4 Wochen, Neigung und Sicherheit. Widerspruch zur Ampel wird ausdrücklich genannt. Jede Einschätzung kommt ins Archiv, der Archiv-Bericht bewertet sie gegen die 20-Tage-Folgerendite
+- [x] Phase 6 — Handy, Erklärungen, Oberfläche (02.11.2026):
+  - **Telegram** statt App: Tagesnachricht einmal je Tag, `/lage`, `/positionen`, `/hilfe`. Antwortet nur der eingetragenen Chat-ID. Funktioniert unterwegs, ohne den PC ins Internet zu öffnen
+  - **Info-Pop-ups** für alle Bereiche (18, vom Selbsttest geprüft) mit Ziel, Warum so, So liest du es und Beispiel
+  - Volle Bildschirmbreite in allen Werkzeugen, kompakte Ampel-Spalte, Hub-Kachel für den Marktsammler
+  - Einrichtung: `KURZANLEITUNG.md`
+  - **Bewusst nicht gebaut:** eine eigene Android-App (APK). Telegram deckt Push und Abfrage ab, ohne Installation und ohne offenen Zugang zum PC
+
+## Was offen bleibt (ehrlich)
+
+- **Live-Läufe unter Windows:** Yahoo, FRED, Gemini, Claude, Telegram und die TWS waren aus der Prüfumgebung nicht erreichbar. Getestet ist alles mit simulierten Antworten und Daten. Die Punkte aus „Offen bei dir“ oben bitte einmal durchgehen
+- **N7:** freie historische Earnings-Termine und eine Kursquelle ohne Survivorship-Verzerrung, für bessere Backtests
+- **Gleichlauf (Korrelation)** im Gesamtrisiko
+- **Short-Seite im Setup-Scanner:** erst nach einem eigenen Test
+- **IV für Futures:** liefert die TWS als Datentyp nicht. Möglich wäre es später über Futures-Optionsketten (Sammler v1.3)
