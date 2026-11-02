@@ -486,6 +486,7 @@ Aus einem Kandidaten, einem Gap oder der Ticker-Suche öffnet ein Knopf das Jour
 IB bietet einen Flex-Web-Service, über den sich Positionen und Ausführungen automatisch abholen lassen. Ob CapTrader diesen Zugang für dein Konto freigibt, prüfe ich vor der Umsetzung. Falls ja, vergleicht die Routine jeden Morgen die offenen Positionen im Journal mit denen beim Broker.
 
 - **Vorteil gegenüber heute:** Der monatliche Abgleich von Hand entfällt, und fehlende oder doppelte Positionen fallen am selben Tag auf.
+- **Offen, deine Entscheidung:** Ob du die Schnittstelle überhaupt nutzen willst, ist noch nicht entschieden. Falls ja, muss der Altbestand sauber getrennt werden, damit er den Abgleich nicht verwirrt. Möglich wäre eine einmal gepflegte Liste „Altbestand, nicht abgleichen“ mit Symbol und Stückzahl. Der Abgleich zieht diese Mengen dann ab und vergleicht nur den Rest mit Trading-, AKJ- und Langfrist-Positionen im Journal. Ohne Schnittstelle bleibt es beim Abgleich von Hand.
 
 **W5 · Monatsbericht automatisch**
 Zum Monatsende entsteht ein Bericht mit:

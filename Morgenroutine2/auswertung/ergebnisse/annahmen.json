@@ -1,0 +1,11 @@
+[
+ "Signal aus dem Schlusskurs von Tag t (die Routine läuft am Morgen danach).",
+ "Handelbar erst ab Schluss t+1: alle Folgerenditen beginnen einen Tag nach dem Signal (vorsichtig).",
+ "EMA wie im Programm: Fenster der letzten 502 Handelstage (Yahoo range=2y), Startwert = SMA.",
+ "Manuelle Sentimentwerte (PCR, AAII-Bear, NAAIM) als letzter bis Tag t veröffentlichter Wert.",
+ "PCR-Equity nur bis 04.10.2019 verfügbar, danach fehlt das Signal (wie ein leeres Feld im Programm).",
+ "Fear & Greed erst ab 03.01.2011; vor 2011 wird der Score ohne F&G normiert (Programmlogik).",
+ "Terminwoche (FOMC/Arbeitsmarkt/Earnings) ist NICHT nachgebildet — die Konsequenz-Zeile ist ohne diesen Größen-Dämpfer.",
+ "Indexdaten DIA/IWM enden am 08.09.2026; Auswertung endet dort.",
+ "Datenquellen: öffentliche GitHub-Abzüge Dritter, siehe quellen.json."
+]

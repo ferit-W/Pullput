@@ -1,0 +1,117 @@
+{
+ "SPY": {
+  "url": "https://raw.githubusercontent.com/flytothejy/market-data/HEAD/data/SPY.csv",
+  "sha256": "3b6eebe59b1fa56783c319dabc885969590f1dd327231bce250d56735a4e8cf8",
+  "bytes": 512579
+ },
+ "QQQ": {
+  "url": "https://raw.githubusercontent.com/flytothejy/market-data/HEAD/data/QQQ.csv",
+  "sha256": "f20e382cfcac42cfd0668f3c6e1b55b13ff971d406375f035020e91ec4ae1996",
+  "bytes": 405338
+ },
+ "DIA": {
+  "url": "https://raw.githubusercontent.com/nohseongmin/stonks-atlas/HEAD/data/us/DIA.csv",
+  "sha256": "b0bdeafd2ef55cdded980d55abf9fa2ff363ffbb36d77f64557f796f94dce453",
+  "bytes": 209714
+ },
+ "IWM": {
+  "url": "https://raw.githubusercontent.com/nohseongmin/stonks-atlas/HEAD/data/us/IWM.csv",
+  "sha256": "e11f9ed1f52c36c1ec67d7c751a70277c1fe9413dd73fea6ac92f8b3d643eeba",
+  "bytes": 193513
+ },
+ "VIX": {
+  "url": "https://raw.githubusercontent.com/flytothejy/market-data/HEAD/data/VIX.csv",
+  "sha256": "c310c4db15eaca5e8e4844d13466ba4aec1b3dc17204387de857fb782e66bce4",
+  "bytes": 386853
+ },
+ "VIX3M": {
+  "url": "https://raw.githubusercontent.com/flytothejy/market-data/HEAD/data/VIX3M.csv",
+  "sha256": "8252897b5acbd27946e8aff53443775b2e6cf66cf9022d0e44769810a9c57c79",
+  "bytes": 218007
+ },
+ "VVIX": {
+  "url": "https://raw.githubusercontent.com/smallfishmacro-Git/market-dashboard/HEAD/data/barchart/CBOE_Vvolatility_%24VVIX.csv",
+  "sha256": "a7bdbbc9225d3d767d17d26f438e7720882331d6836d027e53d41bbc955b6a92",
+  "bytes": 231873
+ },
+ "FG": {
+  "url": "https://raw.githubusercontent.com/whit3rabbit/fear-greed-data/HEAD/fear-greed.csv",
+  "sha256": "8b78821d51c6eee0f96d07494af86f0e80a728c0122ac7638603cd1f2473fbe6",
+  "bytes": 111260
+ },
+ "AAII": {
+  "url": "https://raw.githubusercontent.com/alecsmith/sentiment/HEAD/data/aaii_sentiment.csv",
+  "sha256": "bb53f81094e4cc751e88e4aa0ffb90530df809209c6ad37f1e171d0ac646bb9f",
+  "bytes": 61906
+ },
+ "NAAIM": {
+  "url": "https://raw.githubusercontent.com/riverfjs/notification/HEAD/data/macro/naaim.csv",
+  "sha256": "0238654899fbc72252eef42ea201163e3411c799b14772f135bc5677d6ca760d",
+  "bytes": 27247
+ },
+ "PCR": {
+  "url": "https://raw.githubusercontent.com/achl0902-web/back-testing/HEAD/qld/data/macro/CBOE_EQUITYPC.csv",
+  "sha256": "c463906426713d1f63e553f8107a38bf87edd04f79123e1cd8db39b64d876f98",
+  "bytes": 51729
+ },
+ "HYOAS": {
+  "url": "https://raw.githubusercontent.com/viki-m13/bonds/HEAD/data/fred/BAMLH0A0HYM2.csv",
+  "sha256": "395d9d49073c4e381df6c118887d35ca51b1ac6aed0eb50ec5e9047a48874618",
+  "bytes": 111031
+ },
+ "XLK": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLK.csv",
+  "sha256": "6b647e15fd9de53c60e51c299599084522285f09ed483ab2ff41024648364765",
+  "bytes": 119029
+ },
+ "XLC": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLC.csv",
+  "sha256": "a273e19f9f18b18431bb464a9fddafcc4031a88c8ce10be1cbc1f3635cc3945d",
+  "bytes": 37854
+ },
+ "XLY": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLY.csv",
+  "sha256": "9f87be57e0e710ebf52607e240e044146c336e10273debd48c1f3b4673f79950",
+  "bytes": 120344
+ },
+ "XLF": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLF.csv",
+  "sha256": "41a73c4bd9050ef7ff84f7d864f1012b058121e98e5388927762708491aa6194",
+  "bytes": 119717
+ },
+ "XLV": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLV.csv",
+  "sha256": "e3ddc5106fc48f1d49fc2ec305f58a6ad0b9e3d6ea888c9886bc1ab12e03687c",
+  "bytes": 122093
+ },
+ "XLI": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLI.csv",
+  "sha256": "e93ad71c06bc3f809df4bdfce19c90eade0eef19b20763063d97461717182e7f",
+  "bytes": 121435
+ },
+ "XLP": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLP.csv",
+  "sha256": "07007c442d2127afe4e45c922f6cc3e7aec52f79cf05472ab1dd15a630343181",
+  "bytes": 120565
+ },
+ "XLE": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLE.csv",
+  "sha256": "68961cd00001291db1cf03963e8abf64601664c02637611c514f5eb118e0b7db",
+  "bytes": 119365
+ },
+ "XLB": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLB.csv",
+  "sha256": "c2755138c869e940313ae06164b0c3ba789a97ef1f1711a84199015b4b5942ac",
+  "bytes": 118861
+ },
+ "XLU": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLU.csv",
+  "sha256": "7f7272fc41e175d92d3d77a443e0d00d07d822c74a51f036df5672be1288a7f2",
+  "bytes": 118157
+ },
+ "XLRE": {
+  "url": "https://raw.githubusercontent.com/kittycapital/sector-chart/HEAD/data/history/XLRE.csv",
+  "sha256": "03143621f67e6b3edca150d4d2af9c184dd4b116d09ca2c4656f4daaae92d102",
+  "bytes": 49631
+ }
+}

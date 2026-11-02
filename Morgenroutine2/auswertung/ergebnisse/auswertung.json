@@ -1,0 +1,825 @@
+{
+ "verteilung_pct": {
+  "GO": 44.1,
+  "CAUTION": 32.6,
+  "STOP": 22.0,
+  "REVERSE": 1.2
+ },
+ "mittlere_dauer_handelstage": {
+  "CAUTION": 4.2,
+  "GO": 9.5,
+  "REVERSE": 5.7,
+  "STOP": 6.4
+ },
+ "eintagesphasen_anteil_pct": 33.7,
+ "wechsel_pro_jahr": 40.4,
+ "folgerenditen": {
+  "CAUTION": {
+   "tage": 1575,
+   "spy_5T_mittel_pct": 0.24,
+   "spy_20T_mittel_pct": 0.92,
+   "spy_20T_positiv_pct": 68.0,
+   "spy_60T_mittel_pct": 2.68,
+   "rueckschlag_20T_mittel_pct": -2.51,
+   "rueckschlag_20T_ueber5pct_anteil": 18.0
+  },
+  "GO": {
+   "tage": 2131,
+   "spy_5T_mittel_pct": 0.11,
+   "spy_20T_mittel_pct": 0.34,
+   "spy_20T_positiv_pct": 64.0,
+   "spy_60T_mittel_pct": 1.42,
+   "rueckschlag_20T_mittel_pct": -2.14,
+   "rueckschlag_20T_ueber5pct_anteil": 11.0
+  },
+  "REVERSE": {
+   "tage": 57,
+   "spy_5T_mittel_pct": -0.43,
+   "spy_20T_mittel_pct": 3.63,
+   "spy_20T_positiv_pct": 63.0,
+   "spy_60T_mittel_pct": 12.73,
+   "rueckschlag_20T_mittel_pct": -6.28,
+   "rueckschlag_20T_ueber5pct_anteil": 37.0
+  },
+  "STOP": {
+   "tage": 1064,
+   "spy_5T_mittel_pct": 0.36,
+   "spy_20T_mittel_pct": 1.34,
+   "spy_20T_positiv_pct": 66.0,
+   "spy_60T_mittel_pct": 3.27,
+   "rueckschlag_20T_mittel_pct": -4.1,
+   "rueckschlag_20T_ueber5pct_anteil": 31.0
+  },
+  "ALLE": {
+   "tage": 4827,
+   "spy_5T_mittel_pct": 0.2,
+   "spy_20T_mittel_pct": 0.79,
+   "spy_20T_positiv_pct": 65.0,
+   "spy_60T_mittel_pct": 2.38,
+   "rueckschlag_20T_mittel_pct": -2.74,
+   "rueckschlag_20T_ueber5pct_anteil": 18.0
+  }
+ },
+ "ausloeser": {
+  "STOP:breite<3": {
+   "tage": 725,
+   "spy_20T_mittel_pct": 1.6,
+   "spy_20T_positiv_pct": 68.0,
+   "rueckschlag_20T_mittel_pct": -4.02
+  },
+  "STOP:p6>=2": {
+   "tage": 527,
+   "spy_20T_mittel_pct": 0.47,
+   "spy_20T_positiv_pct": 57.0,
+   "rueckschlag_20T_mittel_pct": -5.46
+  },
+  "STOP:panik>=70": {
+   "tage": 117,
+   "spy_20T_mittel_pct": 1.35,
+   "spy_20T_positiv_pct": 64.0,
+   "rueckschlag_20T_mittel_pct": -7.17
+  },
+  "STOP:vix>28": {
+   "tage": 509,
+   "spy_20T_mittel_pct": 1.54,
+   "spy_20T_positiv_pct": 66.0,
+   "rueckschlag_20T_mittel_pct": -4.78
+  },
+  "CAUTION:backwardation": {
+   "tage": 44,
+   "spy_20T_mittel_pct": 1.87,
+   "spy_20T_positiv_pct": 80.0,
+   "rueckschlag_20T_mittel_pct": -2.33
+  },
+  "CAUTION:breite<6": {
+   "tage": 586,
+   "spy_20T_mittel_pct": 0.87,
+   "spy_20T_positiv_pct": 66.0,
+   "rueckschlag_20T_mittel_pct": -2.68
+  },
+  "CAUTION:fuehrung_eng": {
+   "tage": 134,
+   "spy_20T_mittel_pct": 1.1,
+   "spy_20T_positiv_pct": 67.0,
+   "rueckschlag_20T_mittel_pct": -1.93
+  },
+  "CAUTION:p3<3": {
+   "tage": 937,
+   "spy_20T_mittel_pct": 0.6,
+   "spy_20T_positiv_pct": 63.0,
+   "rueckschlag_20T_mittel_pct": -2.84
+  },
+  "CAUTION:panik>=45": {
+   "tage": 63,
+   "spy_20T_mittel_pct": 1.45,
+   "spy_20T_positiv_pct": 68.0,
+   "rueckschlag_20T_mittel_pct": -3.0
+  },
+  "CAUTION:unklar": {
+   "tage": 24,
+   "spy_20T_mittel_pct": 1.06,
+   "spy_20T_positiv_pct": 75.0,
+   "rueckschlag_20T_mittel_pct": -1.74
+  },
+  "CAUTION:vix>=20": {
+   "tage": 764,
+   "spy_20T_mittel_pct": 1.11,
+   "spy_20T_positiv_pct": 68.0,
+   "rueckschlag_20T_mittel_pct": -2.63
+  }
+ },
+ "konsequenz": {
+  "KEINE -": {
+   "tage": 541,
+   "spy_20T_mittel_pct": 2.12,
+   "spy_20T_positiv_pct": 73.0
+  },
+  "LONG normal": {
+   "tage": 2131,
+   "spy_20T_mittel_pct": 0.34,
+   "spy_20T_positiv_pct": 64.0
+  },
+  "LONG reduziert": {
+   "tage": 953,
+   "spy_20T_mittel_pct": 1.03,
+   "spy_20T_positiv_pct": 69.0
+  },
+  "NUR_GAPS klein": {
+   "tage": 634,
+   "spy_20T_mittel_pct": 0.62,
+   "spy_20T_positiv_pct": 65.0
+  },
+  "SHORT normal": {
+   "tage": 439,
+   "spy_20T_mittel_pct": 1.32,
+   "spy_20T_positiv_pct": 60.0
+  },
+  "SHORT reduziert": {
+   "tage": 129,
+   "spy_20T_mittel_pct": -0.2,
+   "spy_20T_positiv_pct": 54.0
+  }
+ },
+ "panik_stufen": {
+  "ruhig <20": {
+   "tage": 2662,
+   "spy_20T_mittel_pct": 0.45,
+   "spy_60T_mittel_pct": 1.73,
+   "spy_20T_positiv_pct": 64.0
+  },
+  "normal 20-37": {
+   "tage": 1148,
+   "spy_20T_mittel_pct": 0.92,
+   "spy_60T_mittel_pct": 2.83,
+   "spy_20T_positiv_pct": 67.0
+  },
+  "erhöht 38-54": {
+   "tage": 564,
+   "spy_20T_mittel_pct": 1.38,
+   "spy_60T_mittel_pct": 3.12,
+   "spy_20T_positiv_pct": 65.0
+  },
+  "hoch 55-71": {
+   "tage": 323,
+   "spy_20T_mittel_pct": 1.6,
+   "spy_60T_mittel_pct": 3.57,
+   "spy_20T_positiv_pct": 68.0
+  },
+  "extrem 72+": {
+   "tage": 130,
+   "spy_20T_mittel_pct": 1.94,
+   "spy_60T_mittel_pct": 5.43,
+   "spy_20T_positiv_pct": 62.0
+  }
+ },
+ "einbrueche": [
+  {
+   "hoch": "2007-10-09",
+   "tief": "2009-03-09",
+   "erholt": "2013-03-14",
+   "tiefe_pct": -56.5,
+   "ampel_am_hoch": "GO",
+   "erster_STOP": "2007-11-09",
+   "handelstage_bis_STOP": 23,
+   "verlust_bis_STOP_pct": -7.2,
+   "anteil_rueckgang_bis_STOP_pct": 13,
+   "erstes_GO_nach_tief": "2009-12-22",
+   "erholung_bis_GO_verpasst_pct": 64.0,
+   "handelstage_tief_bis_GO": 201
+  },
+  {
+   "hoch": "2015-05-21",
+   "tief": "2016-02-11",
+   "erholt": "2016-07-12",
+   "tiefe_pct": -14.4,
+   "ampel_am_hoch": "GO",
+   "erster_STOP": "2015-06-08",
+   "handelstage_bis_STOP": 11,
+   "verlust_bis_STOP_pct": -2.4,
+   "anteil_rueckgang_bis_STOP_pct": 16,
+   "erstes_GO_nach_tief": "2016-04-13",
+   "erholung_bis_GO_verpasst_pct": 13.7,
+   "handelstage_tief_bis_GO": 42
+  },
+  {
+   "hoch": "2018-01-26",
+   "tief": "2018-04-02",
+   "erholt": "2018-08-24",
+   "tiefe_pct": -10.2,
+   "ampel_am_hoch": "GO",
+   "erster_STOP": "2018-02-05",
+   "handelstage_bis_STOP": 6,
+   "verlust_bis_STOP_pct": -7.9,
+   "anteil_rueckgang_bis_STOP_pct": 78,
+   "erstes_GO_nach_tief": "2018-04-17",
+   "erholung_bis_GO_verpasst_pct": 4.9,
+   "handelstage_tief_bis_GO": 11
+  },
+  {
+   "hoch": "2018-09-20",
+   "tief": "2018-12-24",
+   "erholt": "2019-04-29",
+   "tiefe_pct": -20.2,
+   "ampel_am_hoch": "GO",
+   "erster_STOP": "2018-10-11",
+   "handelstage_bis_STOP": 15,
+   "verlust_bis_STOP_pct": -7.3,
+   "anteil_rueckgang_bis_STOP_pct": 36,
+   "erstes_GO_nach_tief": "2019-03-05",
+   "erholung_bis_GO_verpasst_pct": 19.1,
+   "handelstage_tief_bis_GO": 47
+  },
+  {
+   "hoch": "2020-02-19",
+   "tief": "2020-03-23",
+   "erholt": "2020-08-18",
+   "tiefe_pct": -34.1,
+   "ampel_am_hoch": "GO",
+   "erster_STOP": "2020-02-24",
+   "handelstage_bis_STOP": 3,
+   "verlust_bis_STOP_pct": -4.7,
+   "anteil_rueckgang_bis_STOP_pct": 14,
+   "erstes_GO_nach_tief": null,
+   "erholung_bis_GO_verpasst_pct": null,
+   "handelstage_tief_bis_GO": null
+  },
+  {
+   "hoch": "2022-01-03",
+   "tief": "2022-10-12",
+   "erholt": "2024-01-19",
+   "tiefe_pct": -25.4,
+   "ampel_am_hoch": "GO",
+   "erster_STOP": "2022-01-21",
+   "handelstage_bis_STOP": 13,
+   "verlust_bis_STOP_pct": -8.3,
+   "anteil_rueckgang_bis_STOP_pct": 33,
+   "erstes_GO_nach_tief": "2023-04-11",
+   "erholung_bis_GO_verpasst_pct": 14.9,
+   "handelstage_tief_bis_GO": 123
+  },
+  {
+   "hoch": "2025-02-19",
+   "tief": "2025-04-08",
+   "erholt": "2025-06-27",
+   "tiefe_pct": -19.0,
+   "ampel_am_hoch": "GO",
+   "erster_STOP": "2025-03-10",
+   "handelstage_bis_STOP": 13,
+   "verlust_bis_STOP_pct": -8.5,
+   "anteil_rueckgang_bis_STOP_pct": 45,
+   "erstes_GO_nach_tief": "2025-05-19",
+   "erholung_bis_GO_verpasst_pct": 19.8,
+   "handelstage_tief_bis_GO": 28
+  }
+ ],
+ "luecken": {
+  "GO_vor_Ruecksetzer_7pct": [
+   {
+    "von": "2007-07-12",
+    "bis": "2007-07-20",
+    "max_ruecksetzer_pct": -9.0
+   },
+   {
+    "von": "2007-10-11",
+    "bis": "2007-10-29",
+    "max_ruecksetzer_pct": -8.6
+   },
+   {
+    "von": "2007-12-24",
+    "bis": "2007-12-26",
+    "max_ruecksetzer_pct": -12.6
+   },
+   {
+    "von": "2010-01-07",
+    "bis": "2010-01-19",
+    "max_ruecksetzer_pct": -8.0
+   },
+   {
+    "von": "2010-04-09",
+    "bis": "2010-04-29",
+    "max_ruecksetzer_pct": -11.7
+   },
+   {
+    "von": "2011-07-06",
+    "bis": "2011-07-25",
+    "max_ruecksetzer_pct": -16.6
+   },
+   {
+    "von": "2012-04-25",
+    "bis": "2012-05-02",
+    "max_ruecksetzer_pct": -8.0
+   },
+   {
+    "von": "2012-10-16",
+    "bis": "2012-10-16",
+    "max_ruecksetzer_pct": -7.2
+   },
+   {
+    "von": "2014-09-16",
+    "bis": "2014-09-18",
+    "max_ruecksetzer_pct": -7.7
+   },
+   {
+    "von": "2015-12-23",
+    "bis": "2015-12-29",
+    "max_ruecksetzer_pct": -10.5
+   },
+   {
+    "von": "2018-01-11",
+    "bis": "2018-01-31",
+    "max_ruecksetzer_pct": -10.1
+   },
+   {
+    "von": "2018-02-23",
+    "bis": "2018-02-23",
+    "max_ruecksetzer_pct": -7.1
+   },
+   {
+    "von": "2018-09-19",
+    "bis": "2018-10-04",
+    "max_ruecksetzer_pct": -9.6
+   },
+   {
+    "von": "2018-12-03",
+    "bis": "2018-12-03",
+    "max_ruecksetzer_pct": -13.3
+   },
+   {
+    "von": "2020-01-28",
+    "bis": "2020-02-21",
+    "max_ruecksetzer_pct": -31.4
+   },
+   {
+    "von": "2021-12-23",
+    "bis": "2022-01-04",
+    "max_ruecksetzer_pct": -9.7
+   },
+   {
+    "von": "2024-07-11",
+    "bis": "2024-07-16",
+    "max_ruecksetzer_pct": -8.4
+   },
+   {
+    "von": "2025-02-07",
+    "bis": "2025-02-20",
+    "max_ruecksetzer_pct": -10.0
+   },
+   {
+    "von": "2026-02-26",
+    "bis": "2026-02-26",
+    "max_ruecksetzer_pct": -7.6
+   }
+  ],
+  "STOP_vor_Anstieg_7pct": [
+   {
+    "von": "2008-11-14",
+    "bis": "2008-12-03",
+    "max_anstieg_20T_pct": 16.9
+   },
+   {
+    "von": "2009-02-20",
+    "bis": "2009-04-30",
+    "max_anstieg_20T_pct": 22.7
+   },
+   {
+    "von": "2009-06-19",
+    "bis": "2009-07-13",
+    "max_anstieg_20T_pct": 15.1
+   },
+   {
+    "von": "2010-02-04",
+    "bis": "2010-02-09",
+    "max_anstieg_20T_pct": 8.1
+   },
+   {
+    "von": "2010-06-30",
+    "bis": "2010-07-02",
+    "max_anstieg_20T_pct": 10.3
+   },
+   {
+    "von": "2010-08-23",
+    "bis": "2010-08-30",
+    "max_anstieg_20T_pct": 9.1
+   },
+   {
+    "von": "2011-09-21",
+    "bis": "2011-10-06",
+    "max_anstieg_20T_pct": 14.2
+   },
+   {
+    "von": "2011-11-22",
+    "bis": "2011-11-23",
+    "max_anstieg_20T_pct": 8.6
+   },
+   {
+    "von": "2011-12-15",
+    "bis": "2011-12-16",
+    "max_anstieg_20T_pct": 9.3
+   },
+   {
+    "von": "2013-06-21",
+    "bis": "2013-06-21",
+    "max_anstieg_20T_pct": 7.7
+   },
+   {
+    "von": "2014-02-03",
+    "bis": "2014-02-04",
+    "max_anstieg_20T_pct": 7.4
+   },
+   {
+    "von": "2014-10-10",
+    "bis": "2014-10-17",
+    "max_anstieg_20T_pct": 9.6
+   },
+   {
+    "von": "2015-09-24",
+    "bis": "2015-09-30",
+    "max_anstieg_20T_pct": 10.1
+   },
+   {
+    "von": "2016-02-05",
+    "bis": "2016-02-11",
+    "max_anstieg_20T_pct": 10.9
+   },
+   {
+    "von": "2018-02-07",
+    "bis": "2018-02-07",
+    "max_anstieg_20T_pct": 8.2
+   },
+   {
+    "von": "2018-12-20",
+    "bis": "2019-01-04",
+    "max_anstieg_20T_pct": 12.5
+   },
+   {
+    "von": "2019-05-31",
+    "bis": "2019-05-31",
+    "max_anstieg_20T_pct": 7.7
+   },
+   {
+    "von": "2020-03-20",
+    "bis": "2020-04-06",
+    "max_anstieg_20T_pct": 22.5
+   },
+   {
+    "von": "2020-04-30",
+    "bis": "2020-05-14",
+    "max_anstieg_20T_pct": 11.3
+   },
+   {
+    "von": "2020-06-25",
+    "bis": "2020-06-25",
+    "max_anstieg_20T_pct": 7.7
+   },
+   {
+    "von": "2020-10-26",
+    "bis": "2020-11-02",
+    "max_anstieg_20T_pct": 11.0
+   },
+   {
+    "von": "2021-10-01",
+    "bis": "2021-10-01",
+    "max_anstieg_20T_pct": 7.3
+   },
+   {
+    "von": "2022-02-28",
+    "bis": "2022-03-07",
+    "max_anstieg_20T_pct": 8.9
+   },
+   {
+    "von": "2022-06-16",
+    "bis": "2022-07-18",
+    "max_anstieg_20T_pct": 12.3
+   },
+   {
+    "von": "2022-09-29",
+    "bis": "2022-11-02",
+    "max_anstieg_20T_pct": 11.4
+   },
+   {
+    "von": "2022-12-27",
+    "bis": "2023-01-04",
+    "max_anstieg_20T_pct": 8.7
+   },
+   {
+    "von": "2023-10-19",
+    "bis": "2023-10-31",
+    "max_anstieg_20T_pct": 10.7
+   },
+   {
+    "von": "2025-04-17",
+    "bis": "2025-04-25",
+    "max_anstieg_20T_pct": 15.8
+   },
+   {
+    "von": "2026-03-18",
+    "bis": "2026-03-26",
+    "max_anstieg_20T_pct": 12.8
+   }
+  ]
+ },
+ "varianten": {
+  "Kaufen und halten": {
+   "gesamt 2007-07 bis 2026-09": {
+    "rendite_pa": 8.74,
+    "max_drawdown": -56.5,
+    "vola_pa": 19.8,
+    "sharpe_ohne_zins": 0.52,
+    "investiert_anteil": 100.0,
+    "wechsel_pro_jahr": 0.0
+   },
+   "Hälfte 1: 2007-07 bis 2016-12": {
+    "rendite_pa": 4.27,
+    "max_drawdown": -56.5,
+    "vola_pa": 21.2,
+    "sharpe_ohne_zins": 0.3,
+    "investiert_anteil": 100.0,
+    "wechsel_pro_jahr": 0.0
+   },
+   "Hälfte 2: 2017-01 bis 2026-09": {
+    "rendite_pa": 13.32,
+    "max_drawdown": -34.1,
+    "vola_pa": 18.2,
+    "sharpe_ohne_zins": 0.78,
+    "investiert_anteil": 100.0,
+    "wechsel_pro_jahr": 0.0
+   }
+  },
+  "Ampel heute": {
+   "gesamt 2007-07 bis 2026-09": {
+    "rendite_pa": 4.07,
+    "max_drawdown": -19.3,
+    "vola_pa": 8.9,
+    "sharpe_ohne_zins": 0.49,
+    "investiert_anteil": 61.0,
+    "wechsel_pro_jahr": 40.3
+   },
+   "Hälfte 1: 2007-07 bis 2016-12": {
+    "rendite_pa": 1.67,
+    "max_drawdown": -16.2,
+    "vola_pa": 8.3,
+    "sharpe_ohne_zins": 0.24,
+    "investiert_anteil": 57.0,
+    "wechsel_pro_jahr": 41.5
+   },
+   "Hälfte 2: 2017-01 bis 2026-09": {
+    "rendite_pa": 6.49,
+    "max_drawdown": -19.3,
+    "vola_pa": 9.5,
+    "sharpe_ohne_zins": 0.71,
+    "investiert_anteil": 65.0,
+    "wechsel_pro_jahr": 39.2
+   }
+  },
+  "Ampel, nur GO investiert": {
+   "gesamt 2007-07 bis 2026-09": {
+    "rendite_pa": 3.0,
+    "max_drawdown": -16.5,
+    "vola_pa": 6.9,
+    "sharpe_ohne_zins": 0.46,
+    "investiert_anteil": 44.0,
+    "wechsel_pro_jahr": 23.4
+   },
+   "Hälfte 1: 2007-07 bis 2016-12": {
+    "rendite_pa": 0.45,
+    "max_drawdown": -16.5,
+    "vola_pa": 6.7,
+    "sharpe_ohne_zins": 0.1,
+    "investiert_anteil": 40.0,
+    "wechsel_pro_jahr": 23.4
+   },
+   "Hälfte 2: 2017-01 bis 2026-09": {
+    "rendite_pa": 5.58,
+    "max_drawdown": -13.4,
+    "vola_pa": 7.0,
+    "sharpe_ohne_zins": 0.81,
+    "investiert_anteil": 48.0,
+    "wechsel_pro_jahr": 23.5
+   }
+  },
+  "V1 Ampel mit 2-Tage-Bestätigung": {
+   "gesamt 2007-07 bis 2026-09": {
+    "rendite_pa": 3.69,
+    "max_drawdown": -21.3,
+    "vola_pa": 9.3,
+    "sharpe_ohne_zins": 0.44,
+    "investiert_anteil": 61.0,
+    "wechsel_pro_jahr": 20.8
+   },
+   "Hälfte 1: 2007-07 bis 2016-12": {
+    "rendite_pa": 1.73,
+    "max_drawdown": -15.2,
+    "vola_pa": 8.6,
+    "sharpe_ohne_zins": 0.24,
+    "investiert_anteil": 57.0,
+    "wechsel_pro_jahr": 21.8
+   },
+   "Hälfte 2: 2017-01 bis 2026-09": {
+    "rendite_pa": 5.65,
+    "max_drawdown": -21.3,
+    "vola_pa": 9.8,
+    "sharpe_ohne_zins": 0.61,
+    "investiert_anteil": 66.0,
+    "wechsel_pro_jahr": 19.9
+   }
+  },
+  "V2 Breite über EMA200 statt EMA50": {
+   "gesamt 2007-07 bis 2026-09": {
+    "rendite_pa": 5.17,
+    "max_drawdown": -21.4,
+    "vola_pa": 9.4,
+    "sharpe_ohne_zins": 0.59,
+    "investiert_anteil": 64.0,
+    "wechsel_pro_jahr": 31.3
+   },
+   "Hälfte 1: 2007-07 bis 2016-12": {
+    "rendite_pa": 3.1,
+    "max_drawdown": -14.0,
+    "vola_pa": 8.7,
+    "sharpe_ohne_zins": 0.39,
+    "investiert_anteil": 60.0,
+    "wechsel_pro_jahr": 29.3
+   },
+   "Hälfte 2: 2017-01 bis 2026-09": {
+    "rendite_pa": 7.25,
+    "max_drawdown": -21.4,
+    "vola_pa": 9.9,
+    "sharpe_ohne_zins": 0.75,
+    "investiert_anteil": 68.0,
+    "wechsel_pro_jahr": 33.4
+   }
+  },
+  "V3 + Kreditspread-Signal": {
+   "gesamt 2007-07 bis 2026-09": {
+    "rendite_pa": 4.64,
+    "max_drawdown": -19.3,
+    "vola_pa": 8.7,
+    "sharpe_ohne_zins": 0.57,
+    "investiert_anteil": 59.0,
+    "wechsel_pro_jahr": 37.8
+   },
+   "Hälfte 1: 2007-07 bis 2016-12": {
+    "rendite_pa": 3.07,
+    "max_drawdown": -11.6,
+    "vola_pa": 7.7,
+    "sharpe_ohne_zins": 0.43,
+    "investiert_anteil": 52.0,
+    "wechsel_pro_jahr": 37.6
+   },
+   "Hälfte 2: 2017-01 bis 2026-09": {
+    "rendite_pa": 6.21,
+    "max_drawdown": -19.3,
+    "vola_pa": 9.5,
+    "sharpe_ohne_zins": 0.68,
+    "investiert_anteil": 65.0,
+    "wechsel_pro_jahr": 38.0
+   }
+  },
+  "V4 ohne Panik-Score als Auslöser": {
+   "gesamt 2007-07 bis 2026-09": {
+    "rendite_pa": 4.07,
+    "max_drawdown": -19.3,
+    "vola_pa": 8.9,
+    "sharpe_ohne_zins": 0.49,
+    "investiert_anteil": 61.0,
+    "wechsel_pro_jahr": 40.3
+   },
+   "Hälfte 1: 2007-07 bis 2016-12": {
+    "rendite_pa": 1.67,
+    "max_drawdown": -16.2,
+    "vola_pa": 8.3,
+    "sharpe_ohne_zins": 0.24,
+    "investiert_anteil": 57.0,
+    "wechsel_pro_jahr": 41.5
+   },
+   "Hälfte 2: 2017-01 bis 2026-09": {
+    "rendite_pa": 6.49,
+    "max_drawdown": -19.3,
+    "vola_pa": 9.5,
+    "sharpe_ohne_zins": 0.71,
+    "investiert_anteil": 65.0,
+    "wechsel_pro_jahr": 39.2
+   }
+  },
+  "V5 VIX-Termstruktur statt VIX-Niveau": {
+   "gesamt 2007-07 bis 2026-09": {
+    "rendite_pa": 4.98,
+    "max_drawdown": -21.8,
+    "vola_pa": 9.4,
+    "sharpe_ohne_zins": 0.56,
+    "investiert_anteil": 66.0,
+    "wechsel_pro_jahr": 37.6
+   },
+   "Hälfte 1: 2007-07 bis 2016-12": {
+    "rendite_pa": 1.65,
+    "max_drawdown": -21.8,
+    "vola_pa": 9.5,
+    "sharpe_ohne_zins": 0.22,
+    "investiert_anteil": 62.0,
+    "wechsel_pro_jahr": 40.4
+   },
+   "Hälfte 2: 2017-01 bis 2026-09": {
+    "rendite_pa": 8.36,
+    "max_drawdown": -13.9,
+    "vola_pa": 9.3,
+    "sharpe_ohne_zins": 0.91,
+    "investiert_anteil": 70.0,
+    "wechsel_pro_jahr": 34.9
+   }
+  },
+  "V6 Kombi V1+V2+V3": {
+   "gesamt 2007-07 bis 2026-09": {
+    "rendite_pa": 5.07,
+    "max_drawdown": -21.5,
+    "vola_pa": 9.3,
+    "sharpe_ohne_zins": 0.58,
+    "investiert_anteil": 62.0,
+    "wechsel_pro_jahr": 16.5
+   },
+   "Hälfte 1: 2007-07 bis 2016-12": {
+    "rendite_pa": 4.03,
+    "max_drawdown": -10.4,
+    "vola_pa": 8.3,
+    "sharpe_ohne_zins": 0.52,
+    "investiert_anteil": 56.0,
+    "wechsel_pro_jahr": 16.1
+   },
+   "Hälfte 2: 2017-01 bis 2026-09": {
+    "rendite_pa": 6.11,
+    "max_drawdown": -21.5,
+    "vola_pa": 10.1,
+    "sharpe_ohne_zins": 0.64,
+    "investiert_anteil": 68.0,
+    "wechsel_pro_jahr": 16.9
+   }
+  },
+  "Einfach: SPY über EMA200": {
+   "gesamt 2007-07 bis 2026-09": {
+    "rendite_pa": 5.79,
+    "max_drawdown": -25.9,
+    "vola_pa": 11.8,
+    "sharpe_ohne_zins": 0.54,
+    "investiert_anteil": 78.0,
+    "wechsel_pro_jahr": 8.1
+   },
+   "Hälfte 1: 2007-07 bis 2016-12": {
+    "rendite_pa": 1.43,
+    "max_drawdown": -21.3,
+    "vola_pa": 11.5,
+    "sharpe_ohne_zins": 0.18,
+    "investiert_anteil": 73.0,
+    "wechsel_pro_jahr": 8.8
+   },
+   "Hälfte 2: 2017-01 bis 2026-09": {
+    "rendite_pa": 10.27,
+    "max_drawdown": -25.9,
+    "vola_pa": 12.2,
+    "sharpe_ohne_zins": 0.86,
+    "investiert_anteil": 83.0,
+    "wechsel_pro_jahr": 7.5
+   }
+  }
+ },
+ "abgleich_snapshots": {
+  "2026-09-04": {
+   "ampel": "GO",
+   "p3": 4,
+   "p6": 0,
+   "breite": 6,
+   "rsBeat": 6,
+   "vix": 14.53
+  },
+  "2026-09-08": {
+   "ampel": "CAUTION",
+   "p3": 3,
+   "p6": 0,
+   "breite": 5,
+   "rsBeat": 6,
+   "vix": 15.72
+  }
+ },
+ "zeitraum": [
+  "2007-07-02",
+  "2026-09-08"
+ ]
+}
