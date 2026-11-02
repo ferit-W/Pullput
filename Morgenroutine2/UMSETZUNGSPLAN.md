@@ -12,6 +12,17 @@ Die Reihenfolge folgt einer einfachen Regel: erst das, was heute Daten verfälsc
 
 Jede neue Regel und jede Änderung an Ampel, Konsequenz-Zeile oder Schwellen wird **vorher** getestet: Die Regel wird festgelegt und eingecheckt, dann in `auswertung/` getrennt in zwei Zeiträumen geprüft und nur bei Verbesserung in beiden fest eingebaut. Alles andere kommt höchstens als klar gekennzeichneter Hinweis. Wo Zweifel bestehen, wird getestet, nicht geschätzt.
 
+## Grundsatz für Erklärungen (Info-Pop-ups)
+
+Jeder Baustein, ob neu oder überarbeitet, bekommt ein „i“-Pop-up mit vier festen Teilen:
+
+1. **Ziel:** welche Frage der Baustein beantwortet
+2. **Warum so:** welche Logik dahintersteckt, mit Bezug auf Lüddemann-Phasen, Handelsplan oder Testergebnis
+3. **So liest du es:** Schwellen, Farben und was daraus folgt
+4. **Beispiel:** ein echter Tag aus der Rückrechnung, etwa „19.03.2020: Breiten-Wende, danach +23 % in 20 Tagen“, oder ein typischer Fall
+
+Wo es Testergebnisse gibt, steht die ehrliche Bilanz dabei, also Trefferquote, Fehlsignale und ob der Baustein getestet und bestanden ist oder nur ein Hinweis. Die bestehenden Erklärtexte werden auf dieses Muster umgestellt.
+
 ## Phase 1 · Fehler, die Daten verfälschen
 
 - **J1** Bearbeiten überschreibt Stückzahl, FX und Risiko
@@ -41,6 +52,16 @@ Jede neue Regel und jede Änderung an Ampel, Konsequenz-Zeile oder Schwellen wir
 - **AM6** ruhigere Anzeige bei Wechseln
 - **AM7** Short-Seite mit Journal-Daten prüfen
 - **AM8** Rückrechnung als Prüfstand: Jede Regeländerung läuft vorher durch `auswertung/`.
+
+## Phase 2b · Das Handelssystem selbst prüfen (neu)
+
+Bisher wurde nur die *Ampel* getestet, also das Marktumfeld, und das am S&P 500. Ob dein eigentlicher Einstieg in Einzelaktien einen Vorteil hat, ist noch offen. Die Daten der 489 S&P-500-Aktien von 2016 bis 2026 liegen dafür bereit.
+
+- **S1 Setup-Test:** Einstieg im Rücksetzer einer Aktie in P3 an EMA20/50 nach mindestens 3 Korrekturkerzen, mit Stopp nach ATR. Wie oft und wie viel R pro Trade, getrennt nach Ampelzustand, Sektorphase und Voreinstieg? Damit bekommt T3 (Setup-Scanner) belegte Regeln.
+- **S2 Ausstieg:** feste Ziele (CRV) gegen Nachziehen des Stopps (EMA20, Swing-Tief, ATR-Trailing). Welche Variante passt zum Trendhandel?
+- **S3 Positionsgröße und Gesamtrisiko:** 0,25 % je Trade und maximal 10 Positionen. Welche Verlustserien und welcher Drawdown sind damit realistisch?
+
+Alle drei gelten mit dem Vorbehalt der Survivorship-Verzerrung (nur heutige Mitglieder) und werden nach dem Grundsatz oben getestet.
 
 ## Phase 3 · Archiv als Grundlage für die spätere Auswertung
 
@@ -103,6 +124,12 @@ Diese Punkte setze ich erst um, wenn du dich entschieden hast:
 2. **U6 Handy-Ansicht:** Dafür müsste der Server ins Heimnetz geöffnet werden, mit Passwortschutz. Ohne ausdrückliches Ja bleibt er nur auf dem eigenen Rechner erreichbar.
 3. **W4 Broker-Abgleich:** Du bist noch unsicher. Das wird nicht gebaut, bis du es willst. Falls ja, kommt der Altbestand auf eine eigene Liste „nicht abgleichen“.
 4. **Stillhalter-Journal:** Bitte `stillhalter_journal_v6.html` ins Repository laden, damit ich es genauso prüfen und anpassen kann.
+
+## Noch nicht vollständig geprüft
+
+- **Stillhalter-Journal:** die Datei fehlt im Repository.
+- **Trading Journal, HTML-Teil:** Formulare und Bedienelemente, rund 900 Zeilen. Das JavaScript ist vollständig geprüft, der HTML-Teil nur automatisch (alle IDs und Klick-Funktionen vorhanden).
+- **Echter Betrieb unter Windows mit Live-Daten:** Yahoo, CNN und Gemini sind aus der Prüfumgebung gesperrt. Live-Abrufe sind deshalb nur am Code geprüft, nicht im Lauf. Nach jeder Phase ist ein kurzer Probelauf bei dir nötig.
 
 ## Fortschritt
 
