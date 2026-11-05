@@ -83,3 +83,6 @@ tage 21, delta 0,8, breite 100 (Ref. 2.750), max_pos 4, ema 200, einsatz 0,85 %,
 ## Schritt 14 – Optionsketten SPXW 29.10.–05.11.2026 (05.11.2026)
 - Echte Geld-/Briefkurse gegen Modellpreise: Modelle überschätzen den Credit des ATM-10-Spreads um 0,6–1,8 Punkte (Markt-Mid 3,67).
 - Marktkonsistent kalibrierte Preise: Rendite der Strategie 2,7–5,1 % p. a. inkl. 4 % Cashzins. Details `audit/KETTEN_ERGEBNIS.md`.
+
+## Schritt 15 – 50 Einstiegsfilter (05.11.2026)
+- Liste und Bewertung vorab festgelegt (0e11fb9). Ergebnis: kein Filter bestanden, 0 von 50 mit rohem p < 5 %. Details `audit/ERGEBNIS_FILTER50.md`.

@@ -34,7 +34,8 @@
   "vx_lag": 0,
   "zyklus": null,
   "strike_modus": "delta",
-  "breite_fest": null
+  "breite_fest": null,
+  "extra_filter": null
  },
  "legacy": {
   "start": "2007-01-01",
@@ -70,7 +71,8 @@
   "vx_lag": 0,
   "zyklus": null,
   "strike_modus": "delta",
-  "breite_fest": null
+  "breite_fest": null,
+  "extra_filter": null
  },
  "varianten": {
   "A1 Original-Logik, Datenende-Fehler behoben": {
@@ -107,7 +109,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "A2 + Laufzeit = tatsächliche Restlaufzeit": {
    "start": "2007-01-01",
@@ -143,7 +146,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "A3 + Stress: 3 Kombinationen inkl. Verfallstag": {
    "start": "2007-01-01",
@@ -179,7 +183,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "A4 + Cashzins nur auf Kontowert": {
    "start": "2007-01-01",
@@ -215,7 +220,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "A5 + 5-Punkte-Strikeraster": {
    "start": "2007-01-01",
@@ -251,7 +257,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "A6 + VX1-Datumszuordnung korrigiert (korrigiertes Modell, synthetisch)": {
    "start": "2007-01-01",
@@ -287,7 +294,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "B1 V-W: Weeklys ab Einführung (Listing-Annahme 28 T)": {
    "start": "2007-01-01",
@@ -323,7 +331,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "B2 V-M: nur Monatsverfälle (AM)": {
    "start": "2007-01-01",
@@ -359,7 +368,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "C1 SPX ganze Kontrakte, V-W": {
    "start": "2007-01-01",
@@ -395,7 +405,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "C2 SPX ganze Kontrakte, V-M": {
    "start": "2007-01-01",
@@ -431,7 +442,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "C3 XSP ganze Kontrakte, V-W (XSP-Verfälle = SPX unterstellt)": {
    "start": "2007-01-01",
@@ -467,7 +479,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   },
   "C4 XSP ganze Kontrakte, V-M (XSP-Verfälle = SPX unterstellt)": {
    "start": "2007-01-01",
@@ -503,7 +516,8 @@
    "vx_lag": 0,
    "zyklus": null,
    "strike_modus": "delta",
-   "breite_fest": null
+   "breite_fest": null,
+   "extra_filter": null
   }
  },
  "szenarien_stufe_D": {

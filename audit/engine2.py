@@ -40,6 +40,7 @@ STANDARD = dict(
     zyklus=None,          # None | 'woche' (Mo–Do, Verfall Freitag derselben Woche) | 'monat' (Mo–Do nach Monatsverfall)
     strike_modus='delta', # 'delta' | 'atm' (K1 = Kurs auf Raster gerundet)
     breite_fest=None,     # feste Breite in Punkten des Produkts (None = 100*S/2750)
+    extra_filter=None,    # optional: bool-Array je Handelstag (True = Einstieg erlaubt), nur Info bis Vortag verwenden
 )
 
 LEGACY = dict(STANDARD, verfaelle='synthetisch', t_legacy=True, raster=0.0, ganze=False, stress='legacy',
@@ -272,6 +273,8 @@ def backtest(d, **kw):
         # Einstieg
         if not (CU[i - 1] >= ema[i - 1]):   # Filter immer auf SPX-Niveau (unabhängig vom Produkt)
             zaehl['filter_aus'] += 1
+        elif c['extra_filter'] is not None and not c['extra_filter'][i]:
+            zaehl['filter_extra'] = zaehl.get('filter_extra', 0) + 1
         elif len(pos) >= c['max_pos']:
             zaehl['voll'] += 1
         else:
