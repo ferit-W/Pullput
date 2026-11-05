@@ -79,3 +79,7 @@ tage 21, delta 0,8, breite 100 (Ref. 2.750), max_pos 4, ema 200, einsatz 0,85 %,
 - Regeln vorab: `audit/VORAB_REGELN_ATM.md`. 8 Varianten (Woche/Monat × SPX/XSP × 5/10 Pkt), ganze Kontrakte.
 - Ergebnis und Empfindlichkeiten: `audit/ERGEBNIS_ATM.md`. Monatszyklus mit niedrigem Drawdown (3,6–11,3 %),
   Rendite stark modellabhängig; Wochenzyklus kostenempfindlich und schlecht durch VX1 abgebildet. Keine Auswahl.
+
+## Schritt 14 – Optionsketten SPXW 29.10.–05.11.2026 (05.11.2026)
+- Echte Geld-/Briefkurse gegen Modellpreise: Modelle überschätzen den Credit des ATM-10-Spreads um 0,6–1,8 Punkte (Markt-Mid 3,67).
+- Marktkonsistent kalibrierte Preise: Rendite der Strategie 2,7–5,1 % p. a. inkl. 4 % Cashzins. Details `audit/KETTEN_ERGEBNIS.md`.
